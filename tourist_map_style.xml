@@ -82,19 +82,19 @@
   <Style name="poi">
     <Rule>
       <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <PointSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
+      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
     </Rule>
     <Rule>
       <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <PointSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
+      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
     </Rule>
     <Rule>
       <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <PointSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
+      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
     </Rule>
     <Rule>
       <Filter>[amenity] = 'parking'</Filter>
-      <PointSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
+      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
     </Rule>
   </Style>
 

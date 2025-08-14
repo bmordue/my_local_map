@@ -77,17 +77,31 @@ def convert_osm_to_shapefiles(osm_file):
     output_dir = Path("osm_data")
     output_dir.mkdir(exist_ok=True)
     
-    # OSM layers to extract
+    # First, let's see what layers are available in the OSM file
+    print("  Inspecting OSM file for available layers...")
+    try:
+        result = subprocess.run(["ogrinfo", osm_file], 
+                              capture_output=True, text=True, check=True)
+        print("  Available layers:")
+        for line in result.stdout.split('\n'):
+            if 'Layer name:' in line:
+                print(f"    {line.strip()}")
+    except subprocess.CalledProcessError as e:
+        print(f"  Warning: Could not inspect OSM file: {e}")
+    
+    # OSM layers to extract (these are the standard OSM layer names)
     layers = {
         'points': 'points of interest, towns, etc.',
-        'lines': 'roads, paths, boundaries',
+        'lines': 'roads, paths, boundaries', 
         'multilinestrings': 'complex routes',
         'multipolygons': 'land use, water bodies, buildings'
     }
     
+    created_files = []
+    
     for layer_name, description in layers.items():
         print(f"  Extracting {layer_name} ({description})...")
-        output_file = output_dir / layer_name
+        output_file = output_dir / f"{layer_name}.shp"
         
         cmd = [
             "ogr2ogr",
@@ -100,9 +114,33 @@ def convert_osm_to_shapefiles(osm_file):
         
         try:
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-            print(f"    ✓ Created {output_file}")
+            if output_file.exists():
+                print(f"    ✓ Created {output_file}")
+                created_files.append(layer_name)
+            else:
+                print(f"    ⚠ Command succeeded but file not found: {output_file}")
         except subprocess.CalledProcessError as e:
-            print(f"    ⚠ Warning: Could not create {layer_name}: {e.stderr}")
+            print(f"    ⚠ Warning: Could not create {layer_name}")
+            print(f"      Error: {e.stderr.strip() if e.stderr else 'Unknown error'}")
+    
+    print(f"  Successfully created {len(created_files)} shapefiles: {created_files}")
+    
+    # Verify files exist and show their info
+    for layer in created_files:
+        shp_file = output_dir / f"{layer}.shp"
+        if shp_file.exists():
+            try:
+                result = subprocess.run(["ogrinfo", "-so", str(shp_file)], 
+                                      capture_output=True, text=True, check=True)
+                # Count features
+                feature_count = 0
+                for line in result.stdout.split('\n'):
+                    if 'Feature Count:' in line:
+                        feature_count = line.split(':')[1].strip()
+                        break
+                print(f"    {layer}: {feature_count} features")
+            except:
+                print(f"    {layer}: file exists but couldn't get info")
     
     return str(output_dir)
 
@@ -193,19 +231,19 @@ def create_mapnik_style(data_dir):
   <Style name="poi">
     <Rule>
       <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <PointSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
+      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
     </Rule>
     <Rule>
       <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <PointSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
+      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
     </Rule>
     <Rule>
       <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <PointSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
+      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
     </Rule>
     <Rule>
       <Filter>[amenity] = 'parking'</Filter>
-      <PointSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
+      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
     </Rule>
   </Style>
 
@@ -345,3 +383,4 @@ def main():
 if __name__ == "__main__":
     import sys
     sys.exit(main())
+

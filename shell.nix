@@ -13,6 +13,9 @@ pkgs.mkShell {
     # Basic tools
     curl
     unzip
+
+    claude-code
+    gemini-cli
   ];
 
   shellHook = ''
