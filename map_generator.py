@@ -344,8 +344,16 @@ def render_map(style_file, bbox, output_file):
     mapnik.load_map(m, style_file)
     
     # Set bounding box
-    bbox_proj = mapnik.Box2d(bbox['west'], bbox['south'], bbox['east'], bbox['north'])
-    m.zoom_to_box(bbox_proj)
+    # The bounding box from the script is in WGS84 (lat/lon)
+    bbox_wgs84 = mapnik.Box2d(bbox['west'], bbox['south'], bbox['east'], bbox['north'])
+    
+    # The map projection is Mercator, so we need to transform the bbox
+    proj_wgs84 = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
+    proj_merc = mapnik.Projection(m.srs)
+    transform = mapnik.ProjectionTransform(proj_wgs84, proj_merc)
+    
+    bbox_merc = transform.forward(bbox_wgs84)
+    m.zoom_to_box(bbox_merc)
     
     # Render
     mapnik.render_to_file(m, output_file, 'png')
