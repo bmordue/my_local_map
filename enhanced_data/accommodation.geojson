@@ -1,0 +1,105 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.885,
+          57.315
+        ]
+      },
+      "properties": {
+        "id": 1,
+        "name": "The Corgarff Arms",
+        "type": "hotel",
+        "star_rating": 3,
+        "description": "Traditional Highland inn with modern amenities",
+        "capacity": 12,
+        "price_range": "\u00a3\u00a3",
+        "website": "www.corgarffarms.com",
+        "phone": "+44 1975 651234",
+        "amenities": "Restaurant, Bar, Wifi",
+        "pet_friendly": 1,
+        "wifi": 1,
+        "parking": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.879,
+          57.312
+        ]
+      },
+      "properties": {
+        "id": 2,
+        "name": "Lumsden Farm B&B",
+        "type": "bed_and_breakfast",
+        "star_rating": null,
+        "description": "Working farm offering comfortable rooms",
+        "capacity": 6,
+        "price_range": "\u00a3",
+        "website": "www.lumsdenfarm.co.uk",
+        "phone": "+44 1975 651567",
+        "amenities": "Breakfast, Farm tours",
+        "pet_friendly": 1,
+        "wifi": 1,
+        "parking": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.888,
+          57.308
+        ]
+      },
+      "properties": {
+        "id": 3,
+        "name": "Highland Holiday Cottage",
+        "type": "holiday_cottage",
+        "star_rating": null,
+        "description": "Self-catering cottage for families",
+        "capacity": 8,
+        "price_range": "\u00a3\u00a3",
+        "website": "www.highland-cottage.com",
+        "phone": "+44 1975 651890",
+        "amenities": "Kitchen, Garden, Parking",
+        "pet_friendly": 1,
+        "wifi": 1,
+        "parking": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.872,
+          57.325
+        ]
+      },
+      "properties": {
+        "id": 4,
+        "name": "Camping Barn",
+        "type": "hostel",
+        "star_rating": null,
+        "description": "Basic accommodation for walkers",
+        "capacity": 16,
+        "price_range": "\u00a3",
+        "website": null,
+        "phone": "+44 1975 651445",
+        "amenities": "Shared facilities, Drying room",
+        "pet_friendly": 0,
+        "wifi": 0,
+        "parking": 1
+      }
+    }
+  ]
+}

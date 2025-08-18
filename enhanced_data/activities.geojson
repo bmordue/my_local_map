@@ -1,0 +1,130 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.865,
+          57.335
+        ]
+      },
+      "properties": {
+        "id": 1,
+        "name": "Guided Castle Tour",
+        "type": "tourism",
+        "activity_type": "guided_tour",
+        "description": "Expert-led tour of Corgarff Castle",
+        "duration": "1.5 hours",
+        "difficulty": "Easy",
+        "booking_required": 1,
+        "seasonal": 1,
+        "equipment_provided": 1,
+        "cost": "\u00a38",
+        "min_age": 5,
+        "max_group_size": 20
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.85,
+          57.34
+        ]
+      },
+      "properties": {
+        "id": 2,
+        "name": "Forest Bushcraft",
+        "type": "outdoor",
+        "activity_type": "bushcraft",
+        "description": "Learn traditional woodland skills",
+        "duration": "Half day",
+        "difficulty": "Moderate",
+        "booking_required": 1,
+        "seasonal": 1,
+        "equipment_provided": 1,
+        "cost": "\u00a345",
+        "min_age": 8,
+        "max_group_size": 12
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.87,
+          57.32
+        ]
+      },
+      "properties": {
+        "id": 3,
+        "name": "River Don Kayaking",
+        "type": "water",
+        "activity_type": "kayaking",
+        "description": "Gentle paddling downstream",
+        "duration": "3 hours",
+        "difficulty": "Easy",
+        "booking_required": 1,
+        "seasonal": 1,
+        "equipment_provided": 1,
+        "cost": "\u00a335",
+        "min_age": 12,
+        "max_group_size": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.875,
+          57.33
+        ]
+      },
+      "properties": {
+        "id": 4,
+        "name": "Highland Photography",
+        "type": "tourism",
+        "activity_type": "photography",
+        "description": "Capture stunning Highland scenery",
+        "duration": "4 hours",
+        "difficulty": "Easy",
+        "booking_required": 1,
+        "seasonal": 0,
+        "equipment_provided": 1,
+        "cost": "\u00a325",
+        "min_age": 10,
+        "max_group_size": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.879,
+          57.312
+        ]
+      },
+      "properties": {
+        "id": 5,
+        "name": "Farm Experience",
+        "type": "agritourism",
+        "activity_type": "farm_visit",
+        "description": "Meet animals and learn about farming",
+        "duration": "2 hours",
+        "difficulty": "Easy",
+        "booking_required": 1,
+        "seasonal": 0,
+        "equipment_provided": 0,
+        "cost": "\u00a312",
+        "min_age": 3,
+        "max_group_size": 15
+      }
+    }
+  ]
+}

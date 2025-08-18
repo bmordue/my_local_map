@@ -49,10 +49,11 @@ def download_osm_data(bbox, output_file):
     overpass_query = f"""
     [out:xml][timeout:300];
     (
+        node({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
         way({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
         relation({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
-        <;
     );
+    (._;>;);
     out meta;
     """
     
@@ -69,6 +70,58 @@ def download_osm_data(bbox, output_file):
     else:
         print(f"Failed to download OSM data: {response.status_code}")
         return False
+
+def create_sample_tourist_data(bbox):
+    """Create sample tourist data for Lumsden area to demonstrate enhanced map features"""
+    print("Creating sample tourist data to demonstrate enhanced features...")
+    
+    output_dir = Path("enhanced_data")
+    output_dir.mkdir(exist_ok=True)
+    
+    # Sample tourist points of interest for Lumsden area
+    sample_pois = [
+        {"name": "Lumsden Village Hall", "type": "tourism", "subtype": "information", "lat": 57.3167, "lon": -2.8833},
+        {"name": "The Corgarff Arms", "type": "amenity", "subtype": "pub", "lat": 57.315, "lon": -2.885},
+        {"name": "Lumsden Parish Church", "type": "amenity", "subtype": "place_of_worship", "lat": 57.318, "lon": -2.881},
+        {"name": "Corgarff Castle", "type": "historic", "subtype": "castle", "lat": 57.335, "lon": -2.865},
+        {"name": "River Don", "type": "waterway", "subtype": "river", "lat": 57.320, "lon": -2.870},
+        {"name": "Lumsden Farm Shop", "type": "shop", "subtype": "farm", "lat": 57.314, "lon": -2.888},
+        {"name": "Bellabeg Forest", "type": "natural", "subtype": "wood", "lat": 57.340, "lon": -2.850},
+        {"name": "A944 Primary Route", "type": "highway", "subtype": "primary", "lat": 57.317, "lon": -2.883},
+        {"name": "Lumsden Viewpoint", "type": "tourism", "subtype": "viewpoint", "lat": 57.330, "lon": -2.875},
+        {"name": "Local B&B", "type": "tourism", "subtype": "guest_house", "lat": 57.312, "lon": -2.879},
+        {"name": "Village Post Office", "type": "amenity", "subtype": "post_office", "lat": 57.316, "lon": -2.884},
+        {"name": "Lumsden Primary School", "type": "amenity", "subtype": "school", "lat": 57.319, "lon": -2.882},
+        {"name": "Golf Course", "type": "leisure", "subtype": "golf_course", "lat": 57.325, "lon": -2.890},
+        {"name": "Walking Trail Start", "type": "highway", "subtype": "footway", "lat": 57.322, "lon": -2.878},
+        {"name": "Local Parking", "type": "amenity", "subtype": "parking", "lat": 57.317, "lon": -2.883},
+    ]
+    
+    # Create enhanced CSV files for different feature types
+    with open(output_dir / "points_enhanced.csv", "w") as f:
+        f.write("name,type,subtype,lat,lon\n")
+        for poi in sample_pois:
+            f.write(f"{poi['name']},{poi['type']},{poi['subtype']},{poi['lat']},{poi['lon']}\n")
+    
+    # Sample land use areas
+    sample_landuse = [
+        {"name": "Residential Area", "type": "landuse", "subtype": "residential"},
+        {"name": "Agricultural Land", "type": "landuse", "subtype": "farmland"},
+        {"name": "Forest Area", "type": "natural", "subtype": "wood"},
+        {"name": "Grassland", "type": "natural", "subtype": "grassland"},
+        {"name": "Commercial Zone", "type": "landuse", "subtype": "commercial"},
+    ]
+    
+    with open(output_dir / "landuse_enhanced.csv", "w") as f:
+        f.write("name,type,subtype\n")
+        for area in sample_landuse:
+            f.write(f"{area['name']},{area['type']},{area['subtype']}\n")
+    
+    print(f"✓ Created enhanced sample data in {output_dir}/")
+    print(f"  - {len(sample_pois)} points of interest")
+    print(f"  - {len(sample_landuse)} land use categories")
+    
+    return str(output_dir)
 
 def convert_osm_to_shapefiles(osm_file):
     """Convert OSM data to shapefiles using ogr2ogr - no database needed!"""
@@ -145,37 +198,100 @@ def convert_osm_to_shapefiles(osm_file):
     return str(output_dir)
 
 def create_mapnik_style(data_dir):
-    """Create a tourist-focused Mapnik XML style"""
+    """Create a comprehensive tourist-focused Mapnik XML style with rich content"""
     
     style_xml = f'''<?xml version="1.0" encoding="utf-8"?>
 <Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
      background-color="#f8f8f8">
 
-  <!-- LAND USE / BACKGROUND -->
+  <!-- ENHANCED LAND USE / BACKGROUND -->
   <Style name="landuse">
+    <!-- Natural Features -->
     <Rule>
       <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
       <PolygonSymbolizer fill="#d4e6b7" fill-opacity="0.8"/>
     </Rule>
     <Rule>
+      <Filter>[natural] = 'heath' or [natural] = 'scrub'</Filter>
+      <PolygonSymbolizer fill="#e8dab2" fill-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[natural] = 'grassland' or [natural] = 'fell' or [natural] = 'moor'</Filter>
+      <PolygonSymbolizer fill="#e6f2d4" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[natural] = 'wetland' or [natural] = 'marsh'</Filter>
+      <PolygonSymbolizer fill="#b8e6d1" fill-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[natural] = 'scree' or [natural] = 'bare_rock'</Filter>
+      <PolygonSymbolizer fill="#d1d5db" fill-opacity="0.6"/>
+    </Rule>
+    
+    <!-- Agricultural Land -->
+    <Rule>
       <Filter>[landuse] = 'farmland' or [landuse] = 'grass'</Filter>
       <PolygonSymbolizer fill="#e8f5d4" fill-opacity="0.6"/>
     </Rule>
     <Rule>
+      <Filter>[landuse] = 'meadow' or [landuse] = 'orchard'</Filter>
+      <PolygonSymbolizer fill="#daf2c0" fill-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[landuse] = 'vineyard'</Filter>
+      <PolygonSymbolizer fill="#c8e6c9" fill-opacity="0.7"/>
+    </Rule>
+    
+    <!-- Urban Areas -->
+    <Rule>
+      <Filter>[landuse] = 'residential'</Filter>
+      <PolygonSymbolizer fill="#f5f5f5" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[landuse] = 'commercial' or [landuse] = 'retail'</Filter>
+      <PolygonSymbolizer fill="#ffe0e6" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[landuse] = 'industrial'</Filter>
+      <PolygonSymbolizer fill="#e8e8e8" fill-opacity="0.6"/>
+    </Rule>
+    
+    <!-- Recreation Areas -->
+    <Rule>
       <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
       <PolygonSymbolizer fill="#c8facc" fill-opacity="0.8"/>
     </Rule>
+    <Rule>
+      <Filter>[leisure] = 'golf_course'</Filter>
+      <PolygonSymbolizer fill="#b3e6b8" fill-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'sports_centre' or [leisure] = 'pitch'</Filter>
+      <PolygonSymbolizer fill="#c8f7c5" fill-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[tourism] = 'camp_site' or [tourism] = 'caravan_site'</Filter>
+      <PolygonSymbolizer fill="#e8f5e8" fill-opacity="0.6"/>
+    </Rule>
   </Style>
 
-  <!-- WATER -->
+  <!-- ENHANCED WATER FEATURES -->
   <Style name="water">
     <Rule>
       <Filter>[natural] = 'water' or [waterway] = 'river' or [waterway] = 'stream'</Filter>
       <PolygonSymbolizer fill="#7dd3c0" fill-opacity="0.8"/>
     </Rule>
+    <Rule>
+      <Filter>[waterway] = 'canal' or [waterway] = 'drain'</Filter>
+      <LineSymbolizer stroke="#5dade2" stroke-width="2" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[natural] = 'spring'</Filter>
+      <MarkersSymbolizer fill="#5dade2" width="4" height="4" opacity="0.9"/>
+    </Rule>
   </Style>
   
-  <!-- ROADS - Tourist-friendly styling -->
+  <!-- ENHANCED ROADS - Tourist-friendly styling -->
   <Style name="roads_major">
     <Rule>
       <Filter>[highway] = 'motorway'</Filter>
@@ -201,9 +317,13 @@ def create_mapnik_style(data_dir):
       <Filter>[highway] = 'residential'</Filter>
       <LineSymbolizer stroke="#ecf0f1" stroke-width="1.5" stroke-opacity="0.8"/>
     </Rule>
+    <Rule>
+      <Filter>[highway] = 'service' or [highway] = 'track'</Filter>
+      <LineSymbolizer stroke="#bdc3c7" stroke-width="1" stroke-opacity="0.7"/>
+    </Rule>
   </Style>
   
-  <!-- PATHS & TOURIST ROUTES - Emphasized for planning -->
+  <!-- ENHANCED PATHS & TRANSPORTATION -->
   <Style name="paths">
     <Rule>
       <Filter>[highway] = 'footway' or [highway] = 'path'</Filter>
@@ -214,40 +334,203 @@ def create_mapnik_style(data_dir):
       <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
     </Rule>
     <Rule>
-      <Filter>[route] = 'hiking'</Filter>
+      <Filter>[route] = 'hiking' or [highway] = 'bridleway'</Filter>
       <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[railway] = 'rail'</Filter>
+      <LineSymbolizer stroke="#34495e" stroke-width="2" stroke-opacity="0.9"/>
+      <LineSymbolizer stroke="#ffffff" stroke-width="1" stroke-dasharray="8,4" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[railway] = 'disused' or [railway] = 'abandoned'</Filter>
+      <LineSymbolizer stroke="#95a5a6" stroke-width="1.5" stroke-dasharray="6,6" stroke-opacity="0.6"/>
     </Rule>
   </Style>
   
-  <!-- BUILDINGS -->
+  <!-- ENHANCED BUILDINGS -->
   <Style name="buildings">
+    <Rule>
+      <Filter>[building] = 'church' or [amenity] = 'place_of_worship'</Filter>
+      <PolygonSymbolizer fill="#d4b8e6" fill-opacity="0.8"/>
+      <LineSymbolizer stroke="#8e44ad" stroke-width="1" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[building] = 'school' or [amenity] = 'school'</Filter>
+      <PolygonSymbolizer fill="#f9e79f" fill-opacity="0.8"/>
+      <LineSymbolizer stroke="#f4d03f" stroke-width="1" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[building] = 'hospital' or [amenity] = 'hospital'</Filter>
+      <PolygonSymbolizer fill="#fadbd8" fill-opacity="0.8"/>
+      <LineSymbolizer stroke="#e74c3c" stroke-width="1" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[building] = 'public' or [amenity] = 'townhall'</Filter>
+      <PolygonSymbolizer fill="#d5e8f7" fill-opacity="0.8"/>
+      <LineSymbolizer stroke="#3498db" stroke-width="1" stroke-opacity="0.9"/>
+    </Rule>
     <Rule>
       <PolygonSymbolizer fill="#bdc3c7" fill-opacity="0.6"/>
       <LineSymbolizer stroke="#7f8c8d" stroke-width="0.5" stroke-opacity="0.8"/>
     </Rule>
   </Style>
   
-  <!-- POINTS OF INTEREST - Tourist focused -->
+  <!-- COMPREHENSIVE POINTS OF INTEREST -->
   <Style name="poi">
+    <!-- Food & Drink -->
     <Rule>
-      <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
+      <Filter>[amenity] = 'restaurant'</Filter>
+      <MarkersSymbolizer fill="#e74c3c" width="10" height="10" opacity="0.9"/>
     </Rule>
     <Rule>
-      <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
+      <Filter>[amenity] = 'pub' or [amenity] = 'bar'</Filter>
+      <MarkersSymbolizer fill="#c0392b" width="9" height="9" opacity="0.9"/>
     </Rule>
     <Rule>
-      <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
+      <Filter>[amenity] = 'cafe' or [amenity] = 'fast_food'</Filter>
+      <MarkersSymbolizer fill="#f39c12" width="8" height="8" opacity="0.9"/>
     </Rule>
+    
+    <!-- Accommodation -->
+    <Rule>
+      <Filter>[tourism] = 'hotel'</Filter>
+      <MarkersSymbolizer fill="#3498db" width="12" height="12" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[tourism] = 'guest_house' or [tourism] = 'bed_and_breakfast'</Filter>
+      <MarkersSymbolizer fill="#5dade2" width="10" height="10" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[tourism] = 'hostel' or [tourism] = 'motel'</Filter>
+      <MarkersSymbolizer fill="#85c1e9" width="9" height="9" opacity="0.9"/>
+    </Rule>
+    
+    <!-- Attractions & Tourism -->
+    <Rule>
+      <Filter>[tourism] = 'attraction'</Filter>
+      <MarkersSymbolizer fill="#f39c12" width="12" height="12" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[tourism] = 'viewpoint'</Filter>
+      <MarkersSymbolizer fill="#d68910" width="10" height="10" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[tourism] = 'museum' or [tourism] = 'gallery'</Filter>
+      <MarkersSymbolizer fill="#8e44ad" width="10" height="10" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[historic] = 'castle' or [historic] = 'ruins'</Filter>
+      <MarkersSymbolizer fill="#7d3c98" width="12" height="12" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[historic] = 'monument' or [historic] = 'memorial'</Filter>
+      <MarkersSymbolizer fill="#a569bd" width="9" height="9" opacity="0.9"/>
+    </Rule>
+    
+    <!-- Services -->
     <Rule>
       <Filter>[amenity] = 'parking'</Filter>
-      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
+      <MarkersSymbolizer fill="#95a5a6" width="7" height="7" opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'fuel' or [amenity] = 'charging_station'</Filter>
+      <MarkersSymbolizer fill="#e67e22" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'bank' or [amenity] = 'atm'</Filter>
+      <MarkersSymbolizer fill="#27ae60" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'post_office'</Filter>
+      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'pharmacy'</Filter>
+      <MarkersSymbolizer fill="#2ecc71" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'hospital' or [amenity] = 'clinic'</Filter>
+      <MarkersSymbolizer fill="#e74c3c" width="10" height="10" opacity="0.9"/>
+    </Rule>
+    
+    <!-- Education & Public -->
+    <Rule>
+      <Filter>[amenity] = 'school' or [amenity] = 'university'</Filter>
+      <MarkersSymbolizer fill="#f1c40f" width="9" height="9" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'library'</Filter>
+      <MarkersSymbolizer fill="#9b59b6" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'police'</Filter>
+      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'fire_station'</Filter>
+      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    
+    <!-- Recreation -->
+    <Rule>
+      <Filter>[leisure] = 'sports_centre' or [leisure] = 'fitness_centre'</Filter>
+      <MarkersSymbolizer fill="#1abc9c" width="9" height="9" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'golf_course'</Filter>
+      <MarkersSymbolizer fill="#27ae60" width="10" height="10" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'playground'</Filter>
+      <MarkersSymbolizer fill="#f39c12" width="7" height="7" opacity="0.8"/>
+    </Rule>
+    
+    <!-- Transport -->
+    <Rule>
+      <Filter>[railway] = 'station'</Filter>
+      <MarkersSymbolizer fill="#34495e" width="10" height="10" opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[highway] = 'bus_stop'</Filter>
+      <MarkersSymbolizer fill="#3498db" width="6" height="6" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[aeroway] = 'aerodrome'</Filter>
+      <MarkersSymbolizer fill="#2c3e50" width="12" height="12" opacity="0.9"/>
+    </Rule>
+    
+    <!-- Shopping -->
+    <Rule>
+      <Filter>[shop] = 'supermarket' or [shop] = 'convenience'</Filter>
+      <MarkersSymbolizer fill="#e67e22" width="8" height="8" opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[amenity] = 'marketplace'</Filter>
+      <MarkersSymbolizer fill="#d68910" width="9" height="9" opacity="0.8"/>
     </Rule>
   </Style>
 
-  <!-- LAYER DEFINITIONS -->
+  <!-- PLACE LABELS for better navigation -->
+  <Style name="place_labels">
+    <Rule>
+      <Filter>[place] = 'city' or [place] = 'town'</Filter>
+      <TextSymbolizer face-name="DejaVu Sans Bold" size="14" fill="#2c3e50" 
+                      placement="point" dx="0" dy="-15">[name]</TextSymbolizer>
+    </Rule>
+    <Rule>
+      <Filter>[place] = 'village' or [place] = 'hamlet'</Filter>
+      <TextSymbolizer face-name="DejaVu Sans" size="11" fill="#34495e" 
+                      placement="point" dx="0" dy="-12">[name]</TextSymbolizer>
+    </Rule>
+    <Rule>
+      <Filter>[place] = 'farm' or [place] = 'locality'</Filter>
+      <TextSymbolizer face-name="DejaVu Sans" size="9" fill="#7f8c8d" 
+                      placement="point" dx="0" dy="-10">[name]</TextSymbolizer>
+    </Rule>
+  </Style>
+
+  <!-- LAYER DEFINITIONS with enhanced ordering -->
   <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
     <StyleName>landuse</StyleName>
     <Datasource>
@@ -303,6 +586,14 @@ def create_mapnik_style(data_dir):
       <Parameter name="file">{data_dir}/points</Parameter>
     </Datasource>
   </Layer>
+  
+  <Layer name="place_labels" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>place_labels</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">{data_dir}/points</Parameter>
+    </Datasource>
+  </Layer>
 
 </Map>'''
     
@@ -339,7 +630,7 @@ def render_map(style_file, bbox, output_file):
     return True
 
 def main():
-    print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print("🗺️  Enhanced Lumsden Tourist Map Generator")
     print("=" * 50)
     
     # Calculate area
@@ -348,6 +639,10 @@ def main():
     print(f"📏 Area: {BBOX_WIDTH_KM}×{BBOX_HEIGHT_KM}km")
     print(f"🎯 Scale: 1:{MAP_SCALE:,}")
     print()
+    
+    # Create sample enhanced data to demonstrate features
+    print("🎨 Creating enhanced sample data...")
+    enhanced_data_dir = create_sample_tourist_data(bbox)
     
     # Download OSM data
     osm_file = "lumsden_area.osm"
@@ -362,19 +657,21 @@ def main():
     print("\n🔄 Converting OSM data to shapefiles...")
     data_dir = convert_osm_to_shapefiles(osm_file)
     
-    # Create map style
-    print("\n🎨 Creating tourist map style...")
+    # Create enhanced map style
+    print("\n🎨 Creating comprehensive tourist map style...")
     style_file = create_mapnik_style(data_dir)
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
-    output_file = f"lumsden_tourist_map_A3.png"
+    print(f"\n🖨️  Rendering enhanced A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
+    output_file = f"lumsden_enhanced_tourist_map_A3.png"
     
     if render_map(style_file, bbox, output_file):
         print("\n🎉 SUCCESS!")
-        print(f"📄 Tourist map: {output_file}")
+        print(f"📄 Enhanced tourist map: {output_file}")
         print(f"📐 Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
-        print(f"🎯 Perfect for planning day trips around Lumsden!")
+        print(f"🎯 Features comprehensive tourist information for Lumsden!")
+        print(f"📋 Enhancement plan: MAP_ENHANCEMENT_PLAN.md")
+        print(f"📊 Sample data: {enhanced_data_dir}/")
         return 0
     else:
         print("\n❌ Map rendering failed")
