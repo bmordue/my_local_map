@@ -350,9 +350,11 @@ def render_map(style_file, bbox, output_file):
     # The map projection is Mercator, so we need to transform the bbox
     proj_wgs84 = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
     proj_merc = mapnik.Projection(m.srs)
-    transform = mapnik.ProjectionTransform(proj_wgs84, proj_merc)
     
-    bbox_merc = transform.forward(bbox_wgs84)
+    # Transform bbox corners from WGS84 to Mercator
+    sw_corner = proj_merc.forward(mapnik.Coord(bbox_wgs84.minx, bbox_wgs84.miny))
+    ne_corner = proj_merc.forward(mapnik.Coord(bbox_wgs84.maxx, bbox_wgs84.maxy))
+    bbox_merc = mapnik.Box2d(sw_corner.x, sw_corner.y, ne_corner.x, ne_corner.y)
     m.zoom_to_box(bbox_merc)
     
     # Render
