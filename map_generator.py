@@ -129,12 +129,12 @@ def convert_osm_to_shapefiles(osm_file):
             if result.stderr:
                 print(f"      ogr2ogr stderr:\n{result.stderr}")
             if output_file.exists():
-                print(f"    ✓ Created {output_file}")
+                print(f"    Created {output_file}")
                 created_files.append(layer_name)
             else:
-                print(f"    ⚠ Command succeeded but file not found: {output_file}")
+                print(f"    Command succeeded but file not found: {output_file}")
         except subprocess.CalledProcessError as e:
-            print(f"    ⚠ Error creating {layer_name}:")
+            print(f"    Error creating {layer_name}:")
             print(f"      Command: {' '.join(cmd)}")
             print(f"      Stderr: {e.stderr.strip()}")
             print(f"      Stdout: {e.stdout.strip()}")
@@ -201,54 +201,53 @@ def render_map(style_file, bbox, output_file):
     mapnik.render_to_file(m, output_file, 'png')
     
     file_size_mb = os.path.getsize(output_file) / 1024 / 1024
-    print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
+    print(f"Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
 def main():
-    print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print("Lightweight Lumsden Tourist Map Generator")
     print("=" * 50)
     
     # Calculate area
     bbox = calculate_bbox(LUMSDEN_LAT, LUMSDEN_LON, BBOX_WIDTH_KM, BBOX_HEIGHT_KM)
-    print(f"📍 Center: {LUMSDEN_LAT}, {LUMSDEN_LON}")
-    print(f"📏 Area: {BBOX_WIDTH_KM}×{BBOX_HEIGHT_KM}km")
-    print(f"🎯 Scale: 1:{MAP_SCALE:,}")
+    print(f"Centre: {LUMSDEN_LAT}, {LUMSDEN_LON}")
+    print(f"Area: {BBOX_WIDTH_KM}×{BBOX_HEIGHT_KM}km")
+    print(f"Scale: 1:{MAP_SCALE:,}")
     print()
     
     # Download OSM data
     osm_file = "lumsden_area.osm"
     if not Path(osm_file).exists():
-        print("📡 Downloading OpenStreetMap data...")
+        print("Downloading OpenStreetMap data...")
         if not download_osm_data(bbox, osm_file):
             return 1
     else:
-        print(f"📁 Using existing OSM data: {osm_file}")
+        print(f"Using existing OSM data: {osm_file}")
     
     # Convert to shapefiles (no database!)
-    print("\n🔄 Converting OSM data to shapefiles...")
+    print("\nConverting OSM data to shapefiles...")
     data_dir = convert_osm_to_shapefiles(osm_file)
     
     # Create map style
-    print("\n🎨 Creating tourist map style...")
+    print("\nCreating tourist map style...")
     style_file = create_mapnik_style(data_dir)
     if not style_file:
         return 1
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
+    print(f"\nRendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
     output_file = f"lumsden_tourist_map_A3.png"
     
     if render_map(style_file, bbox, output_file):
-        print("\n🎉 SUCCESS!")
-        print(f"📄 Tourist map: {output_file}")
-        print(f"📐 Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
-        print(f"🎯 Perfect for planning day trips around Lumsden!")
+        print("\nSUCCESS!")
+        print(f"Tourist map: {output_file}")
+        print(f"Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
+        print(f"Perfect for planning day trips around Lumsden!")
         return 0
     else:
-        print("\n❌ Map rendering failed")
+        print("\nMap rendering failed")
         return 1
 
 if __name__ == "__main__":
     import sys
     sys.exit(main())
-
