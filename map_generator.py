@@ -161,172 +161,12 @@ def convert_osm_to_shapefiles(osm_file):
     return str(output_dir)
 
 def create_mapnik_style(data_dir):
-    """Create a tourist-focused Mapnik XML style"""
-    
-    style_xml = f'''<?xml version="1.0" encoding="utf-8"?>
-<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
-     background-color="#f8f8f8">
-
-  <!-- LAND USE / BACKGROUND -->
-  <Style name="landuse">
-    <Rule>
-      <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
-      <PolygonSymbolizer fill="#d4e6b7" fill-opacity="0.8"/>
-    </Rule>
-    <Rule>
-      <Filter>[landuse] = 'farmland' or [landuse] = 'grass'</Filter>
-      <PolygonSymbolizer fill="#e8f5d4" fill-opacity="0.6"/>
-    </Rule>
-    <Rule>
-      <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
-      <PolygonSymbolizer fill="#c8facc" fill-opacity="0.8"/>
-    </Rule>
-  </Style>
-
-  <!-- WATER -->
-  <Style name="water">
-    <Rule>
-      <Filter>[natural] = 'water' or [waterway] = 'river' or [waterway] = 'stream'</Filter>
-      <PolygonSymbolizer fill="#7dd3c0" fill-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <!-- ROADS - Tourist-friendly styling -->
-  <Style name="roads_major">
-    <Rule>
-      <Filter>[highway] = 'motorway'</Filter>
-      <LineSymbolizer stroke="#e74c3c" stroke-width="4" stroke-opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'trunk' or [highway] = 'primary'</Filter>
-      <LineSymbolizer stroke="#f39c12" stroke-width="3" stroke-opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'secondary'</Filter>
-      <LineSymbolizer stroke="#f1c40f" stroke-width="2.5" stroke-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <Style name="roads_minor">
-    <Rule>
-      <Filter>[highway] = 'tertiary' or [highway] = 'unclassified'</Filter>
-      <LineSymbolizer stroke="#ffffff" stroke-width="2" stroke-opacity="0.9"/>
-      <LineSymbolizer stroke="#34495e" stroke-width="1.5" stroke-opacity="0.7"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'residential'</Filter>
-      <LineSymbolizer stroke="#ecf0f1" stroke-width="1.5" stroke-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <!-- PATHS & TOURIST ROUTES - Emphasized for planning -->
-  <Style name="paths">
-    <Rule>
-      <Filter>[highway] = 'footway' or [highway] = 'path'</Filter>
-      <LineSymbolizer stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="3,2" stroke-opacity="0.8"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'cycleway'</Filter>
-      <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[route] = 'hiking'</Filter>
-      <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
-    </Rule>
-  </Style>
-  
-  <!-- BUILDINGS -->
-  <Style name="buildings">
-    <Rule>
-      <PolygonSymbolizer fill="#bdc3c7" fill-opacity="0.6"/>
-      <LineSymbolizer stroke="#7f8c8d" stroke-width="0.5" stroke-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <!-- POINTS OF INTEREST - Tourist focused -->
-  <Style name="poi">
-    <Rule>
-      <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[amenity] = 'parking'</Filter>
-      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
-    </Rule>
-  </Style>
-
-  <!-- LAYER DEFINITIONS -->
-  <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>landuse</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="water" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>water</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="buildings" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>buildings</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="roads_major" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>roads_major</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="roads_minor" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>roads_minor</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="paths" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>paths</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="poi" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>poi</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/points.shp</Parameter>
-    </Datasource>
-  </Layer>
-
-</Map>'''
-    
+    """Use a Mapnik XML style file."""
     style_file = "tourist_map_style.xml"
-    with open(style_file, 'w') as f:
-        f.write(style_xml)
-    
-    print(f"Created tourist-focused map style: {style_file}")
+    if not os.path.exists(style_file):
+        print(f"Error: style file not found: {style_file}")
+        return None
+    print(f"Using external map style: {style_file}")
     return style_file
 
 def render_map(style_file, bbox, output_file):
@@ -391,6 +231,8 @@ def main():
     # Create map style
     print("\n🎨 Creating tourist map style...")
     style_file = create_mapnik_style(data_dir)
+    if not style_file:
+        return 1
     
     # Render map
     print(f"\n🖨️  Rendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
