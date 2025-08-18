@@ -21,8 +21,20 @@
   <!-- WATER -->
   <Style name="water">
     <Rule>
-      <Filter>[natural] = 'water' or [waterway] = 'river' or [waterway] = 'stream'</Filter>
+      <Filter>[natural] = 'water'</Filter>
       <PolygonSymbolizer fill="#7dd3c0" fill-opacity="0.8"/>
+    </Rule>
+  </Style>
+  
+  <!-- WATERWAYS (rivers, streams) -->
+  <Style name="waterways">
+    <Rule>
+      <Filter>[waterway] = 'river'</Filter>
+      <LineSymbolizer stroke="#7dd3c0" stroke-width="3" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[waterway] = 'stream'</Filter>
+      <LineSymbolizer stroke="#7dd3c0" stroke-width="1.5" stroke-opacity="0.8"/>
     </Rule>
   </Style>
   
@@ -64,10 +76,6 @@
       <Filter>[highway] = 'cycleway'</Filter>
       <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
     </Rule>
-    <Rule>
-      <Filter>[route] = 'hiking'</Filter>
-      <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
-    </Rule>
   </Style>
   
   <!-- BUILDINGS -->
@@ -81,19 +89,11 @@
   <!-- POINTS OF INTEREST - Tourist focused -->
   <Style name="poi">
     <Rule>
-      <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
+      <Filter>[place] = 'village' or [place] = 'hamlet' or [place] = 'town'</Filter>
+      <MarkersSymbolizer fill="#2c3e50" width="10" height="10" opacity="0.9"/>
     </Rule>
     <Rule>
-      <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[amenity] = 'parking'</Filter>
+      <Filter>[man_made] = 'tower' or [man_made] = 'mast'</Filter>
       <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
     </Rule>
   </Style>
@@ -112,6 +112,14 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">osm_data/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="waterways" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>waterways</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">osm_data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   

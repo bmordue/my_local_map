@@ -169,37 +169,93 @@ def create_mapnik_style(data_dir):
     print(f"Using external map style: {style_file}")
     return style_file
 
-def render_map(style_file, bbox, output_file):
-    """Render the map using Mapnik"""
+
+def _add_osm_layers_to_map(m, data_dir):
+    """Add shapefile layers created from OSM into the map using styles from the XML."""
+    import mapnik
+    data_dir = str(Path(data_dir).resolve())
+
+    # Ensure we use styles already defined by the XML
+    required_styles = ["landuse", "water", "buildings", "roads_major", "roads_minor", "paths", "poi"]
+    # Check if styles exist in the map
+    style_names = []
+    for style_name in required_styles:
+        try:
+            m.find_style(style_name)
+            style_names.append(style_name)
+        except RuntimeError:
+            print(f"Warning: Style '{style_name}' not found in map XML")
+    
+    print(f"Found {len(style_names)} styles in map: {style_names}")
+
+    # Note: We'll append to existing layers rather than clearing them
+    # since m.layers is append-only in this Mapnik version
+
+    wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+
+    # Polygons
+    poly = os.path.join(data_dir, "multipolygons.shp")
+    if os.path.exists(poly):
+        lyr = mapnik.Layer("osm_multipolygons", wgs84)
+        lyr.datasource = mapnik.Shapefile(file=poly)
+        for sty in ("landuse", "water", "buildings"):
+            if sty in style_names:
+                lyr.styles.append(sty)
+        m.layers.append(lyr)
+    else:
+        print(f"Note: missing shapefile: {poly}")
+
+    # Lines
+    lines = os.path.join(data_dir, "lines.shp")
+    if os.path.exists(lines):
+        lyr = mapnik.Layer("osm_lines", wgs84)
+        lyr.datasource = mapnik.Shapefile(file=lines)
+        for sty in ("roads_major", "roads_minor", "paths"):
+            if sty in style_names:
+                lyr.styles.append(sty)
+        m.layers.append(lyr)
+    else:
+        print(f"Note: missing shapefile: {lines}")
+
+    # Points
+    pts = os.path.join(data_dir, "points.shp")
+    if os.path.exists(pts):
+        lyr = mapnik.Layer("osm_points", wgs84)
+        lyr.datasource = mapnik.Shapefile(file=pts)
+        if "poi" in style_names:
+            lyr.styles.append("poi")
+        m.layers.append(lyr)
+    else:
+        print(f"Note: missing shapefile: {pts}")
+
+    print(f"Added {len(m.layers)} OSM layers to map from {data_dir}")
+
+
+def render_map(style_file, bbox, output_file, data_dir):
     try:
         import mapnik
     except ImportError:
         print("Error: python-mapnik not available. Install with: pip install mapnik")
         return False
-    
+
     print("Rendering A3 tourist map...")
-    
-    # Create map
+
     m = mapnik.Map(A3_WIDTH_PX, A3_HEIGHT_PX)
     mapnik.load_map(m, style_file)
-    
-    # Set bounding box
-    # The bounding box from the script is in WGS84 (lat/lon)
+
+    # Add the converted OSM shapefiles explicitly so paths are correct
+    if data_dir:
+        _add_osm_layers_to_map(m, data_dir)
+
+    # Correctly reproject bbox from WGS84 to map SRS
     bbox_wgs84 = mapnik.Box2d(bbox['west'], bbox['south'], bbox['east'], bbox['north'])
-    
-    # The map projection is Mercator, so we need to transform the bbox
     proj_wgs84 = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
-    proj_merc = mapnik.Projection(m.srs)
-    
-    # Transform bbox corners from WGS84 to Mercator
-    sw_corner = proj_merc.forward(mapnik.Coord(bbox_wgs84.minx, bbox_wgs84.miny))
-    ne_corner = proj_merc.forward(mapnik.Coord(bbox_wgs84.maxx, bbox_wgs84.maxy))
-    bbox_merc = mapnik.Box2d(sw_corner.x, sw_corner.y, ne_corner.x, ne_corner.y)
-    m.zoom_to_box(bbox_merc)
-    
-    # Render
+    proj_map = mapnik.Projection(m.srs)
+    tx = mapnik.ProjTransform(proj_wgs84, proj_map)
+    bbox_proj = tx.forward(bbox_wgs84)
+    m.zoom_to_box(bbox_proj)
+
     mapnik.render_to_file(m, output_file, 'png')
-    
     file_size_mb = os.path.getsize(output_file) / 1024 / 1024
     print(f"Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
@@ -238,7 +294,7 @@ def main():
     print(f"\nRendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
     output_file = f"lumsden_tourist_map_A3.png"
     
-    if render_map(style_file, bbox, output_file):
+    if render_map(style_file, bbox, output_file, data_dir=data_dir):
         print("\nSUCCESS!")
         print(f"Tourist map: {output_file}")
         print(f"Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
