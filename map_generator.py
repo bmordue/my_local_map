@@ -72,6 +72,58 @@ def download_osm_data(bbox, output_file):
         print(f"Failed to download OSM data: {response.status_code}")
         return False
 
+def create_sample_tourist_data(bbox):
+    """Create sample tourist data for Lumsden area to demonstrate enhanced map features"""
+    print("Creating sample tourist data to demonstrate enhanced features...")
+    
+    output_dir = Path("enhanced_data")
+    output_dir.mkdir(exist_ok=True)
+    
+    # Sample tourist points of interest for Lumsden area
+    sample_pois = [
+        {"name": "Lumsden Village Hall", "type": "tourism", "subtype": "information", "lat": 57.3167, "lon": -2.8833},
+        {"name": "The Corgarff Arms", "type": "amenity", "subtype": "pub", "lat": 57.315, "lon": -2.885},
+        {"name": "Lumsden Parish Church", "type": "amenity", "subtype": "place_of_worship", "lat": 57.318, "lon": -2.881},
+        {"name": "Corgarff Castle", "type": "historic", "subtype": "castle", "lat": 57.335, "lon": -2.865},
+        {"name": "River Don", "type": "waterway", "subtype": "river", "lat": 57.320, "lon": -2.870},
+        {"name": "Lumsden Farm Shop", "type": "shop", "subtype": "farm", "lat": 57.314, "lon": -2.888},
+        {"name": "Bellabeg Forest", "type": "natural", "subtype": "wood", "lat": 57.340, "lon": -2.850},
+        {"name": "A944 Primary Route", "type": "highway", "subtype": "primary", "lat": 57.317, "lon": -2.883},
+        {"name": "Lumsden Viewpoint", "type": "tourism", "subtype": "viewpoint", "lat": 57.330, "lon": -2.875},
+        {"name": "Local B&B", "type": "tourism", "subtype": "guest_house", "lat": 57.312, "lon": -2.879},
+        {"name": "Village Post Office", "type": "amenity", "subtype": "post_office", "lat": 57.316, "lon": -2.884},
+        {"name": "Lumsden Primary School", "type": "amenity", "subtype": "school", "lat": 57.319, "lon": -2.882},
+        {"name": "Golf Course", "type": "leisure", "subtype": "golf_course", "lat": 57.325, "lon": -2.890},
+        {"name": "Walking Trail Start", "type": "highway", "subtype": "footway", "lat": 57.322, "lon": -2.878},
+        {"name": "Local Parking", "type": "amenity", "subtype": "parking", "lat": 57.317, "lon": -2.883},
+    ]
+    
+    # Create enhanced CSV files for different feature types
+    with open(output_dir / "points_enhanced.csv", "w") as f:
+        f.write("name,type,subtype,lat,lon\n")
+        for poi in sample_pois:
+            f.write(f"{poi['name']},{poi['type']},{poi['subtype']},{poi['lat']},{poi['lon']}\n")
+    
+    # Sample land use areas
+    sample_landuse = [
+        {"name": "Residential Area", "type": "landuse", "subtype": "residential"},
+        {"name": "Agricultural Land", "type": "landuse", "subtype": "farmland"},
+        {"name": "Forest Area", "type": "natural", "subtype": "wood"},
+        {"name": "Grassland", "type": "natural", "subtype": "grassland"},
+        {"name": "Commercial Zone", "type": "landuse", "subtype": "commercial"},
+    ]
+    
+    with open(output_dir / "landuse_enhanced.csv", "w") as f:
+        f.write("name,type,subtype\n")
+        for area in sample_landuse:
+            f.write(f"{area['name']},{area['type']},{area['subtype']}\n")
+    
+    print(f"✓ Created enhanced sample data in {output_dir}/")
+    print(f"  - {len(sample_pois)} points of interest")
+    print(f"  - {len(sample_landuse)} land use categories")
+    
+    return str(output_dir)
+
 def convert_osm_to_shapefiles(osm_file):
     """Convert OSM data to shapefiles using ogr2ogr - no database needed!"""
     print("Converting OSM data to shapefiles (no database required)...")
@@ -126,7 +178,7 @@ def convert_osm_to_shapefiles(osm_file):
         try:
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
             if output_file.exists():
-                print(f"    ✓ Created {output_file}")
+                print(f"    Created {output_file}")
                 created_files.append(layer_name)
             else:
                 print(f"    ⚠ Command succeeded but file not found: {output_file}")
@@ -135,7 +187,7 @@ def convert_osm_to_shapefiles(osm_file):
                 if result.stderr:
                     print(f"      ogr2ogr stderr:\n{result.stderr}")
         except subprocess.CalledProcessError as e:
-            print(f"    ⚠ Error creating {layer_name}:")
+            print(f"    Error creating {layer_name}:")
             print(f"      Command: {' '.join(cmd)}")
             print(f"      Stderr: {e.stderr.strip()}")
             print(f"      Stdout: {e.stdout.strip()}")
@@ -162,250 +214,153 @@ def convert_osm_to_shapefiles(osm_file):
     return str(output_dir)
 
 def create_mapnik_style(data_dir):
-    """Create a tourist-focused Mapnik XML style"""
-    
-    style_xml = f'''<?xml version="1.0" encoding="utf-8"?>
-<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
-     background-color="#f8f8f8">
-
-  <!-- LAND USE / BACKGROUND -->
-  <Style name="landuse">
-    <Rule>
-      <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
-      <PolygonSymbolizer fill="#d4e6b7" fill-opacity="0.8"/>
-    </Rule>
-    <Rule>
-      <Filter>[landuse] = 'farmland' or [landuse] = 'grass'</Filter>
-      <PolygonSymbolizer fill="#e8f5d4" fill-opacity="0.6"/>
-    </Rule>
-    <Rule>
-      <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
-      <PolygonSymbolizer fill="#c8facc" fill-opacity="0.8"/>
-    </Rule>
-  </Style>
-
-  <!-- WATER -->
-  <Style name="water">
-    <Rule>
-      <Filter>[natural] = 'water' or [waterway] = 'river' or [waterway] = 'stream'</Filter>
-      <PolygonSymbolizer fill="#7dd3c0" fill-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <!-- ROADS - Tourist-friendly styling -->
-  <Style name="roads_major">
-    <Rule>
-      <Filter>[highway] = 'motorway'</Filter>
-      <LineSymbolizer stroke="#e74c3c" stroke-width="4" stroke-opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'trunk' or [highway] = 'primary'</Filter>
-      <LineSymbolizer stroke="#f39c12" stroke-width="3" stroke-opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'secondary'</Filter>
-      <LineSymbolizer stroke="#f1c40f" stroke-width="2.5" stroke-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <Style name="roads_minor">
-    <Rule>
-      <Filter>[highway] = 'tertiary' or [highway] = 'unclassified'</Filter>
-      <LineSymbolizer stroke="#ffffff" stroke-width="2" stroke-opacity="0.9"/>
-      <LineSymbolizer stroke="#34495e" stroke-width="1.5" stroke-opacity="0.7"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'residential'</Filter>
-      <LineSymbolizer stroke="#ecf0f1" stroke-width="1.5" stroke-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <!-- PATHS & TOURIST ROUTES - Emphasized for planning -->
-  <Style name="paths">
-    <Rule>
-      <Filter>[highway] = 'footway' or [highway] = 'path'</Filter>
-      <LineSymbolizer stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="3,2" stroke-opacity="0.8"/>
-    </Rule>
-    <Rule>
-      <Filter>[highway] = 'cycleway'</Filter>
-      <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[route] = 'hiking'</Filter>
-      <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
-    </Rule>
-  </Style>
-  
-  <!-- BUILDINGS -->
-  <Style name="buildings">
-    <Rule>
-      <PolygonSymbolizer fill="#bdc3c7" fill-opacity="0.6"/>
-      <LineSymbolizer stroke="#7f8c8d" stroke-width="0.5" stroke-opacity="0.8"/>
-    </Rule>
-  </Style>
-  
-  <!-- POINTS OF INTEREST - Tourist focused -->
-  <Style name="poi">
-    <Rule>
-      <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[amenity] = 'parking'</Filter>
-      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
-    </Rule>
-  </Style>
-
-  <!-- LAYER DEFINITIONS -->
-  <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>landuse</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="water" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>water</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="buildings" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>buildings</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="roads_major" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>roads_major</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="roads_minor" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>roads_minor</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="paths" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>paths</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <Layer name="poi" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>poi</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/points.shp</Parameter>
-    </Datasource>
-  </Layer>
-
-</Map>'''
-    
+    """Use a Mapnik XML style file."""
     style_file = "tourist_map_style.xml"
-    with open(style_file, 'w') as f:
-        f.write(style_xml)
-    
-    print(f"Created tourist-focused map style: {style_file}")
+    if not os.path.exists(style_file):
+        print(f"Error: style file not found: {style_file}")
+        return None
+    print(f"Using external map style: {style_file}")
     return style_file
 
-def render_map(style_file, bbox, output_file):
-    """Render the map using Mapnik"""
+
+def _add_osm_layers_to_map(m, data_dir):
+    """Add shapefile layers created from OSM into the map using styles from the XML."""
+    import mapnik
+    data_dir = str(Path(data_dir).resolve())
+
+    # Ensure we use styles already defined by the XML
+    required_styles = ["landuse", "water", "buildings", "roads_major", "roads_minor", "paths", "poi"]
+    # Check if styles exist in the map
+    style_names = []
+    for style_name in required_styles:
+        try:
+            m.find_style(style_name)
+            style_names.append(style_name)
+        except RuntimeError:
+            print(f"Warning: Style '{style_name}' not found in map XML")
+    
+    print(f"Found {len(style_names)} styles in map: {style_names}")
+
+    # Note: We'll append to existing layers rather than clearing them
+    # since m.layers is append-only in this Mapnik version
+
+    wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+
+    # Polygons
+    poly = os.path.join(data_dir, "multipolygons.shp")
+    if os.path.exists(poly):
+        lyr = mapnik.Layer("osm_multipolygons", wgs84)
+        lyr.datasource = mapnik.Shapefile(file=poly)
+        for sty in ("landuse", "water", "buildings"):
+            if sty in style_names:
+                lyr.styles.append(sty)
+        m.layers.append(lyr)
+    else:
+        print(f"Note: missing shapefile: {poly}")
+
+    # Lines
+    lines = os.path.join(data_dir, "lines.shp")
+    if os.path.exists(lines):
+        lyr = mapnik.Layer("osm_lines", wgs84)
+        lyr.datasource = mapnik.Shapefile(file=lines)
+        for sty in ("roads_major", "roads_minor", "paths"):
+            if sty in style_names:
+                lyr.styles.append(sty)
+        m.layers.append(lyr)
+    else:
+        print(f"Note: missing shapefile: {lines}")
+
+    # Points
+    pts = os.path.join(data_dir, "points.shp")
+    if os.path.exists(pts):
+        lyr = mapnik.Layer("osm_points", wgs84)
+        lyr.datasource = mapnik.Shapefile(file=pts)
+        if "poi" in style_names:
+            lyr.styles.append("poi")
+        m.layers.append(lyr)
+    else:
+        print(f"Note: missing shapefile: {pts}")
+
+    print(f"Added {len(m.layers)} OSM layers to map from {data_dir}")
+
+
+def render_map(style_file, bbox, output_file, data_dir):
     try:
         import mapnik
     except ImportError:
         print("Error: python-mapnik not available. Install with: pip install mapnik")
         return False
-    
+
     print("Rendering A3 tourist map...")
-    
-    # Create map
+
     m = mapnik.Map(A3_WIDTH_PX, A3_HEIGHT_PX)
     mapnik.load_map(m, style_file)
-    
-    # Set bounding box
-    # The bounding box from the script is in WGS84 (lat/lon)
+
+    # Add the converted OSM shapefiles explicitly so paths are correct
+    if data_dir:
+        _add_osm_layers_to_map(m, data_dir)
+
+    # Correctly reproject bbox from WGS84 to map SRS
     bbox_wgs84 = mapnik.Box2d(bbox['west'], bbox['south'], bbox['east'], bbox['north'])
-    
-    # The map projection is Mercator, so we need to transform the bbox
     proj_wgs84 = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
-    proj_merc = mapnik.Projection(m.srs)
-    transform = mapnik.ProjectionTransform(proj_wgs84, proj_merc)
-    
-    bbox_merc = transform.forward(bbox_wgs84)
-    m.zoom_to_box(bbox_merc)
-    
-    # Render
+    proj_map = mapnik.Projection(m.srs)
+    tx = mapnik.ProjTransform(proj_wgs84, proj_map)
+    bbox_proj = tx.forward(bbox_wgs84)
+    m.zoom_to_box(bbox_proj)
+
     mapnik.render_to_file(m, output_file, 'png')
-    
     file_size_mb = os.path.getsize(output_file) / 1024 / 1024
-    print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
+    print(f"Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
 def main():
-    print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print("Lumsden Tourist Map Generator")
     print("=" * 50)
     
     # Calculate area
     bbox = calculate_bbox(LUMSDEN_LAT, LUMSDEN_LON, BBOX_WIDTH_KM, BBOX_HEIGHT_KM)
-    print(f"📍 Center: {LUMSDEN_LAT}, {LUMSDEN_LON}")
-    print(f"📏 Area: {BBOX_WIDTH_KM}×{BBOX_HEIGHT_KM}km")
-    print(f"🎯 Scale: 1:{MAP_SCALE:,}")
+    print(f"Centre: {LUMSDEN_LAT}, {LUMSDEN_LON}")
+    print(f"Area: {BBOX_WIDTH_KM}×{BBOX_HEIGHT_KM}km")
+    print(f"Scale: 1:{MAP_SCALE:,}")
     print()
+    
+    # Create sample enhanced data to demonstrate features
+    print("🎨 Creating enhanced sample data...")
+    enhanced_data_dir = create_sample_tourist_data(bbox)
     
     # Download OSM data
     osm_file = "lumsden_area.osm"
     if not Path(osm_file).exists():
-        print("📡 Downloading OpenStreetMap data...")
+        print("Downloading OpenStreetMap data...")
         if not download_osm_data(bbox, osm_file):
             return 1
     else:
-        print(f"📁 Using existing OSM data: {osm_file}")
+        print(f"Using existing OSM data: {osm_file}")
     
     # Convert to shapefiles (no database!)
-    print("\n🔄 Converting OSM data to shapefiles...")
+    print("\nConverting OSM data to shapefiles...")
     data_dir = convert_osm_to_shapefiles(osm_file)
     
     # Create map style
-    print("\n🎨 Creating tourist map style...")
+    print("\nCreating tourist map style...")
     style_file = create_mapnik_style(data_dir)
+    if not style_file:
+        return 1
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
+    print(f"\nRendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
     output_file = f"lumsden_tourist_map_A3.png"
     
-    if render_map(style_file, bbox, output_file):
-        print("\n🎉 SUCCESS!")
-        print(f"📄 Tourist map: {output_file}")
-        print(f"📐 Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
-        print(f"🎯 Perfect for planning day trips around Lumsden!")
+    if render_map(style_file, bbox, output_file, data_dir=data_dir):
+        print("\nSUCCESS!")
+        print(f"Tourist map: {output_file}")
+        print(f"Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
+        print(f"Perfect for planning day trips around Lumsden!")
         return 0
     else:
-        print("\n❌ Map rendering failed")
+        print("\nMap rendering failed")
         return 1
 
 if __name__ == "__main__":
     import sys
     sys.exit(main())
-
