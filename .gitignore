@@ -4,3 +4,21 @@ __pycache__/
 data/*.png
 data/*.osm
 !data/lumsden_area.osm
+
+# Testing artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

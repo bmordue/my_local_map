@@ -93,7 +93,7 @@
     <StyleName>landuse</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/multipolygons.shp</Parameter>
+      <Parameter name="file">/test/data/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -101,7 +101,7 @@
     <StyleName>water</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/multipolygons.shp</Parameter>
+      <Parameter name="file">/test/data/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -109,7 +109,7 @@
     <StyleName>buildings</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/multipolygons.shp</Parameter>
+      <Parameter name="file">/test/data/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -117,7 +117,7 @@
     <StyleName>roads_major</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/lines.shp</Parameter>
+      <Parameter name="file">/test/data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -125,7 +125,7 @@
     <StyleName>roads_minor</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/lines.shp</Parameter>
+      <Parameter name="file">/test/data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -133,7 +133,7 @@
     <StyleName>paths</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/lines.shp</Parameter>
+      <Parameter name="file">/test/data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -141,7 +141,7 @@
     <StyleName>poi</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">None/points.shp</Parameter>
+      <Parameter name="file">/test/data/points.shp</Parameter>
     </Datasource>
   </Layer>
 
