@@ -49,10 +49,12 @@ def download_osm_data(bbox, output_file):
     overpass_query = f"""
     [out:xml][timeout:300];
     (
-        way({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
-        relation({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
-        <;
+      node({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
+      way({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
+      relation({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
+      <;
     );
+    (._;>;);
     out meta;
     """
     
@@ -77,6 +79,14 @@ def convert_osm_to_shapefiles(osm_file):
     output_dir = Path("osm_data")
     output_dir.mkdir(exist_ok=True)
     
+    # Check ogr2ogr version
+    try:
+        result = subprocess.run(["ogr2ogr", "--version"], capture_output=True, text=True, check=True)
+        print(f"  Using GDAL/OGR version: {result.stdout.strip()}")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"  Error: Could not find or run 'ogr2ogr'. Is GDAL installed and in your PATH?")
+        return None
+
     # First, let's see what layers are available in the OSM file
     print("  Inspecting OSM file for available layers...")
     try:
@@ -107,6 +117,7 @@ def convert_osm_to_shapefiles(osm_file):
             "ogr2ogr",
             "-f", "ESRI Shapefile",
             "-overwrite",
+            "--debug", "on",
             str(output_file),
             osm_file,
             layer_name
@@ -119,10 +130,16 @@ def convert_osm_to_shapefiles(osm_file):
                 created_files.append(layer_name)
             else:
                 print(f"    ⚠ Command succeeded but file not found: {output_file}")
+                if result.stdout:
+                    print(f"      ogr2ogr stdout:\n{result.stdout}")
+                if result.stderr:
+                    print(f"      ogr2ogr stderr:\n{result.stderr}")
         except subprocess.CalledProcessError as e:
-            print(f"    ⚠ Warning: Could not create {layer_name}")
-            print(f"      Error: {e.stderr.strip() if e.stderr else 'Unknown error'}")
-    
+            print(f"    ⚠ Error creating {layer_name}:")
+            print(f"      Command: {' '.join(cmd)}")
+            print(f"      Stderr: {e.stderr.strip()}")
+            print(f"      Stdout: {e.stdout.strip()}")
+
     print(f"  Successfully created {len(created_files)} shapefiles: {created_files}")
     
     # Verify files exist and show their info
@@ -252,7 +269,7 @@ def create_mapnik_style(data_dir):
     <StyleName>landuse</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons</Parameter>
+      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -260,7 +277,7 @@ def create_mapnik_style(data_dir):
     <StyleName>water</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons</Parameter>
+      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -268,7 +285,7 @@ def create_mapnik_style(data_dir):
     <StyleName>buildings</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/multipolygons</Parameter>
+      <Parameter name="file">{data_dir}/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -276,7 +293,7 @@ def create_mapnik_style(data_dir):
     <StyleName>roads_major</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines</Parameter>
+      <Parameter name="file">{data_dir}/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -284,7 +301,7 @@ def create_mapnik_style(data_dir):
     <StyleName>roads_minor</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines</Parameter>
+      <Parameter name="file">{data_dir}/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -292,7 +309,7 @@ def create_mapnik_style(data_dir):
     <StyleName>paths</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/lines</Parameter>
+      <Parameter name="file">{data_dir}/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -300,7 +317,7 @@ def create_mapnik_style(data_dir):
     <StyleName>poi</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">{data_dir}/points</Parameter>
+      <Parameter name="file">{data_dir}/points.shp</Parameter>
     </Datasource>
   </Layer>
 
@@ -328,8 +345,16 @@ def render_map(style_file, bbox, output_file):
     mapnik.load_map(m, style_file)
     
     # Set bounding box
-    bbox_proj = mapnik.Box2d(bbox['west'], bbox['south'], bbox['east'], bbox['north'])
-    m.zoom_to_box(bbox_proj)
+    # The bounding box from the script is in WGS84 (lat/lon)
+    bbox_wgs84 = mapnik.Box2d(bbox['west'], bbox['south'], bbox['east'], bbox['north'])
+    
+    # The map projection is Mercator, so we need to transform the bbox
+    proj_wgs84 = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
+    proj_merc = mapnik.Projection(m.srs)
+    transform = mapnik.ProjectionTransform(proj_wgs84, proj_merc)
+    
+    bbox_merc = transform.forward(bbox_wgs84)
+    m.zoom_to_box(bbox_merc)
     
     # Render
     mapnik.render_to_file(m, output_file, 'png')
