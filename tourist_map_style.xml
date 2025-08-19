@@ -117,7 +117,7 @@
     <StyleName>roads_major</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/test/data/lines.shp</Parameter>
+      <Parameter name="file">${DATA_DIR}/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
