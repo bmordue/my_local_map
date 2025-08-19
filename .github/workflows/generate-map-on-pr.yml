@@ -1,0 +1,137 @@
+name: Generate Tourist Map on PR
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  generate-map:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gdal-bin python3-dev
+        # Install mapnik development libraries
+        sudo apt-get install -y libmapnik-dev mapnik-utils python3-mapnik
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Install requests for the main application
+        pip install requests
+    
+    - name: Verify installations
+      run: |
+        # Check GDAL/OGR
+        ogr2ogr --version
+        # Check Python imports
+        python -c "import requests; print('✓ requests available')"
+        python -c "import mapnik; print('✓ mapnik available')"
+        python -c "import os; print('✓ Python standard library available')"
+    
+    - name: Create sample OSM data for offline operation
+      run: |
+        mkdir -p data
+        cat > data/lumsden_area.osm << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <osm version="0.6" generator="Overpass API">
+        <note>Sample data for CI map generation. Real OSM data would be downloaded in production.</note>
+
+        <!-- Sample nodes around Lumsden coordinates -->
+        <node id="1" lat="57.31" lon="-2.89" />
+        <node id="2" lat="57.32" lon="-2.89" />
+        <node id="3" lat="57.32" lon="-2.87" />
+        <node id="4" lat="57.31" lon="-2.87" />
+        <node id="5" lat="57.315" lon="-2.88" />
+        <node id="6" lat="57.318" lon="-2.88" />
+
+        <!-- Sample residential area -->
+        <way id="100">
+          <nd ref="1"/>
+          <nd ref="2"/>
+          <nd ref="3"/>
+          <nd ref="4"/>
+          <nd ref="1"/>
+          <tag k="landuse" v="residential"/>
+          <tag k="name" v="Sample Residential Area"/>
+        </way>
+
+        <!-- Sample road -->
+        <way id="101">
+          <nd ref="5"/>
+          <nd ref="6"/>
+          <tag k="highway" v="primary"/>
+          <tag k="name" v="Sample Road"/>
+        </way>
+
+        <!-- Sample multipolygon for testing -->
+        <relation id="200">
+          <member type="way" ref="100" role="outer"/>
+          <tag k="type" v="multipolygon"/>
+          <tag k="landuse" v="residential"/>
+          <tag k="name" v="Sample Lumsden Area"/>
+        </relation>
+
+        </osm>
+        EOF
+    
+    - name: Generate Tourist Map
+      run: |
+        python3 map_generator.py
+        
+    - name: Verify map generation
+      run: |
+        echo "=== Generated Files ==="
+        ls -la data/
+        echo ""
+        echo "=== Map File Details ==="
+        if [ -f "data/lumsden_tourist_map_A3.png" ]; then
+          file data/lumsden_tourist_map_A3.png
+          ls -lh data/lumsden_tourist_map_A3.png
+          echo "✓ Map successfully generated!"
+        else
+          echo "❌ Map file not found!"
+          exit 1
+        fi
+        
+    - name: Upload Generated Map as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lumsden-tourist-map-pr-${{ github.event.number }}
+        path: |
+          data/lumsden_tourist_map_A3.png
+          styles/tourist_map_style.xml
+        retention-days: 30
+        
+    - name: Add Map Generation Summary
+      run: |
+        echo "## 🗺️ Tourist Map Generated" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The Lumsden tourist map has been successfully generated for this PR." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📁 Generated Files:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Map Image**: \`lumsden_tourist_map_A3.png\` (A3 format, 3507×4960 pixels)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Style Definition**: \`tourist_map_style.xml\` (Mapnik styling)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 Map Specifications:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Print Size**: A3 (297×420mm at 300 DPI)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Coverage Area**: 8×12km around Lumsden, Aberdeenshire" >> $GITHUB_STEP_SUMMARY
+        echo "- **Scale**: 1:25,000 (ideal for tourist planning)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 💾 Download Instructions:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Go to the **Actions** tab of this PR" >> $GITHUB_STEP_SUMMARY
+        echo "2. Click on this workflow run" >> $GITHUB_STEP_SUMMARY
+        echo "3. Download the **lumsden-tourist-map-pr-${{ github.event.number }}** artifact" >> $GITHUB_STEP_SUMMARY
+        echo "4. Extract and view the PNG file to see the visual changes" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "_Perfect for reviewing the visual impact of your map generation changes!_ 🎯" >> $GITHUB_STEP_SUMMARY
