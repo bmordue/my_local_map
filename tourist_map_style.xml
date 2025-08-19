@@ -141,7 +141,7 @@
     <StyleName>poi</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/test/data/points.shp</Parameter>
+      <Parameter name="file">${DATA_DIR}/points.shp</Parameter>
     </Datasource>
   </Layer>
 
