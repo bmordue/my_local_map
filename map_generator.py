@@ -125,15 +125,15 @@ def convert_osm_to_shapefiles(osm_file):
         
         try:
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-            if result.stdout:
-                print(f"      ogr2ogr stdout:\n{result.stdout}")
-            if result.stderr:
-                print(f"      ogr2ogr stderr:\n{result.stderr}")
             if output_file.exists():
                 print(f"    ✓ Created {output_file}")
                 created_files.append(layer_name)
             else:
                 print(f"    ⚠ Command succeeded but file not found: {output_file}")
+                if result.stdout:
+                    print(f"      ogr2ogr stdout:\n{result.stdout}")
+                if result.stderr:
+                    print(f"      ogr2ogr stderr:\n{result.stderr}")
         except subprocess.CalledProcessError as e:
             print(f"    ⚠ Error creating {layer_name}:")
             print(f"      Command: {' '.join(cmd)}")
