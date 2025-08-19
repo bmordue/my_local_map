@@ -55,8 +55,8 @@ def convert_osm_to_shapefiles(osm_file):
     """Convert OSM data to shapefiles using ogr2ogr - no database needed!"""
     print("Converting OSM data to shapefiles (no database required)...")
     
-    output_dir = Path("osm_data")
-    output_dir.mkdir(exist_ok=True)
+    output_dir = Path("data/osm_data")
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     # Check ogr2ogr version
     try:

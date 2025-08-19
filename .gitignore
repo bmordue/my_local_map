@@ -1,5 +1,5 @@
-osm_data/
+data/osm_data/
 __pycache__/
 *.pyc
-*png
-*.osm
+data/*png
+data/*.osm

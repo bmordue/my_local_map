@@ -73,27 +73,29 @@ def main():
     print()
     
     # Download OSM data
-    osm_file = "lumsden_area.osm"
-    if not Path(osm_file).exists():
+    data_dir = Path("data")
+    data_dir.mkdir(exist_ok=True)
+    osm_file = data_dir / "lumsden_area.osm"
+    if not osm_file.exists():
         print("📡 Downloading OpenStreetMap data...")
-        if not download_osm_data(bbox, osm_file):
+        if not download_osm_data(bbox, str(osm_file)):
             return 1
     else:
         print(f"📁 Using existing OSM data: {osm_file}")
     
     # Convert to shapefiles (no database!)
     print("\n🔄 Converting OSM data to shapefiles...")
-    data_dir = convert_osm_to_shapefiles(osm_file)
+    osm_data_dir = convert_osm_to_shapefiles(str(osm_file))
     
     # Create map style
     print("\n🎨 Creating tourist map style...")
-    style_file = create_mapnik_style(data_dir)
+    style_file = create_mapnik_style(osm_data_dir)
     
     # Render map
     print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")
-    output_file = f"lumsden_tourist_map_A3.png"
+    output_file = data_dir / "lumsden_tourist_map_A3.png"
     
-    if render_map(style_file, bbox, output_file, width_px, height_px):
+    if render_map(style_file, bbox, str(output_file), width_px, height_px):
         print("\n🎉 SUCCESS!")
         print(f"📄 Tourist map: {output_file}")
         print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
