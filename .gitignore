@@ -1,3 +1,22 @@
 data/
 __pycache__/
 *.pyc
+
+# Testing artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+styles/tourist_map_style.xml

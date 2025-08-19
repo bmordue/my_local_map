@@ -1,0 +1,1 @@
+"""Tests for the Lumsden Tourist Map Generator"""
