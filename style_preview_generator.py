@@ -149,7 +149,9 @@ def main():
         ("blue_theme", "Blue Theme"),
         ("warm_theme", "Warm Theme"), 
         ("monochrome_theme", "Monochrome"),
-        ("delicate_theme", "Delicate Purple")
+        ("delicate_theme", "Delicate Purple"),
+        ("high_contrast", "High Contrast"),
+        ("minimalist", "Minimalist")
     ]
     
     print(f"🎨 Available styles: {len(styles)}")
