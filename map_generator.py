@@ -52,6 +52,7 @@ def download_osm_data(bbox, output_file):
       node({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
       way({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
       relation({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
+      <;
     );
     (._;>;);
     out meta;
