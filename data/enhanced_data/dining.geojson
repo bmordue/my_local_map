@@ -100,6 +100,106 @@
         "wheelchair_accessible": 1,
         "local_produce": 1
       }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.884,
+          57.316
+        ]
+      },
+      "properties": {
+        "id": 5,
+        "name": "The Village Tearoom",
+        "type": "cafe",
+        "cuisine": "British",
+        "description": "Homemade cakes and light lunches",
+        "price_range": "\u00a3\u00a3",
+        "opening_hours": "9:00-17:00 (Closed Mon)",
+        "website": "www.villagetearoom.co.uk",
+        "phone": "+44 1975 651333",
+        "outdoor_seating": 1,
+        "takeaway": 1,
+        "wheelchair_accessible": 1,
+        "local_produce": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.882,
+          57.318
+        ]
+      },
+      "properties": {
+        "id": 6,
+        "name": "Lumsden Fish & Chips",
+        "type": "restaurant",
+        "cuisine": "Fish & Chips",
+        "description": "Fresh local fish, takeaway available",
+        "price_range": "\u00a3",
+        "opening_hours": "17:00-21:00 (Closed Sun)",
+        "website": null,
+        "phone": "+44 1975 651777",
+        "outdoor_seating": 0,
+        "takeaway": 1,
+        "wheelchair_accessible": 1,
+        "local_produce": 0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.885,
+          57.315
+        ]
+      },
+      "properties": {
+        "id": 7,
+        "name": "The Highland Restaurant",
+        "type": "restaurant",
+        "cuisine": "Scottish",
+        "description": "Fine dining with local produce",
+        "price_range": "\u00a3\u00a3\u00a3",
+        "opening_hours": "18:00-22:00 (Closed Mon-Tue)",
+        "website": "www.highland-restaurant.com",
+        "phone": "+44 1975 651234",
+        "outdoor_seating": 1,
+        "takeaway": 0,
+        "wheelchair_accessible": 1,
+        "local_produce": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.883,
+          57.317
+        ]
+      },
+      "properties": {
+        "id": 8,
+        "name": "Mobile Coffee Van",
+        "type": "cafe",
+        "cuisine": "Coffee",
+        "description": "Morning coffee and pastries",
+        "price_range": "\u00a3",
+        "opening_hours": "7:00-11:00 (Weekdays)",
+        "website": null,
+        "phone": "+44 7700 123456",
+        "outdoor_seating": 0,
+        "takeaway": 1,
+        "wheelchair_accessible": 1,
+        "local_produce": 1
+      }
     }
   ]
 }

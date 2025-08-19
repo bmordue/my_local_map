@@ -1,6 +1,6 @@
-osm_data/
-enhanced_data/
+data/osm_data/
 __pycache__/
 *.pyc
-*png
-*.osm
+data/*.png
+data/*.osm
+!data/lumsden_area.osm
