@@ -109,7 +109,7 @@
     <StyleName>buildings</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/test/data/multipolygons.shp</Parameter>
+      <Parameter name="file">${DATA_DIR}/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
