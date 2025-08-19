@@ -2,6 +2,25 @@
 <Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
      background-color="#f8f8f8">
 
+  <!-- FONT DEFINITIONS for text labels -->
+  <FontSet name="regular">
+    <Font face-name="DejaVu Sans Book"/>
+    <Font face-name="Liberation Sans Regular"/>
+    <Font face-name="Bitstream Vera Sans"/>
+  </FontSet>
+  
+  <FontSet name="bold">
+    <Font face-name="DejaVu Sans Bold"/>
+    <Font face-name="Liberation Sans Bold"/>
+    <Font face-name="Bitstream Vera Sans Bold"/>
+  </FontSet>
+  
+  <FontSet name="italic">
+    <Font face-name="DejaVu Sans Oblique"/>
+    <Font face-name="Liberation Sans Italic"/>
+    <Font face-name="Bitstream Vera Sans Oblique"/>
+  </FontSet>
+
   <!-- LAND USE / BACKGROUND -->
   <Style name="landuse">
     <Rule>
@@ -31,14 +50,20 @@
     <Rule>
       <Filter>[waterway] = 'river'</Filter>
       <LineSymbolizer stroke="#7dd3c0" stroke-width="3" stroke-opacity="0.9"/>
+      <TextSymbolizer size="12" fill="#2c3e50" fontset-name="regular" placement="line" 
+                      dy="-8" halo-fill="#ffffff" halo-radius="1.5" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
     <Rule>
       <Filter>[waterway] = 'stream'</Filter>
       <LineSymbolizer stroke="#7dd3c0" stroke-width="1.5" stroke-opacity="0.8"/>
+      <TextSymbolizer size="10" fill="#2c3e50" fontset-name="regular" placement="line" 
+                      dy="-6" halo-fill="#ffffff" halo-radius="1" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
     <Rule>
       <Filter>[waterway] = 'canal' or [waterway] = 'drain'</Filter>
       <LineSymbolizer stroke="#5dade2" stroke-width="2" stroke-opacity="0.8"/>
+      <TextSymbolizer size="10" fill="#2c3e50" fontset-name="regular" placement="line" 
+                      dy="-6" halo-fill="#ffffff" halo-radius="1" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
   </Style>
   
@@ -47,14 +72,20 @@
     <Rule>
       <Filter>[highway] = 'motorway'</Filter>
       <LineSymbolizer stroke="#e74c3c" stroke-width="4" stroke-opacity="0.9"/>
+      <TextSymbolizer size="11" fill="#ffffff" fontset-name="bold" placement="line" 
+                      dy="0" halo-fill="#e74c3c" halo-radius="2" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
     <Rule>
       <Filter>[highway] = 'trunk' or [highway] = 'primary'</Filter>
       <LineSymbolizer stroke="#f39c12" stroke-width="3" stroke-opacity="0.9"/>
+      <TextSymbolizer size="10" fill="#2c3e50" fontset-name="bold" placement="line" 
+                      dy="0" halo-fill="#ffffff" halo-radius="1.5" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
     <Rule>
       <Filter>[highway] = 'secondary'</Filter>
       <LineSymbolizer stroke="#f1c40f" stroke-width="2.5" stroke-opacity="0.8"/>
+      <TextSymbolizer size="9" fill="#2c3e50" fontset-name="regular" placement="line" 
+                      dy="0" halo-fill="#ffffff" halo-radius="1" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
   </Style>
   
@@ -63,6 +94,8 @@
       <Filter>[highway] = 'tertiary' or [highway] = 'unclassified'</Filter>
       <LineSymbolizer stroke="#ffffff" stroke-width="2" stroke-opacity="0.9"/>
       <LineSymbolizer stroke="#34495e" stroke-width="1.5" stroke-opacity="0.7"/>
+      <TextSymbolizer size="8" fill="#2c3e50" fontset-name="regular" placement="line" 
+                      dy="0" halo-fill="#ffffff" halo-radius="1" allow-overlap="false">[name]</TextSymbolizer>
     </Rule>
     <Rule>
       <Filter>[highway] = 'residential'</Filter>
@@ -101,6 +134,86 @@
     <!-- Simplified POI style that works with any point data -->
     <Rule>
       <MarkersSymbolizer fill="#e74c3c" width="6" height="6" opacity="0.9"/>
+    </Rule>
+  </Style>
+  
+  <!-- PLACE NAMES - Hierarchical text labels -->
+  <Style name="place_labels">
+    <!-- Cities and towns - largest text -->
+    <Rule>
+      <Filter>[place] = 'city' or [place] = 'town'</Filter>
+      <TextSymbolizer size="16" fill="#2c3e50" fontset-name="bold" 
+                      dx="0" dy="-10" halo-fill="#ffffff" halo-radius="2" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Villages - medium text -->
+    <Rule>
+      <Filter>[place] = 'village'</Filter>
+      <TextSymbolizer size="14" fill="#2c3e50" fontset-name="bold" 
+                      dx="0" dy="-8" halo-fill="#ffffff" halo-radius="1.5" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Hamlets and smaller places - smaller text -->
+    <Rule>
+      <Filter>[place] = 'hamlet' or [place] = 'locality' or [place] = 'suburb'</Filter>
+      <TextSymbolizer size="11" fill="#34495e" fontset-name="regular" 
+                      dx="0" dy="-6" halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+  </Style>
+  
+  <!-- POI LABELS - for named amenities and features -->
+  <Style name="poi_labels">
+    <!-- Schools and hospitals -->
+    <Rule>
+      <Filter>[other_tags].match('.*school.*') or [other_tags].match('.*hospital.*')</Filter>
+      <TextSymbolizer size="10" fill="#e74c3c" fontset-name="bold" 
+                      dx="8" dy="0" halo-fill="#ffffff" halo-radius="1.5" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Pubs and restaurants -->
+    <Rule>
+      <Filter>[other_tags].match('.*pub.*') or [other_tags].match('.*restaurant.*')</Filter>
+      <TextSymbolizer size="9" fill="#8e44ad" fontset-name="regular" 
+                      dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Religious buildings -->
+    <Rule>
+      <Filter>[other_tags].match('.*place_of_worship.*') or [other_tags].match('.*church.*')</Filter>
+      <TextSymbolizer size="9" fill="#7f8c8d" fontset-name="italic" 
+                      dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Natural features -->
+    <Rule>
+      <Filter>[other_tags].match('.*peak.*') or [other_tags].match('.*hill.*')</Filter>
+      <TextSymbolizer size="9" fill="#27ae60" fontset-name="italic" 
+                      dx="0" dy="-8" halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Fallback for all other named points -->
+    <Rule>
+      <Filter>[name] != '' and [place] = ''</Filter>
+      <TextSymbolizer size="8" fill="#34495e" fontset-name="regular" 
+                      dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+  </Style>
+  
+  <!-- AREA LABELS - for named land use areas -->
+  <Style name="area_labels">
+    <Rule>
+      <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
+      <TextSymbolizer size="10" fill="#27ae60" fontset-name="italic" 
+                      halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="interior">[name]</TextSymbolizer>
+    </Rule>
+    <Rule>
+      <Filter>[natural] = 'water'</Filter>
+      <TextSymbolizer size="10" fill="#2980b9" fontset-name="italic" 
+                      halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="interior">[name]</TextSymbolizer>
     </Rule>
   </Style>
 
@@ -166,6 +279,31 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- LABEL LAYERS - rendered on top for visibility -->
+  <Layer name="place_labels" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>place_labels</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="poi_labels" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>poi_labels</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="area_labels" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>area_labels</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
 
