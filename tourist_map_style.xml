@@ -333,7 +333,7 @@
     <StyleName>landuse</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/multipolygons</Parameter>
+      <Parameter name="file">osm_data/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -341,7 +341,7 @@
     <StyleName>water</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/multipolygons</Parameter>
+      <Parameter name="file">osm_data/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -349,7 +349,7 @@
     <StyleName>buildings</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/multipolygons</Parameter>
+      <Parameter name="file">osm_data/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -357,7 +357,7 @@
     <StyleName>roads_major</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/lines</Parameter>
+      <Parameter name="file">osm_data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -365,7 +365,7 @@
     <StyleName>roads_minor</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/lines</Parameter>
+      <Parameter name="file">osm_data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -373,7 +373,7 @@
     <StyleName>paths</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/lines</Parameter>
+      <Parameter name="file">osm_data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -381,7 +381,7 @@
     <StyleName>poi</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">osm_data/points</Parameter>
+      <Parameter name="file">osm_data/points.shp</Parameter>
     </Datasource>
   </Layer>
   
