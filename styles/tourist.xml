@@ -21,8 +21,24 @@
   <!-- WATER -->
   <Style name="water">
     <Rule>
-      <Filter>[natural] = 'water' or [waterway] = 'river' or [waterway] = 'stream'</Filter>
+      <Filter>[natural] = 'water'</Filter>
       <PolygonSymbolizer fill="#7dd3c0" fill-opacity="0.8"/>
+    </Rule>
+  </Style>
+
+  <!-- WATERWAYS (rivers, streams, etc.) -->
+  <Style name="waterways">
+    <Rule>
+      <Filter>[waterway] = 'river'</Filter>
+      <LineSymbolizer stroke="#7dd3c0" stroke-width="3" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[waterway] = 'stream'</Filter>
+      <LineSymbolizer stroke="#7dd3c0" stroke-width="1.5" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[waterway] = 'canal' or [waterway] = 'drain'</Filter>
+      <LineSymbolizer stroke="#5dade2" stroke-width="2" stroke-opacity="0.8"/>
     </Rule>
   </Style>
   
@@ -102,6 +118,14 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="waterways" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>waterways</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
     </Datasource>
   </Layer>
   

@@ -1,9 +1,6 @@
-data/osm_data/
+data/
 __pycache__/
 *.pyc
-data/*.png
-data/*.osm
-!data/lumsden_area.osm
 
 # Testing artifacts
 .pytest_cache/
