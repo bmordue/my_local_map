@@ -12,22 +12,9 @@ from pathlib import Path
 import tempfile
 import xml.etree.ElementTree as ET
 import math
+from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 
-# Map configuration
-LUMSDEN_LAT = 57.3167
-LUMSDEN_LON = -2.8833
-MAP_SCALE = 25000
-
-# A3 dimensions at 300 DPI
-A3_WIDTH_MM = 297
-A3_HEIGHT_MM = 420
-DPI = 300
-A3_WIDTH_PX = int(A3_WIDTH_MM / 25.4 * DPI)  # ~3508 pixels
-A3_HEIGHT_PX = int(A3_HEIGHT_MM / 25.4 * DPI)  # ~4961 pixels
-
-# Area coverage (8km x 12km for tourist planning)
-BBOX_WIDTH_KM = 8
-BBOX_HEIGHT_KM = 12
+# Configuration will be loaded dynamically
 
 def calculate_bbox(center_lat, center_lon, width_km, height_km):
     """Calculate bounding box around center point"""
@@ -230,10 +217,12 @@ def create_mapnik_style(data_dir):
       <Filter>[highway] = 'cycleway'</Filter>
       <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
     </Rule>
+    <!-- Commented out route filter as it's not available in OSM shapefiles
     <Rule>
       <Filter>[route] = 'hiking'</Filter>
       <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
     </Rule>
+    -->
   </Style>
   
   <!-- BUILDINGS -->
@@ -246,21 +235,9 @@ def create_mapnik_style(data_dir):
   
   <!-- POINTS OF INTEREST - Tourist focused -->
   <Style name="poi">
+    <!-- Simplified POI style that works with any point data -->
     <Rule>
-      <Filter>[amenity] = 'restaurant' or [amenity] = 'pub' or [amenity] = 'cafe'</Filter>
-      <MarkersSymbolizer fill="#e74c3c" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'hotel' or [tourism] = 'guest_house'</Filter>
-      <MarkersSymbolizer fill="#3498db" width="8" height="8" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[tourism] = 'attraction' or [tourism] = 'viewpoint'</Filter>
-      <MarkersSymbolizer fill="#f39c12" width="10" height="10" opacity="0.9"/>
-    </Rule>
-    <Rule>
-      <Filter>[amenity] = 'parking'</Filter>
-      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
+      <MarkersSymbolizer fill="#e74c3c" width="6" height="6" opacity="0.9"/>
     </Rule>
   </Style>
 
@@ -330,7 +307,7 @@ def create_mapnik_style(data_dir):
     print(f"Created tourist-focused map style: {style_file}")
     return style_file
 
-def render_map(style_file, bbox, output_file):
+def render_map(style_file, bbox, output_file, width_px, height_px):
     """Render the map using Mapnik"""
     try:
         import mapnik
@@ -341,7 +318,7 @@ def render_map(style_file, bbox, output_file):
     print("Rendering A3 tourist map...")
     
     # Create map
-    m = mapnik.Map(A3_WIDTH_PX, A3_HEIGHT_PX)
+    m = mapnik.Map(width_px, height_px)
     mapnik.load_map(m, style_file)
     
     # Set bounding box
@@ -351,7 +328,7 @@ def render_map(style_file, bbox, output_file):
     # The map projection is Mercator, so we need to transform the bbox
     proj_wgs84 = mapnik.Projection('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
     proj_merc = mapnik.Projection(m.srs)
-    transform = mapnik.ProjectionTransform(proj_wgs84, proj_merc)
+    transform = mapnik.ProjTransform(proj_wgs84, proj_merc)
     
     bbox_merc = transform.forward(bbox_wgs84)
     m.zoom_to_box(bbox_merc)
@@ -367,11 +344,21 @@ def main():
     print("🗺️  Lightweight Lumsden Tourist Map Generator")
     print("=" * 50)
     
+    # Load configuration
+    area_config = load_area_config("lumsden")
+    output_format = load_output_format("A3")
+    width_px, height_px = calculate_pixel_dimensions(output_format)
+    
     # Calculate area
-    bbox = calculate_bbox(LUMSDEN_LAT, LUMSDEN_LON, BBOX_WIDTH_KM, BBOX_HEIGHT_KM)
-    print(f"📍 Center: {LUMSDEN_LAT}, {LUMSDEN_LON}")
-    print(f"📏 Area: {BBOX_WIDTH_KM}×{BBOX_HEIGHT_KM}km")
-    print(f"🎯 Scale: 1:{MAP_SCALE:,}")
+    bbox = calculate_bbox(
+        area_config["center"]["lat"], 
+        area_config["center"]["lon"], 
+        area_config["coverage"]["width_km"], 
+        area_config["coverage"]["height_km"]
+    )
+    print(f"📍 Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
+    print(f"📏 Area: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
+    print(f"🎯 Scale: 1:{area_config['scale']:,}")
     print()
     
     # Download OSM data
@@ -392,13 +379,13 @@ def main():
     style_file = create_mapnik_style(data_dir)
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({A3_WIDTH_PX}×{A3_HEIGHT_PX} pixels)...")
+    print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")
     output_file = f"lumsden_tourist_map_A3.png"
     
-    if render_map(style_file, bbox, output_file):
+    if render_map(style_file, bbox, output_file, width_px, height_px):
         print("\n🎉 SUCCESS!")
         print(f"📄 Tourist map: {output_file}")
-        print(f"📐 Print size: A3 ({A3_WIDTH_MM}×{A3_HEIGHT_MM}mm at {DPI} DPI)")
+        print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
         print(f"🎯 Perfect for planning day trips around Lumsden!")
         return 0
     else:

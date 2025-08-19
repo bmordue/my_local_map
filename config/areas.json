@@ -1,0 +1,14 @@
+{
+  "lumsden": {
+    "center": {
+      "lat": 57.3167,
+      "lon": -2.8833
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Lumsden, Aberdeenshire"
+  }
+}
