@@ -19,3 +19,4 @@ htmlcov/
 # OS files
 .DS_Store
 Thumbs.db
+styles/tourist_map_style.xml
