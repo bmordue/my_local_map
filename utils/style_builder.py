@@ -14,10 +14,13 @@ def build_mapnik_style(style_name, data_dir):
     with open(template_file) as f:
         template = string.Template(f.read())
     
-    # Substitute template variables
-    style_xml = template.substitute(DATA_DIR=data_dir)
+    # Convert data_dir to absolute path to avoid relative path issues
+    abs_data_dir = Path(data_dir).resolve()
     
-    output_file = f"{style_name}_map_style.xml"
+    # Substitute template variables
+    style_xml = template.substitute(DATA_DIR=str(abs_data_dir))
+    
+    output_file = f"styles/{style_name}_map_style.xml"
     with open(output_file, 'w') as f:
         f.write(style_xml)
     
