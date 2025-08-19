@@ -51,7 +51,7 @@ class TestStyleBuilder:
                 result = build_mapnik_style(style_name, data_dir)
         
         # Verify return value
-        assert result == "tourist_map_style.xml"
+        assert result == "styles/tourist_map_style.xml"
         
         # Verify file operations - check that write was called
         mock_file().write.assert_called()
@@ -91,9 +91,9 @@ class TestStyleBuilder:
     def test_build_mapnik_style_output_filename(self, sample_template):
         """Test that output filename is generated correctly"""
         test_cases = [
-            ("tourist", "tourist_map_style.xml"),
-            ("basic", "basic_map_style.xml"),
-            ("detailed", "detailed_map_style.xml"),
+            ("tourist", "styles/tourist_map_style.xml"),
+            ("basic", "styles/basic_map_style.xml"),
+            ("detailed", "styles/detailed_map_style.xml"),
         ]
         
         for style_name, expected_filename in test_cases:
@@ -175,7 +175,7 @@ class TestStyleBuilder:
             with patch("builtins.open", mock_open(read_data=empty_template)) as mock_file:
                 result = build_mapnik_style("empty", data_dir)
         
-        assert result == "empty_map_style.xml"
+        assert result == "styles/empty_map_style.xml"
         
         # Verify empty content was written
         write_calls = mock_file().write.call_args_list
@@ -203,7 +203,7 @@ class TestStyleBuilder:
             with patch("builtins.open", mock_open(read_data=template_no_subs)) as mock_file:
                 result = build_mapnik_style("static", data_dir)
         
-        assert result == "static_map_style.xml"
+        assert result == "styles/static_map_style.xml"
         
         # Content should remain unchanged
         write_calls = mock_file().write.call_args_list
