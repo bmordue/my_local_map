@@ -48,11 +48,11 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     mapnik.render_to_file(m, output_file, 'png')
     
     file_size_mb = os.path.getsize(output_file) / 1024 / 1024
-    print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
+    print(f"Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
 def main():
-    print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print("Lightweight Lumsden Tourist Map Generator")
     print("=" * 50)
     
     # Load configuration
@@ -67,9 +67,9 @@ def main():
         area_config["coverage"]["width_km"], 
         area_config["coverage"]["height_km"]
     )
-    print(f"📍 Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
-    print(f"📏 Area: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
-    print(f"🎯 Scale: 1:{area_config['scale']:,}")
+    print(f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
+    print(f"Area: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
+    print(f"Scale: 1:{area_config['scale']:,}")
     print()
     
     # Download OSM data
@@ -77,32 +77,32 @@ def main():
     data_dir.mkdir(exist_ok=True)
     osm_file = data_dir / "lumsden_area.osm"
     if not osm_file.exists():
-        print("📡 Downloading OpenStreetMap data...")
+        print("Downloading OpenStreetMap data...")
         if not download_osm_data(bbox, str(osm_file)):
             return 1
     else:
-        print(f"📁 Using existing OSM data: {osm_file}")
+        print(f"Using existing OSM data: {osm_file}")
     
     # Convert to shapefiles (no database!)
-    print("\n🔄 Converting OSM data to shapefiles...")
+    print("\nConverting OSM data to shapefiles...")
     osm_data_dir = convert_osm_to_shapefiles(str(osm_file))
     
     # Create map style
-    print("\n🎨 Creating tourist map style...")
+    print("\nCreating tourist map style...")
     style_file = create_mapnik_style(osm_data_dir)
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")
+    print(f"\nRendering A3 map ({width_px}×{height_px} pixels)...")
     output_file = data_dir / "lumsden_tourist_map_A3.png"
     
     if render_map(style_file, bbox, str(output_file), width_px, height_px):
-        print("\n🎉 SUCCESS!")
-        print(f"📄 Tourist map: {output_file}")
-        print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
-        print(f"🎯 Perfect for planning day trips around Lumsden!")
+        print("\nSUCCESS!")
+        print(f"Tourist map: {output_file}")
+        print(f"Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
+        print(f"Perfect for planning day trips around Lumsden!")
         return 0
     else:
-        print("\n❌ Map rendering failed")
+        print("\nMap rendering failed")
         return 1
 
 if __name__ == "__main__":
