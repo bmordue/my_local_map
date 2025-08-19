@@ -1,3 +1,6 @@
 osm_data/
+enhanced_data/
 __pycache__/
 *.pyc
+*png
+*.osm
