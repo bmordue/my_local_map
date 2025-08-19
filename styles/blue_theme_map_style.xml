@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
+     background-color="#f0f8ff">
+
+  <!-- LAND USE / BACKGROUND - Blue Theme -->
+  <Style name="landuse">
+    <Rule>
+      <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
+      <PolygonSymbolizer fill="#b3d9f7" fill-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[landuse] = 'farmland' or [landuse] = 'grass'</Filter>
+      <PolygonSymbolizer fill="#ddeeff" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
+      <PolygonSymbolizer fill="#a8d0f0" fill-opacity="0.8"/>
+    </Rule>
+  </Style>
+
+  <!-- WATER -->
+  <Style name="water">
+    <Rule>
+      <Filter>[natural] = 'water'</Filter>
+      <PolygonSymbolizer fill="#4682b4" fill-opacity="0.9"/>
+    </Rule>
+  </Style>
+
+  <!-- WATERWAYS -->
+  <Style name="waterways">
+    <Rule>
+      <Filter>[waterway] = 'river'</Filter>
+      <LineSymbolizer stroke="#4682b4" stroke-width="4" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[waterway] = 'stream'</Filter>
+      <LineSymbolizer stroke="#4682b4" stroke-width="2" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[waterway] = 'canal' or [waterway] = 'drain'</Filter>
+      <LineSymbolizer stroke="#1e90ff" stroke-width="3" stroke-opacity="0.8"/>
+    </Rule>
+  </Style>
+  
+  <!-- ROADS - Blue Theme -->
+  <Style name="roads_major">
+    <Rule>
+      <Filter>[highway] = 'motorway'</Filter>
+      <LineSymbolizer stroke="#1e3a8a" stroke-width="5" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[highway] = 'trunk' or [highway] = 'primary'</Filter>
+      <LineSymbolizer stroke="#3b82f6" stroke-width="4" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[highway] = 'secondary'</Filter>
+      <LineSymbolizer stroke="#60a5fa" stroke-width="3" stroke-opacity="0.8"/>
+    </Rule>
+  </Style>
+
+  <Style name="roads_minor">
+    <Rule>
+      <Filter>[highway] = 'tertiary' or [highway] = 'residential'</Filter>
+      <LineSymbolizer stroke="#93c5fd" stroke-width="2" stroke-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[highway] = 'service' or [highway] = 'track'</Filter>
+      <LineSymbolizer stroke="#bfdbfe" stroke-width="1.5" stroke-opacity="0.6"/>
+    </Rule>
+  </Style>
+
+  <Style name="paths">
+    <Rule>
+      <Filter>[highway] = 'footway' or [highway] = 'path'</Filter>
+      <LineSymbolizer stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="3,2" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[highway] = 'cycleway'</Filter>
+      <LineSymbolizer stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
+    </Rule>
+  </Style>
+  
+  <!-- BUILDINGS -->
+  <Style name="buildings">
+    <Rule>
+      <PolygonSymbolizer fill="#cbd5e1" fill-opacity="0.7"/>
+      <LineSymbolizer stroke="#475569" stroke-width="0.8" stroke-opacity="0.8"/>
+    </Rule>
+  </Style>
+  
+  <!-- POINTS OF INTEREST -->
+  <Style name="poi">
+    <Rule>
+      <MarkersSymbolizer fill="#1e40af" width="8" height="8" opacity="0.9"/>
+    </Rule>
+  </Style>
+
+  <!-- LAYER DEFINITIONS -->
+  <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>landuse</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="water" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>water</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="waterways" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>waterways</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="buildings" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>buildings</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="roads_major" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>roads_major</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="roads_minor" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>roads_minor</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="paths" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>paths</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="poi" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>poi</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+
+</Map>

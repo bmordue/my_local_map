@@ -4,5 +4,11 @@
     "height_mm": 420,
     "dpi": 300,
     "description": "Standard A3 format"
+  },
+  "preview": {
+    "width_mm": 100,
+    "height_mm": 141,
+    "dpi": 150,
+    "description": "Small preview format for style comparison"
   }
 }
