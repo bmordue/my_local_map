@@ -126,9 +126,26 @@ def create_sample_tourist_data(bbox):
 
 def convert_osm_to_shapefiles(osm_file):
     """Convert OSM data to shapefiles using ogr2ogr - no database needed!"""
-    print("Converting OSM data to shapefiles (no database required)...")
-    
     output_dir = Path("osm_data")
+    
+    # Check if shapefiles already exist
+    required_layers = ['points', 'lines', 'multilinestrings', 'multipolygons']
+    existing_shapefiles = []
+    
+    if output_dir.exists():
+        for layer in required_layers:
+            shp_file = output_dir / f"{layer}.shp"
+            if shp_file.exists():
+                existing_shapefiles.append(layer)
+    
+    # If all required shapefiles exist, skip conversion
+    if len(existing_shapefiles) == len(required_layers):
+        print("Using existing shapefiles (conversion not required)...")
+        print(f"  Found all {len(required_layers)} layers: {existing_shapefiles}")
+        return str(output_dir)
+    
+    # Need to convert - create directory and proceed
+    print("Converting OSM data to shapefiles (no database required)...")
     output_dir.mkdir(exist_ok=True)
     
     # Check ogr2ogr version
