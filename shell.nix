@@ -16,6 +16,7 @@ pkgs.mkShell {
 
     claude-code
     gemini-cli
+    gh
   ];
 
   shellHook = ''
