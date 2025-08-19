@@ -74,7 +74,9 @@ class TestRenderMapUnit:
         with patch.dict('sys.modules', {'mapnik': None}):
             with patch('builtins.__import__', side_effect=ImportError("No module named 'mapnik'")):
                 result = map_generator.render_map("test.xml", {}, "test.png", 100, 100)
-                assert result is False
+        with patch('builtins.__import__', side_effect=ImportError("No module named 'mapnik'")):
+            result = map_generator.render_map("test.xml", {}, "test.png", 100, 100)
+            assert result is False
 
     @pytest.mark.unit 
     def test_render_map_with_mock_mapnik(self):
