@@ -76,7 +76,7 @@
   <!-- ENHANCED WATER FEATURES -->
   <Style name="water">
     <Rule>
-      <Filter>[natural] = 'water' or [waterway] = 'river' or [waterway] = 'stream'</Filter>
+      <Filter>[natural] = 'water'</Filter>
       <PolygonSymbolizer fill="#7dd3c0" fill-opacity="0.8"/>
     </Rule>
     <Rule>
@@ -86,6 +86,18 @@
     <Rule>
       <Filter>[natural] = 'spring'</Filter>
       <MarkersSymbolizer fill="#5dade2" width="4" height="4" opacity="0.9"/>
+    </Rule>
+  </Style>
+  
+  <!-- WATERWAYS (rivers, streams) -->
+  <Style name="waterways">
+    <Rule>
+      <Filter>[waterway] = 'river'</Filter>
+      <LineSymbolizer stroke="#7dd3c0" stroke-width="3" stroke-opacity="0.9"/>
+    </Rule>
+    <Rule>
+      <Filter>[waterway] = 'stream'</Filter>
+      <LineSymbolizer stroke="#7dd3c0" stroke-width="1.5" stroke-opacity="0.8"/>
     </Rule>
   </Style>
   
@@ -210,10 +222,14 @@
       <MarkersSymbolizer fill="#f39c12" width="12" height="12" opacity="0.9"/>
     </Rule>
     <Rule>
+      <Filter>[place] = 'village' or [place] = 'hamlet' or [place] = 'town'</Filter>
+      <MarkersSymbolizer fill="#2c3e50" width="10" height="10" opacity="0.9"/>
       <Filter>[tourism] = 'viewpoint'</Filter>
       <MarkersSymbolizer fill="#d68910" width="10" height="10" opacity="0.9"/>
     </Rule>
     <Rule>
+      <Filter>[man_made] = 'tower' or [man_made] = 'mast'</Filter>
+      <MarkersSymbolizer fill="#95a5a6" width="6" height="6" opacity="0.7"/>
       <Filter>[tourism] = 'museum' or [tourism] = 'gallery'</Filter>
       <MarkersSymbolizer fill="#8e44ad" width="10" height="10" opacity="0.9"/>
     </Rule>
@@ -342,6 +358,14 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">osm_data/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="waterways" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>waterways</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">osm_data/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
