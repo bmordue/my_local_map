@@ -205,9 +205,35 @@ The enhanced map system provides a foundation for:
 - **Community integration** with local knowledge
 - **Business partnerships** for live information updates
 
+## 🔄 Automated Map Generation
+
+### PR Map Generation Workflow
+
+Every pull request to the `main` branch automatically generates a tourist map, allowing visual review of changes:
+
+**🗺️ How it works:**
+1. **Automatic Trigger**: Workflow runs on every PR to `main`
+2. **Map Generation**: Creates the full Lumsden tourist map (A3, 3507×4960 pixels)
+3. **Artifact Upload**: Map files are uploaded as downloadable artifacts
+4. **Visual Review**: Download and compare maps to see the impact of your changes
+
+**📥 How to access generated maps:**
+1. Go to the **Actions** tab of your PR
+2. Click on the "Generate Tourist Map on PR" workflow run
+3. Download the `lumsden-tourist-map-pr-{number}` artifact
+4. Extract and view the PNG file
+
+**📋 Generated artifacts include:**
+- `lumsden_tourist_map_A3.png` - The complete tourist map
+- `tourist_map_style.xml` - Mapnik style definition
+
+Perfect for reviewing changes to styling, data processing, or map generation logic! 🎯
+
 ## 📞 Contributing
 
 This project demonstrates how to transform a basic map into a comprehensive tourist resource. The modular design allows for easy extension with additional data sources and features.
+
+Pull requests are welcome! The automated map generation workflow will help you visualize the impact of your changes.
 
 ---
 
