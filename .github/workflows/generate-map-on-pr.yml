@@ -26,14 +26,10 @@ jobs:
     
     - name: Verify installations
       run: |
-        nix-shell --run "
-          # Check GDAL/OGR
-          ogr2ogr --version
-          # Check Python imports
-          python -c 'import requests; print(\"✓ requests available\")'
-          python -c 'import mapnik; print(\"✓ mapnik available\")'
-          python -c 'import os; print(\"✓ Python standard library available\")'
-        "
+        nix-shell --run "ogr2ogr --version"
+        nix-shell --run "python -c 'import requests; print(\"✓ requests available\")'"
+        nix-shell --run "python -c 'import mapnik; print(\"✓ mapnik available\")'"
+        nix-shell --run "python -c 'import os; print(\"✓ Python standard library available\")'"
     
     - name: Create sample OSM data for offline operation
       run: |
