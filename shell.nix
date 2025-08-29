@@ -3,9 +3,9 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     # Minimal mapping dependencies (no PostgreSQL!)
-    python313
-    python313Packages.requests
-    python313Packages.python-mapnik
+    python312
+    python312Packages.requests
+    python312Packages.python-mapnik
 
     # GDAL for OSM conversion
     gdal
@@ -14,13 +14,13 @@ pkgs.mkShell {
     curl
     unzip
 
-    claude-code
-    gemini-cli
+#    claude-code
+#    gemini-cli
   ];
 
   shellHook = ''
     echo "Made available:"
-    echo "  Python 3 + requests"
+    echo "  Python 3.12 + requests"
     echo "  GDAL/OGR (for data conversion)"
     echo "  Mapnik (for rendering)"
     echo ""
