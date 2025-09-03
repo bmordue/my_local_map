@@ -64,11 +64,25 @@ def create_style_grid(styles, data_dir, bbox, preview_size, cols=2):
     # Create the main grid image
     grid_img = Image.new('RGB', (grid_width, grid_height), color='white')
     
-    # Try to load a font
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
-        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
-    except (OSError, IOError):
+    # Try to load a font from several common locations
+    font_paths = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",  # Linux
+        "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",           # Alternate Linux
+        "/Library/Fonts/Arial.ttf",                              # macOS
+        "C:\\Windows\\Fonts\\arial.ttf",                         # Windows
+        "C:\\Windows\\Fonts\\DejaVuSans-Bold.ttf",               # Windows alternate
+    ]
+    font = None
+    title_font = None
+    for path in font_paths:
+        if os.path.exists(path):
+            try:
+                font = ImageFont.truetype(path, 16)
+                title_font = ImageFont.truetype(path, 20)
+                break
+            except (OSError, IOError):
+                continue
+    if font is None or title_font is None:
         font = ImageFont.load_default()
         title_font = ImageFont.load_default()
     
