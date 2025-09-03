@@ -140,15 +140,14 @@ def main():
     )
     
     # Ensure data is available
-    data_dir = Path("data")
-    data_dir.mkdir(exist_ok=True)
-    osm_file = data_dir / "lumsden_area.osm"
+    osm_file = Path("lumsden_area.osm")
     
     if not osm_file.exists():
         print("❌ OSM data file not found. Run map_generator.py first to download data.")
         return 1
     
     # Convert to shapefiles if needed
+    data_dir = Path("data")
     osm_data_dir = data_dir / "osm_data"
     if not osm_data_dir.exists():
         print("🔄 Converting OSM data to shapefiles...")
@@ -177,6 +176,7 @@ def main():
     grid_img = create_style_grid(styles, osm_data_dir, bbox, (preview_width, preview_height), cols=3)
     
     # Save the grid
+    data_dir.mkdir(exist_ok=True)
     output_file = data_dir / "style_preview_grid.png"
     grid_img.save(str(output_file), 'PNG')
     

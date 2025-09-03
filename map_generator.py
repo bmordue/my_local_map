@@ -72,10 +72,12 @@ def main():
     print(f"🎯 Scale: 1:{area_config['scale']:,}")
     print()
     
-    # Download OSM data
+    # Ensure data directory exists for shapefiles and output
     data_dir = Path("data")
     data_dir.mkdir(exist_ok=True)
-    osm_file = data_dir / "lumsden_area.osm"
+    
+    # OSM file should be at repository root according to coding guidelines  
+    osm_file = Path("lumsden_area.osm")
     if not osm_file.exists():
         print("📡 Downloading OpenStreetMap data...")
         if not download_osm_data(bbox, str(osm_file)):

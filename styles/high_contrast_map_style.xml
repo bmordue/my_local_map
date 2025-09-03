@@ -100,7 +100,7 @@
     <StyleName>landuse</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/multipolygons.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -108,7 +108,7 @@
     <StyleName>water</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/multipolygons.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -116,7 +116,7 @@
     <StyleName>waterways</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -124,7 +124,7 @@
     <StyleName>buildings</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/multipolygons.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -132,7 +132,7 @@
     <StyleName>roads_major</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -140,7 +140,7 @@
     <StyleName>roads_minor</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -148,7 +148,7 @@
     <StyleName>paths</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/lines.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
     </Datasource>
   </Layer>
   
@@ -156,7 +156,7 @@
     <StyleName>poi</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
-      <Parameter name="file">/home/runner/work/my_local_map/my_local_map/data/osm_data/points.shp</Parameter>
+      <Parameter name="file">$DATA_DIR/points.shp</Parameter>
     </Datasource>
   </Layer>
 

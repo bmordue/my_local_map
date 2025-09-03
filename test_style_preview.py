@@ -127,11 +127,10 @@ def test_data_files():
     """Test that required data files exist"""
     print("\nTesting data files...")
     
-    data_dir = Path("data")
-    osm_file = data_dir / "lumsden_area.osm"
+    osm_file = Path("lumsden_area.osm")
     
     if not osm_file.exists():
-        print("❌ Missing data/lumsden_area.osm")
+        print("❌ Missing lumsden_area.osm")
         return False
     
     file_size = osm_file.stat().st_size
