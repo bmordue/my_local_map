@@ -9,6 +9,7 @@ from pathlib import Path
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles
+from utils.legend import MapLegend, add_legend_to_image
 
 # Configuration will be loaded dynamically
 
@@ -44,8 +45,19 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     bbox_merc = transform.forward(bbox_wgs84)
     m.zoom_to_box(bbox_merc)
     
-    # Render
+    # Render base map
     mapnik.render_to_file(m, output_file, 'png')
+    
+    # Create and add legend
+    print("Adding map legend...")
+    legend = MapLegend()
+    legend_data = legend.render_to_map(m)
+    
+    # Add legend overlay to the image
+    if add_legend_to_image(output_file, legend_data):
+        print("✓ Legend added successfully")
+    else:
+        print("⚠ Legend could not be added (continuing without legend)")
     
     file_size_mb = os.path.getsize(output_file) / 1024 / 1024
     print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
