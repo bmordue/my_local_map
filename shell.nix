@@ -14,8 +14,8 @@ pkgs.mkShell {
     curl
     unzip
 
-#    claude-code
-#    gemini-cli
+    claude-code
+    gemini-cli
   ];
 
   shellHook = ''
