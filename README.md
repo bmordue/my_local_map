@@ -90,7 +90,7 @@ enhanced_data/
 
 ## Enhancement Plan Implementation
 
-### Phase 1: Foundation 
+### Phase 1: Foundation
 - [x] Fix OSM data extraction (Overpass query with complete nodes)
 - [x] Create comprehensive map styling (25+ feature categories)
 - [x] Build tourist information database
