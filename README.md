@@ -9,13 +9,13 @@ This project generates high-quality A3 tourist maps of the Lumsden area, enhance
 ## Enhanced Features
 
 ### Map Content Categories (25+ types)
-- Natural Features: Forests, heath, moors, wetlands, grasslands, scree
-- Land Use: Residential, commercial, industrial, agricultural areas
-- Transportation: Roads (all categories), railways, cycling paths, walking trails
-- Points of Interest: 50+ amenity types including restaurants, hotels, attractions, services
-- Buildings: Categorized by type (churches, schools, hospitals, public buildings)
-- Place Labels: Towns, villages, farms with hierarchical text sizing
-- Water Features: Rivers, streams, springs, water bodies
+- **Natural Features**: Forests, heath, moors, wetlands, grasslands, scree
+- **Land Use**: Residential, commercial, industrial, agricultural areas
+- **Transportation**: Roads (all categories), railways, cycling paths, walking trails
+- **Points of Interest**: 50+ amenity types including restaurants, hotels, attractions, services
+- **Buildings**: Categorized by type (churches, schools, hospitals, public buildings)
+- **Place Labels**: Towns, villages, farms with hierarchical text sizing
+- **Water Features**: Rivers, streams, springs, water bodies
 
 ### Tourist-Specific Information
 - Accommodation: Hotels, B&Bs, hostels, camping with amenities
