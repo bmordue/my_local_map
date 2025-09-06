@@ -63,8 +63,12 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
+from utils.download_icons import download_icons
+
 def main():
     print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print("Downloading icons...")
+    download_icons()
     print("=" * 50)
     
     # Load configuration
