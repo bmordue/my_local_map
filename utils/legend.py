@@ -73,8 +73,15 @@ class MapLegend:
             LegendItem("Buildings", "polygon", 
                       fill="#bdc3c7", fill_opacity=0.6, 
                       stroke="#7f8c8d", stroke_width=0.5),
-            LegendItem("Points of Interest", "point", 
-                      fill="#e74c3c", width=6, height=6, opacity=0.9),
+            # Points of Interest with new icons
+            LegendItem("Food & Drink", "icon", icon_path="icons/restaurant-15.svg"),
+            LegendItem("Accommodation", "icon", icon_path="icons/lodging-15.svg"),
+            LegendItem("Attractions", "icon", icon_path="icons/attraction-15.svg"),
+            LegendItem("Shopping", "icon", icon_path="icons/shop-15.svg"),
+            LegendItem("Transportation", "icon", icon_path="icons/car-15.svg"),
+            LegendItem("Public Services", "icon", icon_path="icons/toilet-15.svg"),
+            LegendItem("Healthcare", "icon", icon_path="icons/hospital-15.svg"),
+            LegendItem("Religious Sites", "icon", icon_path="icons/religious-christian-15.svg"),
         ])
     
     def render_to_map(self, map_obj, legend_width=200, legend_height=None):
@@ -211,6 +218,21 @@ def add_legend_to_image(image_path, legend_data, output_path=None):
                 ]
                 draw.ellipse(circle_coords, fill=fill_color)
             
+            elif item.symbol_type == "icon":
+                # Draw a placeholder for the icon
+                icon_path = item.properties.get('icon_path')
+                if icon_path and Path(icon_path).exists():
+                    # For now, draw a placeholder rectangle
+                    fill_color = (142, 68, 173) # Purple
+                    symbol_coords = [
+                        (symbol_x, symbol_y),
+                        (symbol_x + symbol_size, symbol_y + symbol_size)
+                    ]
+                    draw.rectangle(symbol_coords, fill=fill_color)
+                else:
+                    # Draw a fallback if icon is missing
+                    draw.text((symbol_x, symbol_y), "?", fill=(44, 62, 80), font=text_font)
+
             # Draw label text
             draw.text((text_x, symbol_y), item.label, fill=(44, 62, 80), font=text_font)
             

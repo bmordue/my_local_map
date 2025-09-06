@@ -73,7 +73,7 @@ enhanced_data/
 ### Visual Improvements
 - Color-coded land use with distinct styling for each category
 - Hierarchical road network with tourist-friendly colors
-- Comprehensive POI symbols with size indicating importance
+- Color-coded POI categories for easy identification
 - Building categorization with type-specific colors
 - Typography system for place names and labels
 

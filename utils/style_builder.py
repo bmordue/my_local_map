@@ -18,7 +18,8 @@ def build_mapnik_style(style_name, data_dir):
     abs_data_dir = Path(data_dir).resolve()
     
     # Substitute template variables
-    style_xml = template.substitute(DATA_DIR=str(abs_data_dir))
+    abs_icons_dir = Path("icons").resolve()
+    style_xml = template.substitute(DATA_DIR=str(abs_data_dir), ICONS_DIR=str(abs_icons_dir))
     
     output_file = f"styles/{style_name}_map_style.xml"
     with open(output_file, 'w') as f:
