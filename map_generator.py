@@ -10,6 +10,7 @@ from utils.config import load_area_config, load_output_format, calculate_pixel_d
 from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles
 from utils.legend import MapLegend, add_legend_to_image
+#from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
 
@@ -63,13 +64,11 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
-from utils.download_icons import download_icons
-
 def main():
     print("🗺️  Lightweight Lumsden Tourist Map Generator")
-    print("Downloading icons...")
-    download_icons()
-    print("=" * 50)
+#    print("Downloading icons...")
+#    download_icons()
+#    print("=" * 50)
     
     # Load configuration
     area_config = load_area_config("lumsden")
