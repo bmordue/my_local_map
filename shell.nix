@@ -6,6 +6,7 @@ pkgs.mkShell {
     python312
     python312Packages.requests
     python312Packages.python-mapnik
+    python312Packages.cairosvg
 
     # GDAL for OSM conversion
     gdal
