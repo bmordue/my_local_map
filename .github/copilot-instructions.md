@@ -85,15 +85,45 @@ osm_data/                     # Shapefile directory
   ├── points.{shp,dbf,prj,shx}
   ├── lines.{shp,dbf,prj,shx}
   ├── multilinestrings.{shp,dbf,prj,shx}
-  └── multipolygons.{shp,dbf,prj,shx}
+  ├── multipolygons.{shp,dbf,prj,shx}
+  ├── elevation.tif           # Elevation data for hillshading
+  └── hillshade.tif          # Generated hillshade raster
 ```
 
 ### Core Constants and Configuration
-Located in `map_generator.py` lines 16-30:
+Located in `config/areas.json`:
 - `LUMSDEN_LAT = 57.3167`, `LUMSDEN_LON = -2.8833` - Map center coordinates
 - `MAP_SCALE = 25000` - 1:25,000 scale for tourist planning
 - `BBOX_WIDTH_KM = 8`, `BBOX_HEIGHT_KM = 12` - Coverage area
 - A3 output: 297×420mm at 300 DPI (3507×4960 pixels)
+- **Hillshading configuration**: Enable/disable topographical relief visualization
+
+### Hillshading Feature
+The map generator now supports configurable hillshading to enhance topographical visualization:
+
+#### Configuration
+Add hillshading configuration to `config/areas.json`:
+```json
+"hillshading": {
+  "enabled": true,        // Enable/disable hillshading
+  "opacity": 0.4,        // Hillshade opacity (0.0-1.0)
+  "azimuth": 315,        // Light source azimuth (0-360 degrees)
+  "altitude": 45,        // Light source altitude (0-90 degrees)
+  "z_factor": 1.0,       // Vertical exaggeration factor
+  "scale": 111120        // Scale factor for lat/lon (meters per degree)
+}
+```
+
+#### Technical Implementation
+- Uses GDAL/OGR tools for elevation data processing and hillshade generation
+- Synthetic elevation model for demonstration (in production, would use real DEM data)
+- Hillshade rendered as background layer with configurable transparency
+- Graceful fallback when elevation data unavailable
+
+#### Dependencies
+- Requires `gdaldem` tool (part of gdal-bin package)
+- Elevation data processing uses GDAL raster capabilities
+- Hillshade integrated as Mapnik raster layer
 
 ## Development Workflow
 

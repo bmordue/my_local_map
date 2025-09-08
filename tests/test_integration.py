@@ -111,13 +111,15 @@ class TestCreateMapnikStyleUnit:
         """Test that create_mapnik_style calls the build function correctly"""
         import map_generator
         
+        area_config = {"hillshading": {"enabled": True}}
+        
         with patch('map_generator.build_mapnik_style') as mock_build:
             mock_build.return_value = "tourist_map_style.xml"
             
-            result = map_generator.create_mapnik_style("/test/data")
+            result = map_generator.create_mapnik_style("/test/data", area_config, True)
             
             assert result == "tourist_map_style.xml"
-            mock_build.assert_called_once_with("tourist", "/test/data")
+            mock_build.assert_called_once_with("tourist", "/test/data", area_config, True)
 
 
 class TestConfigurationHandling:
