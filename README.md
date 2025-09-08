@@ -16,6 +16,7 @@ This project generates high-quality A3 tourist maps of the Lumsden area, enhance
 - **Buildings**: Categorized by type (churches, schools, hospitals, public buildings)
 - **Place Labels**: Towns, villages, farms with hierarchical text sizing
 - **Water Features**: Rivers, streams, springs, water bodies
+- **Elevation Data**: Contour lines showing terrain features and elevation changes
 
 ### Tourist-Specific Information
 - Accommodation: Hotels, B&Bs, hostels, camping with amenities
@@ -23,6 +24,7 @@ This project generates high-quality A3 tourist maps of the Lumsden area, enhance
 - Attractions: Historic sites, viewpoints, museums with ratings
 - Activities: Guided tours, outdoor activities, sports with booking info
 - Walking Trails: Detailed trail information with difficulty and facilities
+- **Topographic Features**: Elevation contours for outdoor activity planning
 
 ## Quick Start
 
