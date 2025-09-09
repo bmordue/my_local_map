@@ -1,7 +1,9 @@
 """Legend generation utilities for tourist maps"""
 
 from pathlib import Path
-
+from io import BytesIO
+import cairosvg
+from PIL import Image, ImageDraw, ImageFont
 
 class LegendItem:
     """Represents a single item in the map legend"""
@@ -125,12 +127,6 @@ class MapLegend:
 
 def add_legend_to_image(image_path, legend_data, output_path=None):
     """Add legend overlay to an existing map image using PIL"""
-    try:
-        from PIL import Image, ImageDraw, ImageFont
-    except ImportError:
-        print("Warning: PIL not available, skipping legend overlay")
-        return False
-    
     if output_path is None:
         output_path = image_path
     
@@ -223,9 +219,6 @@ def add_legend_to_image(image_path, legend_data, output_path=None):
                 icon_path = item.properties.get('icon_path')
                 if icon_path and Path(icon_path).exists():
                     try:
-                        from io import BytesIO
-                        import cairosvg
-                        from PIL import Image
                         # Convert SVG to PNG in-memory
                         with open(icon_path, 'rb') as svg_file:
                             svg_data = svg_file.read()
