@@ -130,35 +130,40 @@
   </Style>
   
   <!-- POINTS OF INTEREST - Tourist focused -->
+  <!-- BUG: The filters below are causing a RuntimeError during map rendering.
+       The syntax appears to be correct for Mapnik, but there is an issue
+       with how the filters are being parsed or how the data is processed
+       by ogr2ogr. The issue is unresolved.
+  -->
   <Style name="poi">
     <!-- Food & Drink -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*restaurant.*') or [other_tags].match('.*amenity.*cafe.*') or [other_tags].match('.*amenity.*pub.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*restaurant.*' or [other_tags] ~ '.*amenity.*cafe.*' or [other_tags] ~ '.*amenity.*pub.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/restaurant-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Accommodation -->
     <Rule>
-      <Filter>[other_tags].match('.*tourism.*hotel.*') or [other_tags].match('.*tourism.*guest_house.*') or [other_tags].match('.*tourism.*hostel.*') or [other_tags].match('.*tourism.*chalet.*') or [other_tags].match('.*tourism.*camp_site.*')</Filter>
+      <Filter>[other_tags] ~ '.*tourism.*hotel.*' or [other_tags] ~ '.*tourism.*guest_house.*' or [other_tags] ~ '.*tourism.*hostel.*' or [other_tags] ~ '.*tourism.*chalet.*' or [other_tags] ~ '.*tourism.*camp_site.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/lodging-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Attractions -->
     <Rule>
-      <Filter>[other_tags].match('.*tourism.*museum.*') or [other_tags].match('.*tourism.*attraction.*') or [other_tags].match('.*tourism.*viewpoint.*') or [other_tags].match('.*historic.*castle.*') or [other_tags].match('.*historic.*ruins.*')</Filter>
+      <Filter>[other_tags] ~ '.*tourism.*museum.*' or [other_tags] ~ '.*tourism.*attraction.*' or [other_tags] ~ '.*tourism.*viewpoint.*' or [other_tags] ~ '.*historic.*castle.*' or [other_tags] ~ '.*historic.*ruins.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/attraction-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Services -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*bank.*') or [other_tags].match('.*amenity.*post_office.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*bank.*' or [other_tags] ~ '.*amenity.*post_office.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/bank-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Shopping -->
     <Rule>
-      <Filter>[other_tags].match('.*shop.*')</Filter>
+      <Filter>[other_tags] ~ '.*shop.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/shop-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Transportation -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*parking.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*parking.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/car-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <Rule>
@@ -167,21 +172,21 @@
     </Rule>
     <!-- Public Services -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*toilets.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*toilets.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/toilet-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*police.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*police.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/police-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Healthcare -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*hospital.*') or [other_tags].match('.*amenity.*pharmacy.*') or [other_tags].match('.*amenity.*clinic.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*hospital.*' or [other_tags] ~ '.*amenity.*pharmacy.*' or [other_tags] ~ '.*amenity.*clinic.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/hospital-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Religious Sites -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*place_of_worship.*')</Filter>
+      <Filter>[other_tags] ~ '.*amenity.*place_of_worship.*'</Filter>
       <PointSymbolizer file="$ICONS_DIR/religious-christian-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
   </Style>
@@ -215,28 +220,28 @@
   <Style name="poi_labels">
     <!-- Schools and hospitals -->
     <Rule>
-      <Filter>[other_tags].match('.*school.*') or [other_tags].match('.*hospital.*')</Filter>
+      <Filter>[other_tags] ~ '.*school.*' or [other_tags] ~ '.*hospital.*'</Filter>
       <TextSymbolizer size="10" fill="#e74c3c" fontset-name="bold" 
                       dx="8" dy="0" halo-fill="#ffffff" halo-radius="1.5" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Pubs and restaurants -->
     <Rule>
-      <Filter>[other_tags].match('.*pub.*') or [other_tags].match('.*restaurant.*')</Filter>
+      <Filter>[other_tags] ~ '.*pub.*' or [other_tags] ~ '.*restaurant.*'</Filter>
       <TextSymbolizer size="9" fill="#8e44ad" fontset-name="regular" 
                       dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Religious buildings -->
     <Rule>
-      <Filter>[other_tags].match('.*place_of_worship.*') or [other_tags].match('.*church.*')</Filter>
+      <Filter>[other_tags] ~ '.*place_of_worship.*' or [other_tags] ~ '.*church.*'</Filter>
       <TextSymbolizer size="9" fill="#7f8c8d" fontset-name="italic" 
                       dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Natural features -->
     <Rule>
-      <Filter>[other_tags].match('.*peak.*') or [other_tags].match('.*hill.*')</Filter>
+      <Filter>[other_tags] ~ '.*peak.*' or [other_tags] ~ '.*hill.*'</Filter>
       <TextSymbolizer size="9" fill="#27ae60" fontset-name="italic" 
                       dx="0" dy="-8" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>

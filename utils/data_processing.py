@@ -96,6 +96,7 @@ def convert_osm_to_shapefiles(osm_file):
             "ogr2ogr",
             "-f", "ESRI Shapefile",
             "-overwrite",
+            "-lco", "ALL_ATTRIBUTES=YES",
             "--debug", "on",
             str(output_file),
             osm_file,
