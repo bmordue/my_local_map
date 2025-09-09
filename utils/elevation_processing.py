@@ -36,7 +36,7 @@ def download_elevation_data(bbox, output_file, resolution=30):
         center_lat = (bbox['north'] + bbox['south']) / 2
         center_lon = (bbox['west'] + bbox['east']) / 2
         
-        width = max(100, int((bbox['east'] - bbox['west']) * 111120 / resolution))  # approximate meters
+        width = max(100, int((bbox['east'] - bbox['west']) * 111120 * math.cos(math.radians(center_lat)) / resolution))  # approximate meters
         height = max(100, int((bbox['north'] - bbox['south']) * 111120 / resolution))
         
         # Create a temporary raw binary file with synthetic elevation data
