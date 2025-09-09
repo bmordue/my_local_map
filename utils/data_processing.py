@@ -277,7 +277,7 @@ def generate_contour_lines(elevation_file, output_dir, interval=10):
                 print(f"  Interval: {interval}m")
                 
                 return str(contour_file)
-            except:
+            except subprocess.CalledProcessError:
                 print(f"✓ Generated contour lines: {contour_file}")
                 return str(contour_file)
         else:
