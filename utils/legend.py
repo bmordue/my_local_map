@@ -222,13 +222,27 @@ def add_legend_to_image(image_path, legend_data, output_path=None):
                 # Draw a placeholder for the icon
                 icon_path = item.properties.get('icon_path')
                 if icon_path and Path(icon_path).exists():
-                    # For now, draw a placeholder rectangle
-                    fill_color = (142, 68, 173) # Purple
-                    symbol_coords = [
-                        (symbol_x, symbol_y),
-                        (symbol_x + symbol_size, symbol_y + symbol_size)
-                    ]
-                    draw.rectangle(symbol_coords, fill=fill_color)
+                    try:
+                        from io import BytesIO
+                        import cairosvg
+                        from PIL import Image
+                        # Convert SVG to PNG in-memory
+                        with open(icon_path, 'rb') as svg_file:
+                            svg_data = svg_file.read()
+                        png_bytes = cairosvg.svg2png(bytestring=svg_data, output_width=symbol_size, output_height=symbol_size)
+                        png_io = BytesIO(png_bytes)
+                        icon_img = Image.open(png_io).convert('RGBA')
+                        # Paste PNG onto legend
+                        img.paste(icon_img, (symbol_x, symbol_y), icon_img)
+                    except Exception as e:
+                        print(f"Warning: Failed to render icon '{icon_path}': {e}")
+                        # Fallback: draw a placeholder rectangle if conversion fails
+                        fill_color = (142, 68, 173) # Purple
+                        symbol_coords = [
+                            (symbol_x, symbol_y),
+                            (symbol_x + symbol_size, symbol_y + symbol_size)
+                        ]
+                        draw.rectangle(symbol_coords, fill=fill_color)
                 else:
                     # Draw a fallback if icon is missing
                     draw.text((symbol_x, symbol_y), "?", fill=(44, 62, 80), font=text_font)
