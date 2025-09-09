@@ -1,10 +1,7 @@
 """Elevation data processing and hillshading utilities"""
 
-import os
 import subprocess
-import tempfile
 from pathlib import Path
-import requests
 
 
 def calculate_elevation_bbox(bbox, buffer_km=1.0):

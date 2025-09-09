@@ -1,10 +1,8 @@
 """Test elevation processing and hillshading functionality"""
 
 import unittest
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, mock_open
 import tempfile
-import os
-from pathlib import Path
 
 from utils.elevation_processing import (
     calculate_elevation_bbox,
