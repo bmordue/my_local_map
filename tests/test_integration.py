@@ -1,12 +1,7 @@
 """Integration tests for the main map generator application"""
 
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
-import tempfile
-import os
-import sys
-
+from unittest.mock import patch, MagicMock
 
 class TestMapGeneratorIntegration:
     """Integration tests for the complete map generation process"""
