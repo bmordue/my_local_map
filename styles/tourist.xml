@@ -250,6 +250,24 @@
     </Rule>
   </Style>
   
+  <!-- CONTOUR LINES - elevation representation -->
+  <Style name="contours">
+    <!-- Major contour lines (every 50m) -->
+    <Rule>
+      <Filter>[elevation] % 50 = 0</Filter>
+      <LineSymbolizer stroke="#8B4513" stroke-width="1.0" stroke-opacity="0.8"/>
+      <!-- Add elevation labels for major contours -->
+      <TextSymbolizer size="8" fill="#8B4513" fontset-name="regular" 
+                      halo-fill="#ffffff" halo-radius="1" 
+                      allow-overlap="false" placement="line" spacing="200">[elevation]</TextSymbolizer>
+    </Rule>
+    <!-- Minor contour lines (every 10m) -->
+    <Rule>
+      <Filter>[elevation] % 50 != 0</Filter>
+      <LineSymbolizer stroke="#8B4513" stroke-width="0.5" stroke-opacity="0.6"/>
+    </Rule>
+  </Style>
+
   <!-- AREA LABELS - for named land use areas -->
   <Style name="area_labels">
     <Rule>
@@ -328,6 +346,15 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- CONTOUR LINES - elevation contours -->
+  <Layer name="contours" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>contours</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/contours.shp</Parameter>
     </Datasource>
   </Layer>
   
