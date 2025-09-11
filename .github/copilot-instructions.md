@@ -14,10 +14,14 @@ Run these commands in sequence to set up the development environment:
 sudo apt update
 sudo apt install -y python3-mapnik gdal-bin python3-pip
 
+# Install Python dependencies
+pip3 install -r requirements.txt
+
 # Verify installations
 python3 -c "import mapnik; print('mapnik version:', mapnik.mapnik_version())"
 ogr2ogr --version
 python3 -c "import requests; print('requests OK')"
+python3 -c "from PIL import Image; print('Pillow OK')"
 ```
 
 ### Build and Run
