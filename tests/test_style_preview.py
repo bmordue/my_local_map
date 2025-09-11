@@ -3,7 +3,6 @@
 Test script for style preview functionality
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -141,6 +140,7 @@ def test_data_files():
     print(f"✓ data/lumsden_area.osm ({file_size} bytes)")
     
     # Check if shapefiles exist
+    data_dir = Path("data")
     osm_data_dir = data_dir / "osm_data"
     if osm_data_dir.exists():
         shapefiles = list(osm_data_dir.glob("*.shp"))

@@ -1,6 +1,7 @@
 """Elevation data processing and hillshading utilities"""
 
 import subprocess
+import math
 from pathlib import Path
 
 

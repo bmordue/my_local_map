@@ -91,11 +91,18 @@ class TestRenderMapUnit:
                 style_file = "test.xml"
                 bbox = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
                 output_file = "test.png"
-                
-                result = map_generator.render_map(style_file, bbox, output_file, 1000, 1000)
-                
-                assert result is True
-                mock_mapnik.Map.assert_called_once_with(1000, 1000)
+                # Create a dummy PNG file so PIL.Image.open does not fail
+                from PIL import Image
+                img = Image.new('RGB', (10, 10), color='white')
+                img.save(output_file)
+                try:
+                    result = map_generator.render_map(style_file, bbox, output_file, 1000, 1000)
+                    assert result is True
+                    mock_mapnik.Map.assert_called_once_with(1000, 1000)
+                finally:
+                    import os
+                    if os.path.exists(output_file):
+                        os.remove(output_file)
 
 
 class TestCreateMapnikStyleUnit:

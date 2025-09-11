@@ -2,9 +2,9 @@ name: Test Lumsden Map Generator
 
 on:
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   push:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -45,13 +45,9 @@ jobs:
     #     python -c "import requests; print('requests OK')"
     #     python -c "try: import mapnik; print('mapnik available'); except ImportError: print('mapnik not available but tests can still run with mocks')"
     
-    - name: Run unit tests
+    - name: Run tests
       run: |
-        python -m pytest tests/test_config.py tests/test_data_processing.py tests/test_style_builder.py -v --tb=short
-    
-    - name: Run integration tests
-      run: |
-        python -m pytest tests/test_integration.py -v --tb=short
+        python -m pytest tests/
     
     - name: Run all tests with coverage
       run: |
