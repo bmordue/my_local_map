@@ -2,6 +2,7 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
+from PIL import Image
 
 class TestMapGeneratorIntegration:
     """Integration tests for the complete map generation process"""
@@ -92,7 +93,6 @@ class TestRenderMapUnit:
                 bbox = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
                 output_file = "test.png"
                 # Create a dummy PNG file so PIL.Image.open does not fail
-                from PIL import Image
                 img = Image.new('RGB', (10, 10), color='white')
                 img.save(output_file)
                 try:
