@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Style Preview Generator for Lumsden Tourist Map
-Creates a grid of map previews showing different styling options
+Creates a grid of map previews showing different styling options including hillshading variants
 """
 
 import os
@@ -11,8 +11,9 @@ from PIL import Image, ImageDraw, ImageFont
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, convert_osm_to_shapefiles
+from utils.elevation_processing import process_elevation_for_hillshading
 
-def render_preview_map(style_name, data_dir, bbox, width_px, height_px):
+def render_preview_map(style_name, data_dir, bbox, width_px, height_px, area_config=None, hillshade_available=False):
     """Render a small preview map using a specific style"""
     try:
         import mapnik
@@ -20,8 +21,8 @@ def render_preview_map(style_name, data_dir, bbox, width_px, height_px):
         print("Error: python-mapnik not available. Install with: pip install mapnik")
         return None
     
-    # Build the style
-    style_file = build_mapnik_style(style_name, data_dir)
+    # Build the style with hillshading configuration
+    style_file = build_mapnik_style(style_name, data_dir, area_config, hillshade_available)
     
     # Create map
     m = mapnik.Map(width_px, height_px)
@@ -49,7 +50,7 @@ def render_preview_map(style_name, data_dir, bbox, width_px, height_px):
     
     return pil_image
 
-def create_style_grid(styles, data_dir, bbox, preview_size, cols=2):
+def create_style_grid(styles, data_dir, bbox, preview_size, area_config=None, hillshade_available=False, cols=2):
     """Create a grid of style previews"""
     print(f"Creating style preview grid with {len(styles)} styles...")
     
@@ -88,7 +89,7 @@ def create_style_grid(styles, data_dir, bbox, preview_size, cols=2):
     
     draw = ImageDraw.Draw(grid_img)
     
-    for i, (style_name, style_title) in enumerate(styles):
+    for i, (style_name, style_title, style_area_config, style_hillshade_available) in enumerate(styles):
         row = i // cols
         col = i % cols
         
@@ -99,7 +100,10 @@ def create_style_grid(styles, data_dir, bbox, preview_size, cols=2):
         y = row * (preview_size[1] + title_height + padding)
         
         # Render the preview map
-        preview_img = render_preview_map(style_name, data_dir, bbox, preview_size[0], preview_size[1])
+        preview_img = render_preview_map(
+            style_name, data_dir, bbox, preview_size[0], preview_size[1], 
+            style_area_config, style_hillshade_available
+        )
         
         if preview_img:
             # Paste the preview into the grid
@@ -156,8 +160,21 @@ def main():
         print(f"📁 Using existing shapefile data: {osm_data_dir}")
         osm_data_dir = str(osm_data_dir)
     
-    # Define available styles
-    styles = [
+    # Process elevation data for hillshading if enabled
+    hillshade_available = False
+    hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
+    if hillshade_file:
+        hillshade_available = True
+        print(f"✓ Hillshading data available: {hillshade_file}")
+    
+    # Create area configs for hillshading variants
+    area_config_no_hillshade = area_config.copy()
+    if 'hillshading' in area_config_no_hillshade:
+        area_config_no_hillshade['hillshading'] = area_config_no_hillshade['hillshading'].copy()
+        area_config_no_hillshade['hillshading']['enabled'] = False
+    
+    # Define available styles including hillshading variants
+    base_styles = [
         ("tourist", "Tourist (Default)"),
         ("blue_theme", "Blue Theme"),
         ("warm_theme", "Warm Theme"), 
@@ -167,13 +184,26 @@ def main():
         ("minimalist", "Minimalist")
     ]
     
+    styles = []
+    
+    # Add standard versions (no hillshading)
+    for style_name, style_title in base_styles:
+        styles.append((style_name, style_title, area_config_no_hillshade, False))
+    
+    # Add hillshading versions if available
+    if hillshade_available:
+        for style_name, style_title in base_styles:
+            hillshade_title = f"{style_title} + Hillshade"
+            styles.append((style_name, hillshade_title, area_config, True))
+    
     print(f"🎨 Available styles: {len(styles)}")
-    for style_name, style_title in styles:
-        print(f"  • {style_title}")
+    for style_name, style_title, _, hillshade_enabled in styles:
+        hillshade_status = "with hillshading" if hillshade_enabled else "standard"
+        print(f"  • {style_title} ({hillshade_status})")
     print()
     
     # Create the style grid
-    grid_img = create_style_grid(styles, osm_data_dir, bbox, (preview_width, preview_height), cols=3)
+    grid_img = create_style_grid(styles, osm_data_dir, bbox, (preview_width, preview_height), cols=4)
     
     # Save the grid
     data_dir.mkdir(exist_ok=True)
@@ -185,10 +215,15 @@ def main():
     preview_dir.mkdir(exist_ok=True)
     
     print("\n📁 Saving individual previews...")
-    for style_name, style_title in styles:
-        preview_img = render_preview_map(style_name, osm_data_dir, bbox, preview_width, preview_height)
+    for style_name, style_title, style_area_config, style_hillshade_available in styles:
+        preview_img = render_preview_map(
+            style_name, osm_data_dir, bbox, preview_width, preview_height, 
+            style_area_config, style_hillshade_available
+        )
         if preview_img:
-            preview_file = preview_dir / f"{style_name}_preview.png"
+            # Create safe filename
+            safe_title = style_title.replace(" ", "_").replace("+", "plus").replace("(", "").replace(")", "")
+            preview_file = preview_dir / f"{safe_title}_preview.png"
             preview_img.save(str(preview_file), 'PNG')
             print(f"  ✓ Saved {preview_file}")
     
@@ -196,7 +231,15 @@ def main():
     print(f"\n🎉 SUCCESS!")
     print(f"📄 Style grid: {output_file} ({file_size_kb:.1f} KB)")
     print(f"📁 Individual previews: {preview_dir}")
-    print(f"🎯 Grid shows {len(styles)} different style options at lower resolution")
+    
+    if hillshade_available:
+        standard_count = len(base_styles)
+        hillshade_count = len(base_styles)
+        print(f"🎯 Grid shows {standard_count} standard styles + {hillshade_count} hillshading variants")
+        print(f"⛰️  Hillshading enhances topographical visualization with terrain relief")
+    else:
+        print(f"🎯 Grid shows {len(styles)} different style options at lower resolution")
+        print(f"ℹ️  Enable hillshading in config/areas.json to see terrain variants")
     
     return 0
 

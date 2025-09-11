@@ -9,6 +9,14 @@
       "height_km": 12
     },
     "scale": 25000,
-    "name": "Lumsden, Aberdeenshire"
+    "name": "Lumsden, Aberdeenshire",
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    }
   }
 }
