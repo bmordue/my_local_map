@@ -9,7 +9,7 @@ def calculate_elevation_bbox(bbox, buffer_km=1.0):
     """Calculate elevation data bounding box with buffer for hillshading"""
     # Add buffer to ensure good hillshading at edges
     lat_buffer = buffer_km / 111.0  # ~1 degree = 111 km
-    lon_buffer = buffer_km / (111.0 * abs(bbox['north'] + bbox['south']) / 2.0)  # Adjust for latitude
+    lon_buffer = buffer_km / (111.0 * math.cos(math.radians((bbox['north'] + bbox['south']) / 2.0)))  # Adjust for latitude
     
     return {
         'west': bbox['west'] - lon_buffer,
