@@ -23,3 +23,9 @@ styles/tourist_map_style.xml
 
 .gemini/
 gha-creds-*.json
+
+# Nix
+.direnv/
+result
+result-*
+flake.lock

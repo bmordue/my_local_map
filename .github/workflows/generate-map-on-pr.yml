@@ -20,16 +20,18 @@ jobs:
     - name: Setup Nix cache
       uses: cachix/cachix-action@v12
       with:
-        name: nixpkgs-unfree
+        name: devenv
         skipPush: true
     
     - name: Verify installations
       run: |
-        nix-shell --run "ogr2ogr --version"
-        nix-shell --run "python -c 'import requests; print(\"✓ requests available\")'"
-        nix-shell --run "python -c 'import mapnik; print(\"✓ mapnik available\")'"
-        nix-shell --run "python -c 'from PIL import Image; print(\"✓ Pillow available\")'"
-        nix-shell --run "python -c 'import os; print(\"✓ Python standard library available\")'"
+        nix develop --command bash -c "
+          ogr2ogr --version
+          python -c 'import requests; print(\"✓ requests available\")'
+          python -c 'import mapnik; print(\"✓ mapnik available\")'
+          python -c 'from PIL import Image; print(\"✓ Pillow available\")'
+          python -c 'import os; print(\"✓ Python standard library available\")'
+        "
     
     - name: Create sample OSM data for offline operation
       run: |
@@ -87,7 +89,7 @@ jobs:
         mv config/areas_no_hillshade.json config/areas.json
         
         # Generate standard map
-        nix-shell --run "python map_generator.py"
+        nix develop --command python map_generator.py
         
         # Move standard map to separate location
         mkdir -p data/standard
@@ -103,7 +105,7 @@ jobs:
         rm -rf data/osm_data
         
         # Generate hillshading map
-        nix-shell --run "python map_generator.py"
+        nix develop --command python map_generator.py
         
         # Move hillshading map to separate location
         mkdir -p data/hillshading
