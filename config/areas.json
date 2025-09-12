@@ -9,6 +9,25 @@
       "height_km": 12
     },
     "scale": 25000,
-    "name": "Lumsden, Aberdeenshire"
+    "name": "Lumsden, Aberdeenshire",
+    "contours": {
+      "enabled": true,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "color": "#8B4513",
+        "width": 0.5,
+        "major_width": 1.0,
+        "opacity": 0.7
+      },
+      "hillshading": {
+        "enabled": true,
+        "opacity": 0.4,
+        "azimuth": 315,
+        "altitude": 45,
+        "z_factor": 1.0,
+        "scale": 111120
+      }
+    }
   }
 }

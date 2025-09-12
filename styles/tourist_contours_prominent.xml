@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tourist style with prominent contour lines -->
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
+     background-color="#f8f8f8">
+
+  <!-- FONT DEFINITIONS for text labels -->
+  <FontSet name="regular">
+    <Font face-name="DejaVu Sans Book"/>
+    <Font face-name="Liberation Sans Regular"/>
+    <Font face-name="Bitstream Vera Sans"/>
+  </FontSet>
+  
+  <FontSet name="bold">
+    <Font face-name="DejaVu Sans Bold"/>
+    <Font face-name="Liberation Sans Bold"/>
+    <Font face-name="Bitstream Vera Sans Bold"/>
+  </FontSet>
+
+  <!-- LAND USE / BACKGROUND -->
+  <Style name="landuse">
+    <Rule>
+      <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
+      <PolygonSymbolizer fill="#d4e6b7" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[landuse] = 'farmland' or [landuse] = 'grass'</Filter>
+      <PolygonSymbolizer fill="#e8f5d4" fill-opacity="0.4"/>
+    </Rule>
+  </Style>
+  
+  <!-- CONTOUR LINES - prominent elevation representation -->
+  <Style name="contours">
+    <!-- Major contour lines (every 50m) - very prominent -->
+    <Rule>
+      <Filter>[elevation] % 50 = 0</Filter>
+      <LineSymbolizer stroke="#654321" stroke-width="2.0" stroke-opacity="1.0"/>
+      <!-- Large elevation labels for major contours -->
+      <TextSymbolizer size="10" fill="#654321" fontset-name="bold" 
+                      halo-fill="#ffffff" halo-radius="2" 
+                      allow-overlap="false" placement="line" spacing="150">[elevation]</TextSymbolizer>
+    </Rule>
+    <!-- Minor contour lines (every 10m) - more visible -->
+    <Rule>
+      <Filter>[elevation] % 50 != 0</Filter>
+      <LineSymbolizer stroke="#8B4513" stroke-width="1.0" stroke-opacity="0.8"/>
+    </Rule>
+  </Style>
+
+  <!-- LAYER DEFINITIONS -->
+  <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>landuse</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- CONTOUR LINES - elevation contours (prominent version) -->
+  <Layer name="contours" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>contours</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/contours.shp</Parameter>
+    </Datasource>
+  </Layer>
+
+</Map>

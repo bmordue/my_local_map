@@ -97,7 +97,7 @@ Preview size is configured in `config/output_formats.json`:
 ### Dependencies
 
 - **Mapnik**: Map rendering engine
-- **PIL (Pillow)**: Image processing for grid creation
+- **Pillow**: Image processing for grid creation
 - **GDAL**: Geospatial data processing
 
 ### Architecture

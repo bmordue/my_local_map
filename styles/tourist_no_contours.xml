@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tourist style without contour lines for comparison -->
+<Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over" 
+     background-color="#f8f8f8">
+
+  <!-- Include all styles from tourist.xml but exclude the contour style and layer -->
+  <!-- This template demonstrates the map without elevation data -->
+  
+  <!-- FONT DEFINITIONS for text labels -->
+  <FontSet name="regular">
+    <Font face-name="DejaVu Sans Book"/>
+    <Font face-name="Liberation Sans Regular"/>
+    <Font face-name="Bitstream Vera Sans"/>
+  </FontSet>
+  
+  <FontSet name="bold">
+    <Font face-name="DejaVu Sans Bold"/>
+    <Font face-name="Liberation Sans Bold"/>
+    <Font face-name="Bitstream Vera Sans Bold"/>
+  </FontSet>
+  
+  <FontSet name="italic">
+    <Font face-name="DejaVu Sans Oblique"/>
+    <Font face-name="Liberation Sans Italic"/>
+    <Font face-name="Bitstream Vera Sans Oblique"/>
+  </FontSet>
+
+  <!-- LAND USE / BACKGROUND -->
+  <Style name="landuse">
+    <Rule>
+      <Filter>[landuse] = 'forest' or [natural] = 'wood'</Filter>
+      <PolygonSymbolizer fill="#d4e6b7" fill-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[landuse] = 'farmland' or [landuse] = 'grass'</Filter>
+      <PolygonSymbolizer fill="#e8f5d4" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
+      <PolygonSymbolizer fill="#c8facc" fill-opacity="0.8"/>
+    </Rule>
+  </Style>
+
+  <!-- Note: This template intentionally excludes contour layers for comparison -->
+  
+  <!-- Include basic layers only -->
+  <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>landuse</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- No contour layer in this style variation -->
+
+</Map>

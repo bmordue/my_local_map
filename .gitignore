@@ -20,3 +20,6 @@ htmlcov/
 .DS_Store
 Thumbs.db
 styles/tourist_map_style.xml
+
+.gemini/
+gha-creds-*.json
