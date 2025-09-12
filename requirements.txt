@@ -1,0 +1,3 @@
+# Core dependencies for map generation
+requests>=2.25.0
+Pillow>=8.0.0

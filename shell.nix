@@ -6,7 +6,9 @@ pkgs.mkShell {
     python312
     python312Packages.requests
     python312Packages.python-mapnik
+    python312Packages.pytest
     python312Packages.cairosvg
+    python312Packages.pillow
 
     # GDAL for OSM conversion
     gdal
@@ -14,10 +16,11 @@ pkgs.mkShell {
     # Basic tools
     curl
     unzip
-
-#    claude-code
-#    gemini-cli
-  ];
+  ]
+  ++ (if pkgs.config.allowUnfree or false then [
+    pkgs.gemini-cli
+    pkgs.claude-code
+  ] else []);
 
   shellHook = ''
     echo "Made available:"
@@ -27,5 +30,6 @@ pkgs.mkShell {
     echo ""
     echo "Ready to run: python map_generator.py"
     echo ""
+    echo "Optional: npx @qwen-code/qwen-code"
   '';
 }

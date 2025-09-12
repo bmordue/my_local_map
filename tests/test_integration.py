@@ -1,12 +1,8 @@
 """Integration tests for the main map generator application"""
 
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
-import tempfile
-import os
-import sys
-
+from unittest.mock import patch, MagicMock
+from PIL import Image
 
 class TestMapGeneratorIntegration:
     """Integration tests for the complete map generation process"""
@@ -96,11 +92,17 @@ class TestRenderMapUnit:
                 style_file = "test.xml"
                 bbox = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
                 output_file = "test.png"
-                
-                result = map_generator.render_map(style_file, bbox, output_file, 1000, 1000)
-                
-                assert result is True
-                mock_mapnik.Map.assert_called_once_with(1000, 1000)
+                # Create a dummy PNG file so PIL.Image.open does not fail
+                img = Image.new('RGB', (10, 10), color='white')
+                img.save(output_file)
+                try:
+                    result = map_generator.render_map(style_file, bbox, output_file, 1000, 1000)
+                    assert result is True
+                    mock_mapnik.Map.assert_called_once_with(1000, 1000)
+                finally:
+                    import os
+                    if os.path.exists(output_file):
+                        os.remove(output_file)
 
 
 class TestCreateMapnikStyleUnit:
@@ -111,13 +113,15 @@ class TestCreateMapnikStyleUnit:
         """Test that create_mapnik_style calls the build function correctly"""
         import map_generator
         
+        area_config = {"hillshading": {"enabled": True}}
+        
         with patch('map_generator.build_mapnik_style') as mock_build:
             mock_build.return_value = "tourist_map_style.xml"
             
-            result = map_generator.create_mapnik_style("/test/data")
+            result = map_generator.create_mapnik_style("/test/data", area_config, True)
             
             assert result == "tourist_map_style.xml"
-            mock_build.assert_called_once_with("tourist", "/test/data")
+            mock_build.assert_called_once_with("tourist", "/test/data", area_config, True)
 
 
 class TestConfigurationHandling:
@@ -133,30 +137,25 @@ class TestConfigurationHandling:
              patch('map_generator.calculate_pixel_dimensions') as mock_calc_pixels, \
              patch('map_generator.calculate_bbox') as mock_calc_bbox, \
              patch('pathlib.Path.exists', return_value=True), \
-             patch('map_generator.convert_osm_to_shapefiles', return_value="/data"), \
+             patch('map_generator.convert_osm_to_shapefiles', return_value="data"), \
              patch('map_generator.create_mapnik_style', return_value="style.xml"), \
              patch('map_generator.render_map', return_value=True):
-            
             # Setup return values
             area_config = {"center": {"lat": 57.3167, "lon": -2.8833}, 
                           "coverage": {"width_km": 8, "height_km": 12},
                           "scale": 25000}
             output_format = {"width_mm": 297, "height_mm": 420, "dpi": 300}
-            
             mock_load_area.return_value = area_config
             mock_load_output.return_value = output_format
             mock_calc_pixels.return_value = (3507, 4960)
             mock_calc_bbox.return_value = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
-            
             # Run main
             result = map_generator.main()
-            
             # Verify function calls
             mock_load_area.assert_called_once_with("lumsden")
             mock_load_output.assert_called_once_with("A3")
             mock_calc_pixels.assert_called_once_with(output_format)
             mock_calc_bbox.assert_called_once_with(57.3167, -2.8833, 8, 12)
-            
             assert result == 0
 
 

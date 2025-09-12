@@ -19,6 +19,14 @@
         "width": 0.5,
         "major_width": 1.0,
         "opacity": 0.7
+      },
+      "hillshading": {
+        "enabled": true,
+        "opacity": 0.4,
+        "azimuth": 315,
+        "altitude": 45,
+        "z_factor": 1.0,
+        "scale": 111120
       }
     }
   }

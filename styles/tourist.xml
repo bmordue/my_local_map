@@ -21,6 +21,13 @@
     <Font face-name="Bitstream Vera Sans Oblique"/>
   </FontSet>
 
+  <!-- HILLSHADING - topographic relief -->
+  <Style name="hillshade">
+    <Rule>
+      <RasterSymbolizer opacity="$HILLSHADE_OPACITY" comp-op="multiply" scaling="bilinear"/>
+    </Rule>
+  </Style>
+
   <!-- LAND USE / BACKGROUND -->
   <Style name="landuse">
     <Rule>
@@ -285,6 +292,16 @@
   </Style>
 
   <!-- LAYER DEFINITIONS -->
+  
+  <!-- Hillshade layer - rendered first as background -->
+  <Layer name="hillshade" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs" status="$HILLSHADE_STATUS">
+    <StyleName>hillshade</StyleName>
+    <Datasource>
+      <Parameter name="type">gdal</Parameter>
+      <Parameter name="file">$HILLSHADE_FILE</Parameter>
+    </Datasource>
+  </Layer>
+
   <Layer name="landuse" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
     <StyleName>landuse</StyleName>
     <Datasource>

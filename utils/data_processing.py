@@ -4,6 +4,7 @@ import math
 import requests
 import subprocess
 import tempfile
+import os
 from pathlib import Path
 
 
@@ -208,6 +209,7 @@ def download_elevation_data(bbox, output_file="elevation_data.tif"):
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         
         # The temporary file is automatically deleted when the 'with' block is exited
+
         
         if Path(output_file).exists():
             print(f"✓ Created elevation data: {output_file}")
