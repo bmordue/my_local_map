@@ -209,3 +209,112 @@ class TestStyleBuilder:
         write_calls = mock_file().write.call_args_list
         written_content = ''.join([call[0][0] for call in write_calls])
         assert written_content == template_no_subs
+
+    @pytest.mark.unit
+    def test_build_mapnik_style_hillshading_enabled(self):
+        """Test style building with hillshading enabled"""
+        template_with_hillshade = """<?xml version="1.0" encoding="utf-8"?>
+<Map>
+  <Style name="hillshade">
+    <Rule>
+      <RasterSymbolizer opacity="$HILLSHADE_OPACITY"/>
+    </Rule>
+  </Style>
+  <Layer name="hillshade" status="$HILLSHADE_STATUS">
+    <Datasource>
+      <Parameter name="file">$HILLSHADE_FILE</Parameter>
+    </Datasource>
+  </Layer>
+  <Layer name="test">
+    <Datasource>
+      <Parameter name="file">$DATA_DIR/test.shp</Parameter>
+    </Datasource>
+  </Layer>
+</Map>"""
+        
+        data_dir = "/test/data"
+        area_config = {
+            'hillshading': {
+                'enabled': True,
+                'opacity': 0.6,
+                'azimuth': 270,
+                'altitude': 30
+            }
+        }
+        
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("builtins.open", mock_open(read_data=template_with_hillshade)) as mock_file:
+                result = build_mapnik_style("hillshade_test", data_dir, area_config, hillshade_available=True)
+        
+        assert result == "styles/hillshade_test_map_style.xml"
+        
+        # Verify hillshading parameters were substituted
+        write_calls = mock_file().write.call_args_list
+        written_content = ''.join([call[0][0] for call in write_calls])
+        
+        assert "opacity=\"0.6\"" in written_content
+        assert "status=\"on\"" in written_content
+        assert "/test/data/hillshade.tif" in written_content
+
+    @pytest.mark.unit
+    def test_build_mapnik_style_hillshading_disabled(self):
+        """Test style building with hillshading disabled"""
+        template_with_hillshade = """<?xml version="1.0" encoding="utf-8"?>
+<Map>
+  <Style name="hillshade">
+    <Rule>
+      <RasterSymbolizer opacity="$HILLSHADE_OPACITY"/>
+    </Rule>
+  </Style>
+  <Layer name="hillshade" status="$HILLSHADE_STATUS">
+    <Datasource>
+      <Parameter name="file">$HILLSHADE_FILE</Parameter>
+    </Datasource>
+  </Layer>
+</Map>"""
+        
+        data_dir = "/test/data"
+        area_config = {
+            'hillshading': {
+                'enabled': False
+            }
+        }
+        
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("builtins.open", mock_open(read_data=template_with_hillshade)) as mock_file:
+                result = build_mapnik_style("hillshade_disabled", data_dir, area_config, hillshade_available=False)
+        
+        assert result == "styles/hillshade_disabled_map_style.xml"
+        
+        # Verify hillshading is disabled
+        write_calls = mock_file().write.call_args_list
+        written_content = ''.join([call[0][0] for call in write_calls])
+        
+        assert "status=\"off\"" in written_content
+        assert "<Parameter name=\"file\"></Parameter>" in written_content  # Empty file path
+
+    @pytest.mark.unit
+    def test_build_mapnik_style_no_area_config(self):
+        """Test style building without area config (hillshading should be disabled)"""
+        template_with_hillshade = """<?xml version="1.0" encoding="utf-8"?>
+<Map>
+  <Layer name="hillshade" status="$HILLSHADE_STATUS">
+    <Datasource>
+      <Parameter name="file">$HILLSHADE_FILE</Parameter>
+    </Datasource>
+  </Layer>
+</Map>"""
+        
+        data_dir = "/test/data"
+        
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("builtins.open", mock_open(read_data=template_with_hillshade)) as mock_file:
+                result = build_mapnik_style("no_config", data_dir)
+        
+        assert result == "styles/no_config_map_style.xml"
+        
+        # Verify hillshading is disabled by default
+        write_calls = mock_file().write.call_args_list
+        written_content = ''.join([call[0][0] for call in write_calls])
+        
+        assert "status=\"off\"" in written_content

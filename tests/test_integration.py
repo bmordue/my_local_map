@@ -1,12 +1,8 @@
 """Integration tests for the main map generator application"""
 
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
-import tempfile
-import os
-import sys
-
+from unittest.mock import patch, MagicMock
+from PIL import Image
 
 class TestMapGeneratorIntegration:
     """Integration tests for the complete map generation process"""
@@ -96,11 +92,17 @@ class TestRenderMapUnit:
                 style_file = "test.xml"
                 bbox = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
                 output_file = "test.png"
-                # Patch PIL.Image.open to avoid FileNotFoundError
-                with patch('PIL.Image.open', MagicMock()):
+                # Create a dummy PNG file so PIL.Image.open does not fail
+                img = Image.new('RGB', (10, 10), color='white')
+                img.save(output_file)
+                try:
                     result = map_generator.render_map(style_file, bbox, output_file, 1000, 1000)
                     assert result is True
                     mock_mapnik.Map.assert_called_once_with(1000, 1000)
+                finally:
+                    import os
+                    if os.path.exists(output_file):
+                        os.remove(output_file)
 
 
 class TestCreateMapnikStyleUnit:
@@ -111,11 +113,15 @@ class TestCreateMapnikStyleUnit:
         """Test that create_mapnik_style calls the build function correctly"""
         import map_generator
         
+        area_config = {"hillshading": {"enabled": True}}
+        
         with patch('map_generator.build_mapnik_style') as mock_build:
             mock_build.return_value = "tourist_map_style.xml"
-            result = map_generator.create_mapnik_style("/test/data")
+            
+            result = map_generator.create_mapnik_style("/test/data", area_config, True)
+            
             assert result == "tourist_map_style.xml"
-            mock_build.assert_called_once_with("tourist", "/test/data")
+            mock_build.assert_called_once_with("tourist", "/test/data", area_config, True)
 
 
 class TestConfigurationHandling:

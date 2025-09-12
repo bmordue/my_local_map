@@ -43,6 +43,9 @@ sudo apt-get install gdal-bin python3-mapnik
 git clone https://github.com/bmordue/my_local_map.git
 cd my_local_map
 
+# Install Python dependencies
+pip3 install -r requirements.txt
+
 # Run enhanced map generator
 python3 map_generator.py
 ```

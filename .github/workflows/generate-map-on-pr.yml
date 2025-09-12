@@ -28,6 +28,7 @@ jobs:
         nix-shell --run "ogr2ogr --version"
         nix-shell --run "python -c 'import requests; print(\"✓ requests available\")'"
         nix-shell --run "python -c 'import mapnik; print(\"✓ mapnik available\")'"
+        nix-shell --run "python -c 'from PIL import Image; print(\"✓ Pillow available\")'"
         nix-shell --run "python -c 'import os; print(\"✓ Python standard library available\")'"
     
     - name: Create sample OSM data for offline operation
@@ -76,53 +77,114 @@ jobs:
         </osm>
         EOF
     
-    - name: Generate Tourist Map
+    - name: Generate Standard Tourist Map (No Hillshading)
       run: |
+        # Backup original config
+        cp config/areas.json config/areas.json.backup
+        
+        # Create temporary config with hillshading disabled
+        cat config/areas.json | jq '.lumsden.hillshading.enabled = false' > config/areas_no_hillshade.json
+        mv config/areas_no_hillshade.json config/areas.json
+        
+        # Generate standard map
         nix-shell --run "python map_generator.py"
+        
+        # Move standard map to separate location
+        mkdir -p data/standard
+        mv data/lumsden_tourist_map_A3.png data/standard/
+        mv styles/tourist_map_style.xml data/standard/
+        
+    - name: Generate Hillshading Tourist Map
+      run: |
+        # Restore original config (with hillshading enabled)
+        cp config/areas.json.backup config/areas.json
+        
+        # Clean any existing data to ensure fresh generation
+        rm -rf data/osm_data
+        
+        # Generate hillshading map
+        nix-shell --run "python map_generator.py"
+        
+        # Move hillshading map to separate location
+        mkdir -p data/hillshading
+        mv data/lumsden_tourist_map_A3.png data/hillshading/
+        mv styles/tourist_map_style.xml data/hillshading/
         
     - name: Verify map generation
       run: |
         echo "=== Generated Files ==="
         ls -la data/
         echo ""
-        echo "=== Map File Details ==="
-        if [ -f "data/lumsden_tourist_map_A3.png" ]; then
-          file data/lumsden_tourist_map_A3.png
-          ls -lh data/lumsden_tourist_map_A3.png
-          echo "✓ Map successfully generated!"
+        echo "=== Standard Map ==="
+        if [ -f "data/standard/lumsden_tourist_map_A3.png" ]; then
+          file data/standard/lumsden_tourist_map_A3.png
+          ls -lh data/standard/lumsden_tourist_map_A3.png
+          echo "✓ Standard map successfully generated!"
         else
-          echo "❌ Map file not found!"
+          echo "❌ Standard map file not found!"
+          exit 1
+        fi
+        echo ""
+        echo "=== Hillshading Map ==="
+        if [ -f "data/hillshading/lumsden_tourist_map_A3.png" ]; then
+          file data/hillshading/lumsden_tourist_map_A3.png
+          ls -lh data/hillshading/lumsden_tourist_map_A3.png
+          echo "✓ Hillshading map successfully generated!"
+        else
+          echo "❌ Hillshading map file not found!"
           exit 1
         fi
         
-    - name: Upload Generated Map as Artifact
+    - name: Upload Standard Map as Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: lumsden-tourist-map-pr-${{ github.event.number }}
+        name: lumsden-tourist-map-standard-pr-${{ github.event.number }}
         path: |
-          data/lumsden_tourist_map_A3.png
-          styles/tourist_map_style.xml
+          data/standard/lumsden_tourist_map_A3.png
+          data/standard/tourist_map_style.xml
+        retention-days: 30
+        
+    - name: Upload Hillshading Map as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lumsden-tourist-map-hillshading-pr-${{ github.event.number }}
+        path: |
+          data/hillshading/lumsden_tourist_map_A3.png
+          data/hillshading/tourist_map_style.xml
+          data/osm_data/hillshade.tif
         retention-days: 30
         
     - name: Add Map Generation Summary
       run: |
-        echo "## 🗺️ Tourist Map Generated" >> $GITHUB_STEP_SUMMARY
+        echo "## 🗺️ Tourist Maps Generated" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "The Lumsden tourist map has been successfully generated for this PR." >> $GITHUB_STEP_SUMMARY
+        echo "The Lumsden tourist maps have been successfully generated for this PR in **two versions**:" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📁 Generated Files:" >> $GITHUB_STEP_SUMMARY
+        echo "### 📁 Generated Map Versions:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### 🗺️ Standard Version" >> $GITHUB_STEP_SUMMARY
         echo "- **Map Image**: \`lumsden_tourist_map_A3.png\` (A3 format, 3507×4960 pixels)" >> $GITHUB_STEP_SUMMARY
         echo "- **Style Definition**: \`tourist_map_style.xml\` (Mapnik styling)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Features**: Standard tourist map with POIs, roads, and landmarks" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### ⛰️ Hillshading Version" >> $GITHUB_STEP_SUMMARY
+        echo "- **Map Image**: \`lumsden_tourist_map_A3.png\` (A3 format, 3507×4960 pixels)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Style Definition**: \`tourist_map_style.xml\` (Mapnik styling with hillshading)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Hillshade Data**: \`hillshade.tif\` (Elevation-based terrain visualization)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Features**: Enhanced topographical visualization with terrain relief" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📋 Map Specifications:" >> $GITHUB_STEP_SUMMARY
         echo "- **Print Size**: A3 (297×420mm at 300 DPI)" >> $GITHUB_STEP_SUMMARY
         echo "- **Coverage Area**: 8×12km around Lumsden, Aberdeenshire" >> $GITHUB_STEP_SUMMARY
         echo "- **Scale**: 1:25,000 (ideal for tourist planning)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Hillshading**: Configurable terrain relief visualization (40% opacity, 315° azimuth)" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 💾 Download Instructions:" >> $GITHUB_STEP_SUMMARY
         echo "1. Go to the **Actions** tab of this PR" >> $GITHUB_STEP_SUMMARY
         echo "2. Click on this workflow run" >> $GITHUB_STEP_SUMMARY
-        echo "3. Download the **lumsden-tourist-map-pr-${{ github.event.number }}** artifact" >> $GITHUB_STEP_SUMMARY
-        echo "4. Extract and view the PNG file to see the visual changes" >> $GITHUB_STEP_SUMMARY
+        echo "3. Download artifacts:" >> $GITHUB_STEP_SUMMARY
+        echo "   - **lumsden-tourist-map-standard-pr-${{ github.event.number }}** - Standard version" >> $GITHUB_STEP_SUMMARY
+        echo "   - **lumsden-tourist-map-hillshading-pr-${{ github.event.number }}** - Hillshading version" >> $GITHUB_STEP_SUMMARY
+        echo "4. Extract and compare both PNG files to see the visual differences" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "_Perfect for reviewing the visual impact of your map generation changes!_ 🎯" >> $GITHUB_STEP_SUMMARY
+        echo "_Perfect for reviewing both standard and enhanced topographical visualization changes!_ 🎯⛰️" >> $GITHUB_STEP_SUMMARY
