@@ -28,6 +28,23 @@
     </Rule>
   </Style>
 
+  <!-- CONTOUR LINES - elevation contours -->
+  <Style name="contours">
+    <!-- Minor contours -->
+    <Rule>
+      <Filter>[elevation] % $CONTOUR_MAJOR_INTERVAL != 0</Filter>
+      <LineSymbolizer stroke="$CONTOUR_MINOR_COLOR" stroke-width="$CONTOUR_MINOR_WIDTH" stroke-opacity="$CONTOUR_MINOR_OPACITY"/>
+    </Rule>
+    <!-- Major contours -->
+    <Rule>
+      <Filter>[elevation] % $CONTOUR_MAJOR_INTERVAL = 0</Filter>
+      <LineSymbolizer stroke="$CONTOUR_MAJOR_COLOR" stroke-width="$CONTOUR_MAJOR_WIDTH" stroke-opacity="$CONTOUR_MAJOR_OPACITY"/>
+      <!-- Add elevation labels on major contours -->
+      <TextSymbolizer size="8" fill="$CONTOUR_MAJOR_COLOR" fontset-name="regular" placement="line" 
+                      spacing="200" allow-overlap="false">[elevation]</TextSymbolizer>
+    </Rule>
+  </Style>
+
   <!-- LAND USE / BACKGROUND -->
   <Style name="landuse">
     <Rule>
@@ -299,6 +316,15 @@
     <Datasource>
       <Parameter name="type">gdal</Parameter>
       <Parameter name="file">$HILLSHADE_FILE</Parameter>
+    </Datasource>
+  </Layer>
+
+  <!-- Contour lines layer - rendered after hillshade but before other features -->
+  <Layer name="contours" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs" status="$CONTOURS_STATUS">
+    <StyleName>contours</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/contours.shp</Parameter>
     </Datasource>
   </Layer>
 
