@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.60">
+<bounds minlat="57.2600" minlon="-2.9500" maxlat="57.3700" maxlon="-2.8200"/>
+
+<!-- Sample data for testing -->
+<node id="1" lat="57.3167" lon="-2.8833">
+  <tag k="place" v="village"/>
+  <tag k="name" v="Lumsden"/>
+</node>
+
+<node id="2" lat="57.320" lon="-2.870">
+  <tag k="natural" v="water"/>
+</node>
+
+<node id="3" lat="57.330" lon="-2.875">
+  <tag k="tourism" v="viewpoint"/>
+  <tag k="name" v="Highland Viewpoint"/>
+</node>
+
+<way id="10">
+  <nd ref="1"/>
+  <nd ref="2"/>
+  <tag k="highway" v="secondary"/>
+  <tag k="name" v="Test Road"/>
+</way>
+
+<relation id="100">
+  <member type="node" ref="1" role=""/>
+  <tag k="landuse" v="forest"/>
+  <tag k="name" v="Test Forest"/>
+</relation>
+
+</osm>

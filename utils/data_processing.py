@@ -3,6 +3,7 @@
 import math
 import requests
 import subprocess
+import tempfile
 import os
 from pathlib import Path
 
@@ -169,11 +170,9 @@ def download_elevation_data(bbox, output_file="elevation_data.tif"):
         width = max(width, 100)
         height = max(height, 100)
         
-        # Create elevation data using gdal_translate and synthetic data
-        temp_xyz = Path("temp_elevation.xyz")
-        
-        # Generate synthetic elevation data representing Highland topography
-        with open(temp_xyz, 'w') as f:
+        # Use temporary file with proper cleanup instead of current directory
+        with tempfile.NamedTemporaryFile(mode='w+', suffix='.xyz', delete=True) as temp_f:
+            # Generate synthetic elevation data representing Highland topography
             for y in range(height):
                 for x in range(width):
                     # Map pixel coordinates to geographic coordinates
@@ -192,22 +191,25 @@ def download_elevation_data(bbox, output_file="elevation_data.tif"):
                     )
                     
                     elevation = max(0, base_elevation + variation)
-                    f.write(f"{lon} {lat} {elevation:.1f}\n")
+                    temp_f.write(f"{lon} {lat} {elevation:.1f}\n")
+            
+            # Rewind file after writing
+            temp_f.seek(0)
+            
+            # Convert XYZ to GeoTIFF using GDAL
+            cmd = [
+                "gdal_translate",
+                "-of", "GTiff",
+                "-a_srs", "EPSG:4326",  # WGS84
+                "-ot", "Float32",
+                temp_f.name,
+                str(output_file)
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         
-        # Convert XYZ to GeoTIFF using GDAL
-        cmd = [
-            "gdal_translate",
-            "-of", "GTiff",
-            "-a_srs", "EPSG:4326",  # WGS84
-            "-ot", "Float32",
-            str(temp_xyz),
-            str(output_file)
-        ]
-        
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        
-        # Clean up temporary file
-        temp_xyz.unlink(missing_ok=True)
+        # The temporary file is automatically deleted when the 'with' block is exited
+
         
         if Path(output_file).exists():
             print(f"✓ Created elevation data: {output_file}")
@@ -218,8 +220,6 @@ def download_elevation_data(bbox, output_file="elevation_data.tif"):
             
     except Exception as e:
         print(f"⚠ Error creating elevation data: {e}")
-        # Clean up on error
-        Path("temp_elevation.xyz").unlink(missing_ok=True)
         return None
 
 
