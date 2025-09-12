@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="manual">
+  <!-- Minimal OSM data for testing purposes -->
+  <node id="1" version="1" timestamp="2023-01-01T00:00:00Z" changeset="1" uid="1" user="test" lat="57.3167" lon="-2.8833"/>
+  <node id="2" version="1" timestamp="2023-01-01T00:00:00Z" changeset="1" uid="1" user="test" lat="57.3267" lon="-2.8733"/>
+  <node id="3" version="1" timestamp="2023-01-01T00:00:00Z" changeset="1" uid="1" user="test" lat="57.3067" lon="-2.8933"/>
+  
+  <way id="1" version="1" timestamp="2023-01-01T00:00:00Z" changeset="1" uid="1" user="test">
+    <nd ref="1"/>
+    <nd ref="2"/>
+    <tag k="highway" v="primary"/>
+    <tag k="name" v="Main Road"/>
+  </way>
+  
+  <way id="2" version="1" timestamp="2023-01-01T00:00:00Z" changeset="1" uid="1" user="test">
+    <nd ref="2"/>
+    <nd ref="3"/>
+    <tag k="waterway" v="river"/>
+    <tag k="name" v="Test River"/>
+  </way>
+</osm>
