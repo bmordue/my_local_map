@@ -318,3 +318,70 @@ class TestStyleBuilder:
         written_content = ''.join([call[0][0] for call in write_calls])
         
         assert "status=\"off\"" in written_content
+
+    @pytest.mark.unit
+    def test_build_mapnik_style_contours_enabled(self):
+        """Test style building with contours enabled in configuration"""
+        template_with_contours = """
+        <Style name="contours">
+          <Rule>
+            <Filter>[elevation] % $CONTOUR_MAJOR_INTERVAL != 0</Filter>
+            <LineSymbolizer stroke="$CONTOUR_MINOR_COLOR" stroke-width="$CONTOUR_MINOR_WIDTH"/>
+          </Rule>
+        </Style>
+        <Layer name="contours" status="$CONTOURS_STATUS">
+          <Datasource><Parameter name="file">$DATA_DIR/contours.shp</Parameter></Datasource>
+        </Layer>
+        """
+        
+        area_config = {
+            'contours': {
+                'enabled': True,
+                'interval': 10,
+                'major_interval': 25,
+                'style': {
+                    'minor': {'color': '#FF0000', 'width': 0.8, 'opacity': 0.7},
+                    'major': {'color': '#AA0000', 'width': 1.5, 'opacity': 0.9}
+                }
+            }
+        }
+        
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("builtins.open", mock_open(read_data=template_with_contours)) as mock_file:
+                with patch("pathlib.Path.resolve", return_value=Path("/test/data")):
+                    result = build_mapnik_style("test", "/data", area_config)
+                    
+                    # Get the written content
+                    written_content = mock_file.return_value.write.call_args[0][0]
+                    
+                    # Verify contour configuration was substituted correctly
+                    assert 'status="on"' in written_content
+                    assert '[elevation] % 25 != 0' in written_content
+                    assert 'stroke="#FF0000"' in written_content
+                    assert 'stroke-width="0.8"' in written_content
+
+    @pytest.mark.unit
+    def test_build_mapnik_style_contours_disabled(self):
+        """Test style building with contours disabled in configuration"""
+        template_with_contours = """
+        <Layer name="contours" status="$CONTOURS_STATUS">
+          <Datasource><Parameter name="file">$DATA_DIR/contours.shp</Parameter></Datasource>
+        </Layer>
+        """
+        
+        area_config = {
+            'contours': {
+                'enabled': False
+            }
+        }
+        
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("builtins.open", mock_open(read_data=template_with_contours)) as mock_file:
+                with patch("pathlib.Path.resolve", return_value=Path("/test/data")):
+                    result = build_mapnik_style("test", "/data", area_config)
+                    
+                    # Get the written content
+                    written_content = mock_file.return_value.write.call_args[0][0]
+                    
+                    # Verify contours are disabled
+                    assert 'status="off"' in written_content

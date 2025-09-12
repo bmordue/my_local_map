@@ -17,6 +17,23 @@
       "altitude": 45,
       "z_factor": 1.0,
       "scale": 111120
+    },
+    "contours": {
+      "enabled": true,
+      "interval": 20,
+      "major_interval": 100,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
     }
   }
 }

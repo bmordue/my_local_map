@@ -19,6 +19,34 @@ def calculate_elevation_bbox(bbox, buffer_km=1.0):
     }
 
 
+def generate_contours(elevation_file, contours_file, interval=10):
+    """Generate contour lines from elevation data using GDAL"""
+    try:
+        # Use gdal_contour to generate contour lines from elevation data
+        cmd = [
+            'gdal_contour',
+            '-a', 'elevation',  # Attribute name for elevation values
+            '-i', str(interval),  # Contour interval
+            str(elevation_file),
+            str(contours_file)
+        ]
+        
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"✓ Generated contours: {contours_file}")
+            return True
+        else:
+            print(f"⚠ Warning: Failed to generate contours: {result.stderr}")
+            return False
+    
+    except subprocess.CalledProcessError as e:
+        print(f"⚠ Warning: gdal_contour command failed: {e}")
+        return False
+    except FileNotFoundError:
+        print("⚠ Warning: gdal_contour not available")
+        return False
+
+
 def download_elevation_data(bbox, output_file, resolution=30):
     """
     Download elevation data for the given bounding box.
@@ -129,11 +157,16 @@ def generate_hillshade(dem_file, output_file, config):
 
 
 def process_elevation_for_hillshading(bbox, area_config, data_dir):
-    """Main function to process elevation data and generate hillshade"""
+    """Main function to process elevation data and generate hillshade and contours"""
     hillshade_config = area_config.get('hillshading', {})
+    contours_config = area_config.get('contours', {})
     
-    if not hillshade_config.get('enabled', False):
-        print("📊 Hillshading disabled in configuration")
+    # Check if either hillshading or contours are enabled
+    hillshading_enabled = hillshade_config.get('enabled', False)
+    contours_enabled = contours_config.get('enabled', False)
+    
+    if not (hillshading_enabled or contours_enabled):
+        print("📊 Hillshading and contours disabled in configuration")
         return None
     
     print("📊 Processing elevation data for hillshading...")
@@ -148,13 +181,23 @@ def process_elevation_for_hillshading(bbox, area_config, data_dir):
     # File paths
     dem_file = data_path / "elevation.tif"
     hillshade_file = data_path / "hillshade.tif"
+    contours_file = data_path / "contours.shp"
     
     # Download/generate elevation data
     if not download_elevation_data(elev_bbox, dem_file):
         return None
     
-    # Generate hillshade
-    if not generate_hillshade(dem_file, hillshade_file, hillshade_config):
-        return None
+    # Generate hillshade if enabled
+    hillshade_result = None
+    if hillshading_enabled:
+        if generate_hillshade(dem_file, hillshade_file, hillshade_config):
+            hillshade_result = str(hillshade_file)
     
-    return str(hillshade_file)
+    # Generate contours if enabled
+    contours_result = None
+    if contours_enabled:
+        interval = contours_config.get('interval', 10)
+        if generate_contours(dem_file, contours_file, interval):
+            contours_result = str(contours_file)
+    
+    return hillshade_result
