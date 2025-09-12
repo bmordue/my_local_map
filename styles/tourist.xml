@@ -167,8 +167,24 @@
     </Rule>
     <!-- Attractions -->
     <Rule>
-      <Filter>[other_tags].match('.*tourism.*museum.*') or [other_tags].match('.*tourism.*attraction.*') or [other_tags].match('.*tourism.*viewpoint.*') or [other_tags].match('.*historic.*castle.*') or [other_tags].match('.*historic.*ruins.*')</Filter>
-      <PointSymbolizer file="$ICONS_DIR/attraction-15.svg" allow-overlap="true" ignore-placement="true"/>
+      <Filter>[other_tags].match('.*tourism.*museum.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/museum-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <Rule>
+      <Filter>[other_tags].match('.*tourism.*attraction.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/monument-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <Rule>
+      <Filter>[other_tags].match('.*tourism.*viewpoint.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/guidepost-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <Rule>
+      <Filter>[other_tags].match('.*historic.*castle.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/castle-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <Rule>
+      <Filter>[other_tags].match('.*historic.*ruins.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/ruins-14.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Services -->
     <Rule>
@@ -207,6 +223,61 @@
     <Rule>
       <Filter>[other_tags].match('.*amenity.*place_of_worship.*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/religious-christian-15.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Barriers -->
+    <Rule>
+      <Filter>[barrier] != ''</Filter>
+      <PointSymbolizer file="$ICONS_DIR/police-15.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Natural Peaks -->
+    <Rule>
+      <Filter>[other_tags].match('.*natural.*peak.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/peak-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Natural Stones -->
+    <Rule>
+      <Filter>[other_tags].match('.*natural.*stone.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/rock-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Generators -->
+    <Rule>
+      <Filter>[other_tags].match('.*generator.*') or [other_tags].match('.*power.*generator.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/power-wind-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Man Made -->
+    <Rule>
+      <Filter>[man_made] = 'mast' or [man_made] = 'survey_point'</Filter>
+      <PointSymbolizer file="$ICONS_DIR/mast-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Place Types -->
+    <Rule>
+      <Filter>[place] = 'locality' or [place] = 'isolated_dwelling' or [place] = 'hamlet' or [place] = 'village'</Filter>
+      <PointSymbolizer file="$ICONS_DIR/village-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Historic -->
+    <Rule>
+      <Filter>[other_tags].match('.*historic.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/monument-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Memorial -->
+    <Rule>
+      <Filter>[other_tags].match('.*memorial.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/memorial-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Artwork -->
+    <Rule>
+      <Filter>[other_tags].match('.*artwork_type.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/palette-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Tourism -->
+    <Rule>
+      <Filter>[other_tags].match('.*tourism.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/monument-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Heritage -->
+    <Rule>
+      <Filter>[other_tags].match('.*heritage.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/monument-14.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
   </Style>
   
@@ -264,6 +335,11 @@
       <TextSymbolizer size="9" fill="#27ae60" fontset-name="italic" 
                       dx="0" dy="-8" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
+    </Rule>
+    <!-- Label all POIs with a name -->
+    <Rule>
+      <Filter>[name] != '' and [place] = ''</Filter>
+      <TextSymbolizer size="9" fill="#34495e" fontset-name="regular" dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Fallback for all other named points -->
     <Rule>
