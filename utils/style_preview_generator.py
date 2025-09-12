@@ -10,7 +10,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
-from utils.data_processing import calculate_bbox, convert_osm_to_shapefiles
+from utils.data_processing import calculate_bbox, convert_osm_to_shapefiles, process_elevation_and_contours
 from utils.elevation_processing import process_elevation_for_hillshading
 
 def render_preview_map(style_name, data_dir, bbox, width_px, height_px, area_config=None, hillshade_available=False):
@@ -160,6 +160,24 @@ def main():
         print(f"📁 Using existing shapefile data: {osm_data_dir}")
         osm_data_dir = str(osm_data_dir)
     
+    # Ensure contour data is available for preview generation
+    print("📏 Checking contour data availability...")
+    contour_file = Path(osm_data_dir) / "contours.shp"
+    if not contour_file.exists():
+        print("🔄 Generating contour data for previews...")
+        contour_data = process_elevation_and_contours(
+            bbox, 
+            osm_data_dir,
+            contour_interval=10,
+            enable_contours=True
+        )
+        if contour_data:
+            print("✓ Contour data ready for preview generation")
+        else:
+            print("⚠ Could not generate contour data, previews will show without contours")
+    else:
+        print("✓ Contour data already available")
+    
     # Process elevation data for hillshading if enabled
     hillshade_available = False
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
@@ -173,9 +191,11 @@ def main():
         area_config_no_hillshade['hillshading'] = area_config_no_hillshade['hillshading'].copy()
         area_config_no_hillshade['hillshading']['enabled'] = False
     
-    # Define available styles including hillshading variants
+    # Define available styles including hillshading and contour line variants
     base_styles = [
         ("tourist", "Tourist (Default)"),
+        ("tourist_no_contours", "Tourist - No Contours"),
+        ("tourist_contours_prominent", "Tourist - Prominent Contours"),
         ("blue_theme", "Blue Theme"),
         ("warm_theme", "Warm Theme"), 
         ("monochrome_theme", "Monochrome"),

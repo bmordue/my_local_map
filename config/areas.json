@@ -10,14 +10,6 @@
     },
     "scale": 25000,
     "name": "Lumsden, Aberdeenshire",
-    "hillshading": {
-      "enabled": true,
-      "opacity": 0.4,
-      "azimuth": 315,
-      "altitude": 45,
-      "z_factor": 1.0,
-      "scale": 111120
-    },
     "contours": {
       "enabled": true,
       "interval": 20,
@@ -33,6 +25,21 @@
           "width": 1.8,
           "opacity": 0.9
         }
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "color": "#8B4513",
+        "width": 0.5,
+        "major_width": 1.0,
+        "opacity": 0.7
+      },
+      "hillshading": {
+        "enabled": true,
+        "opacity": 0.4,
+        "azimuth": 315,
+        "altitude": 45,
+        "z_factor": 1.0,
+        "scale": 111120
       }
     }
   }
