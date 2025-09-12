@@ -137,30 +137,25 @@ class TestConfigurationHandling:
              patch('map_generator.calculate_pixel_dimensions') as mock_calc_pixels, \
              patch('map_generator.calculate_bbox') as mock_calc_bbox, \
              patch('pathlib.Path.exists', return_value=True), \
-             patch('map_generator.convert_osm_to_shapefiles', return_value="/data"), \
+             patch('map_generator.convert_osm_to_shapefiles', return_value="data"), \
              patch('map_generator.create_mapnik_style', return_value="style.xml"), \
              patch('map_generator.render_map', return_value=True):
-            
             # Setup return values
             area_config = {"center": {"lat": 57.3167, "lon": -2.8833}, 
                           "coverage": {"width_km": 8, "height_km": 12},
                           "scale": 25000}
             output_format = {"width_mm": 297, "height_mm": 420, "dpi": 300}
-            
             mock_load_area.return_value = area_config
             mock_load_output.return_value = output_format
             mock_calc_pixels.return_value = (3507, 4960)
             mock_calc_bbox.return_value = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
-            
             # Run main
             result = map_generator.main()
-            
             # Verify function calls
             mock_load_area.assert_called_once_with("lumsden")
             mock_load_output.assert_called_once_with("A3")
             mock_calc_pixels.assert_called_once_with(output_format)
             mock_calc_bbox.assert_called_once_with(57.3167, -2.8833, 8, 12)
-            
             assert result == 0
 
 
