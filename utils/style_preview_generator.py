@@ -11,9 +11,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 # Add project root to Python path to handle imports when run from utils directory
-current_dir = Path(__file__).parent.absolute()
-project_root = current_dir.parent
-sys.path.insert(0, str(project_root))
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+sys.path.insert(0, str(PROJECT_ROOT))
+# Define project root as a constant to be reused
 
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
