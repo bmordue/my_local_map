@@ -5,9 +5,16 @@ Creates a grid of map previews showing different styling options including hills
 """
 
 import os
+import sys
 import math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
+
+# Add project root to Python path to handle imports when run from utils directory
+current_dir = Path(__file__).parent.absolute()
+project_root = current_dir.parent
+sys.path.insert(0, str(project_root))
+
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, convert_osm_to_shapefiles, process_elevation_and_contours
@@ -125,6 +132,10 @@ def create_style_grid(styles, data_dir, bbox, preview_size, area_config=None, hi
 def main():
     print("🎨 Style Preview Generator for Lumsden Tourist Map")
     print("=" * 55)
+    
+    # Ensure we're working from the project root directory
+    project_root = Path(__file__).parent.parent.absolute()
+    os.chdir(project_root)
     
     # Load configuration
     area_config = load_area_config("lumsden")
