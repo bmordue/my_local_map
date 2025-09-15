@@ -134,8 +134,8 @@ def main():
     print("=" * 55)
     
     # Ensure we're working from the project root directory
-    project_root = Path(__file__).parent.parent.absolute()
-    os.chdir(project_root)
+    # Use the PROJECT_ROOT constant defined at the module level
+    os.chdir(PROJECT_ROOT)
     
     # Load configuration
     area_config = load_area_config("lumsden")
