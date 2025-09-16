@@ -11,13 +11,14 @@ from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours
 from utils.legend import MapLegend, add_legend_to_image
 from utils.elevation_processing import process_elevation_for_hillshading
+from utils.route_planning import process_route_planning
 #from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
 
-def create_mapnik_style(data_dir, area_config, hillshade_available=False):
+def create_mapnik_style(data_dir, area_config, hillshade_available=False, route_available=False):
     """Create a tourist-focused Mapnik XML style using template"""
-    style_file = build_mapnik_style("tourist", data_dir, area_config, hillshade_available)
+    style_file = build_mapnik_style("tourist", data_dir, area_config, hillshade_available, route_available)
     print(f"Created tourist-focused map style: {style_file}")
     return style_file
 
@@ -124,9 +125,19 @@ def main():
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
     hillshade_available = hillshade_file is not None
     
+    # Process route planning if enabled
+    print("\n🗺️ Processing route planning...")
+    route_data = process_route_planning(area_config, osm_data_dir)
+    route_available = bool(route_data.get('total_routes', 0) > 0)
+    
+    if route_available:
+        print(f"✓ Generated {route_data['total_routes']} tourist routes")
+    else:
+        print("⚠ Route planning skipped or disabled")
+    
     # Create map style
     print("\n🎨 Creating tourist map style...")
-    style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available)
+    style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available, route_available)
     
     # Render map
     print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")

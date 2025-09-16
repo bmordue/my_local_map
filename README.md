@@ -19,6 +19,7 @@ Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for 
 - Activities: Guided tours, outdoor activities, sports with booking info
 - Walking Trails: Detailed trail information with difficulty and facilities
 - **Topographic Features**: Elevation contours for outdoor activity planning
+- **Route Planning**: Walking routes, accessible paths, and cycling routes with distance and time estimates
 
 ## Quick Start
 
@@ -105,7 +106,7 @@ enhanced_data/
 - [ ] Mobile-friendly version
 - [ ] Multi-language support
 - [ ] User-generated content integration
-- [ ] Route planning capabilities
+- [x] Route planning capabilities
 
 ## Technical Implementation
 

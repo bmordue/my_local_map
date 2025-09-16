@@ -34,6 +34,33 @@
       "altitude": 45,
       "z_factor": 1.0,
       "scale": 111120
+    },
+    "route_planning": {
+      "enabled": true,
+      "route_types": ["walking", "accessible"],
+      "max_walking_distance": 5.0,
+      "max_accessible_distance": 3.0,
+      "max_cycling_distance": 10.0,
+      "style": {
+        "walking": {
+          "color": "#0066CC",
+          "width": 2.0,
+          "opacity": 0.8,
+          "dash_array": "5,2"
+        },
+        "accessible": {
+          "color": "#00AA44",
+          "width": 2.5,
+          "opacity": 0.9,
+          "dash_array": "10,5"
+        },
+        "cycling": {
+          "color": "#CC6600",
+          "width": 1.8,
+          "opacity": 0.8,
+          "dash_array": "3,3"
+        }
+      }
     }
   }
 }

@@ -45,6 +45,28 @@
     </Rule>
   </Style>
 
+  <!-- TOURIST ROUTES - planned routes -->
+  <Style name="tourist_routes">
+    <!-- Walking routes -->
+    <Rule>
+      <Filter>[route_type] = 'walking'</Filter>
+      <LineSymbolizer stroke="$WALKING_COLOR" stroke-width="$WALKING_WIDTH" 
+                      stroke-opacity="$WALKING_OPACITY" stroke-dasharray="$WALKING_DASH"/>
+    </Rule>
+    <!-- Accessible routes -->
+    <Rule>
+      <Filter>[route_type] = 'accessible'</Filter>
+      <LineSymbolizer stroke="$ACCESSIBLE_COLOR" stroke-width="$ACCESSIBLE_WIDTH" 
+                      stroke-opacity="$ACCESSIBLE_OPACITY" stroke-dasharray="$ACCESSIBLE_DASH"/>
+    </Rule>
+    <!-- Cycling routes -->
+    <Rule>
+      <Filter>[route_type] = 'cycling'</Filter>
+      <LineSymbolizer stroke="$CYCLING_COLOR" stroke-width="$CYCLING_WIDTH" 
+                      stroke-opacity="$CYCLING_OPACITY" stroke-dasharray="$CYCLING_DASH"/>
+    </Rule>
+  </Style>
+
   <!-- LAND USE / BACKGROUND -->
   <Style name="landuse">
     <Rule>
@@ -457,6 +479,15 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- TOURIST ROUTES - planned routes -->
+  <Layer name="tourist_routes" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs" status="$ROUTES_STATUS">
+    <StyleName>tourist_routes</StyleName>
+    <Datasource>
+      <Parameter name="type">geojson</Parameter>
+      <Parameter name="file">$ROUTE_FILE</Parameter>
     </Datasource>
   </Layer>
   
