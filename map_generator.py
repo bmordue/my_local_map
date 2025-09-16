@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
-from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours
+from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours, validate_osm_data_quality
 from utils.legend import MapLegend, add_legend_to_image
 from utils.elevation_processing import process_elevation_for_hillshading
 #from utils.download_icons import download_icons # not needed - icons are already present
@@ -97,9 +97,17 @@ def main():
     if not osm_file.exists():
         print("📡 Downloading OpenStreetMap data...")
         if not download_osm_data(bbox, str(osm_file)):
+            print("❌ Failed to download OSM data")
             return 1
+        
+        # Validate the downloaded data quality
+        if not validate_osm_data_quality(str(osm_file)):
+            print("⚠ Warning: Downloaded OSM data has low quality")
+            print("   Map may have limited features, but continuing...")
     else:
         print(f"📁 Using existing OSM data: {osm_file}")
+        # Also validate existing data
+        validate_osm_data_quality(str(osm_file))
     
     # Convert to shapefiles (no database!)
     print("\n🔄 Converting OSM data to shapefiles...")
