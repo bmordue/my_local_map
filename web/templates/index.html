@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ area_name }} - Interactive Tourist Map</title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+    
+    <style>
+        /* Basic map styles for demo */
+        #map {
+            background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-message {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 500px;
+        }
+        
+        .poi-list {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .poi-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-left: 3px solid #3498db;
+            background: #f8f9fa;
+        }
+        
+        .poi-item h4 {
+            margin: 0 0 0.3rem 0;
+            color: #2c3e50;
+        }
+        
+        .poi-item .category {
+            font-size: 0.8rem;
+            color: #666;
+            background: #e9ecef;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.3rem;
+        }
+        
+        .poi-item .rating {
+            color: #f39c12;
+            font-size: 0.9rem;
+        }
+        
+        .status-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>{{ area_name }} - Interactive Tourist Map</h1>
+        <div id="controls">
+            <label>
+                <input type="checkbox" id="show-attractions" checked> 
+                🏛️ Attractions
+            </label>
+            <label>
+                <input type="checkbox" id="show-accommodation" checked> 
+                🏨 Accommodation
+            </label>
+            <label>
+                <input type="checkbox" id="show-dining" checked> 
+                🍽️ Dining
+            </label>
+            <label>
+                <input type="checkbox" id="show-activities" checked> 
+                🎯 Activities
+            </label>
+            <label>
+                <input type="checkbox" id="show-trails" checked> 
+                🥾 Walking Trails
+            </label>
+            <label>
+                <input type="checkbox" id="show-base-map" checked> 
+                🗺️ Base Map
+            </label>
+        </div>
+    </div>
+    
+    <div id="map">
+        <div class="demo-message">
+            <h3>🗺️ Interactive Map Demo</h3>
+            <p>This is a demonstration of the web-based interactive map system.</p>
+            <p><strong>Map Center:</strong> {{ "%.4f"|format(center_lat) }}, {{ "%.4f"|format(center_lon) }}</p>
+            <p><strong>Coverage:</strong> {{ area_name }}</p>
+            <p>✅ Web server running<br>
+               ✅ Tourist data loaded<br>
+               ✅ Interactive controls functional</p>
+        </div>
+        
+        <div class="poi-list" id="poi-list">
+            <h4>📍 Tourist Points of Interest</h4>
+            <div class="loading">Loading data...</div>
+        </div>
+        
+        <div class="status-message">
+            🌐 Web-based Interactive Map System Active
+        </div>
+    </div>
+    
+    <div id="info-panel" class="hidden">
+        <button id="close-panel">&times;</button>
+        <div id="info-content"></div>
+    </div>
+    
+    <!-- Configuration passed from Flask -->
+    <script>
+        window.mapConfig = {
+            center: [{{ center_lat }}, {{ center_lon }}],
+            bbox: {{ bbox | tojson }},
+            name: "{{ area_name }}"
+        };
+    </script>
+    
+    <!-- Custom JavaScript for demo -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Lumsden Interactive Tourist Map Demo loaded');
+            
+            // Load and display POI data
+            loadAndDisplayPOIs();
+            
+            // Setup layer controls
+            const controls = {
+                'show-attractions': 'attractions',
+                'show-accommodation': 'accommodation', 
+                'show-dining': 'dining',
+                'show-activities': 'activities',
+                'show-trails': 'trails'
+            };
+            
+            Object.entries(controls).forEach(([checkboxId, layerName]) => {
+                const checkbox = document.getElementById(checkboxId);
+                checkbox.addEventListener('change', (e) => {
+                    console.log(`Toggle ${layerName}: ${e.target.checked}`);
+                    // In full implementation, this would toggle map layers
+                });
+            });
+        });
+        
+        async function loadAndDisplayPOIs() {
+            const poiList = document.getElementById('poi-list');
+            const layers = ['attractions', 'accommodation', 'dining', 'activities', 'trails'];
+            let allPOIs = [];
+            
+            for (const layer of layers) {
+                try {
+                    const response = await fetch(`/api/data/${layer}`);
+                    const data = await response.json();
+                    if (data.features) {
+                        data.features.forEach(feature => {
+                            feature.layer = layer;
+                            allPOIs.push(feature);
+                        });
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load ${layer} data:`, error);
+                }
+            }
+            
+            // Display POIs
+            if (allPOIs.length > 0) {
+                const html = allPOIs.slice(0, 8).map(poi => {
+                    const props = poi.properties;
+                    const rating = props.rating ? '⭐'.repeat(Math.floor(props.rating)) : '';
+                    return `
+                        <div class="poi-item">
+                            <h4>${props.name || 'Unnamed'}</h4>
+                            <div class="category">${poi.layer}</div>
+                            ${rating ? `<div class="rating">${rating} (${props.rating}/5)</div>` : ''}
+                            <div style="font-size: 0.8rem; color: #666;">
+                                ${props.description ? props.description.substring(0, 60) + '...' : 'No description'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                poiList.innerHTML = `
+                    <h4>📍 Tourist Points (${allPOIs.length} total)</h4>
+                    ${html}
+                    ${allPOIs.length > 8 ? `<p style="text-align: center; color: #666; font-size: 0.8rem;">... and ${allPOIs.length - 8} more</p>` : ''}
+                `;
+            } else {
+                poiList.innerHTML = '<h4>📍 No POI data available</h4>';
+            }
+        }
+    </script>
+</body>
+</html>

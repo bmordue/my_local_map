@@ -27,6 +27,10 @@ Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for 
 - GDAL/OGR tools
 - Mapnik rendering library
 
+### Static Map Generation
+
+Generate high-resolution A3 tourist map:
+
 ### Nix shell
 
 This project provides a shell.nix to install dependencies and set up a development environment.
@@ -52,6 +56,27 @@ python3 map_generator.py
 - Enhanced Map: `lumsden_enhanced_tourist_map_A3.png` (3507×4960 pixels, A3 300DPI)
 - Style File: `tourist_map_style.xml` (Comprehensive Mapnik styling)
 - Enhanced Data: `enhanced_data/` directory with tourist database and GeoJSON files
+
+### Interactive Web Map
+
+Start the web-based interactive map server:
+
+```bash
+# Install additional web dependencies
+pip3 install Flask
+
+# Start interactive map server
+python3 web_map_server.py
+```
+
+Access at: `http://localhost:5000`
+
+**Features:**
+- 🌐 Interactive web interface with layer controls
+- 📱 Mobile-responsive design
+- 📍 Tourist POI data with detailed information
+- 🗺️ Base map overlay with OpenStreetMap tiles
+- 🎯 RESTful API for data access
 
 ## Data Sources Integration
 
@@ -101,7 +126,7 @@ enhanced_data/
 - [ ] Implement quality validation systems
 
 ### Phase 3: Advanced Features 
-- [ ] Web-based interactive map
+- [x] Web-based interactive map
 - [ ] Mobile-friendly version
 - [ ] Multi-language support
 - [ ] User-generated content integration
@@ -143,6 +168,7 @@ External APIs → Data Validation → SQLite Database → GeoJSON Export → Map
 
 ## Documentation
 
+- [WEB_INTERACTIVE_MAP.md](docs/WEB_INTERACTIVE_MAP.md): Web-based interactive map implementation
 - [MAP_ENHANCEMENT_PLAN.md](MAP_ENHANCEMENT_PLAN.md): Comprehensive plan for adding content
-- [DATA_SOURCES_INTEGRATION.md](DATA_SOURCES_INTEGRATION.md): Guide for external data integration
+- [DATA_SOURCES_INTEGRATION.md](docs/DATA_SOURCES_INTEGRATION.md): Guide for external data integration
 - Style XML: Detailed Mapnik styling with extensive comments

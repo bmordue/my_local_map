@@ -1,0 +1,255 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.865,
+          57.335
+        ]
+      },
+      "properties": {
+        "id": 1,
+        "name": "Corgarff Castle",
+        "type": "historic",
+        "subtype": "castle",
+        "description": "16th-century tower house with star-shaped curtain wall",
+        "opening_hours": "Apr-Sep: 9:30-17:30",
+        "website": "www.historicenvironment.scot",
+        "phone": "+44 1975 651460",
+        "admission_fee": "Adult \u00a35, Child \u00a33",
+        "accessibility": "Partial wheelchair access",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.8833,
+          57.3167
+        ]
+      },
+      "properties": {
+        "id": 2,
+        "name": "Lumsden Heritage Trail",
+        "type": "tourism",
+        "subtype": "trail",
+        "description": "Self-guided heritage walk through village",
+        "opening_hours": "Always open",
+        "website": null,
+        "phone": null,
+        "admission_fee": "Free",
+        "accessibility": "Fully accessible",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.85,
+          57.34
+        ]
+      },
+      "properties": {
+        "id": 3,
+        "name": "Bellabeg Forest Walks",
+        "type": "natural",
+        "subtype": "forest",
+        "description": "Network of woodland paths with wildlife viewing",
+        "opening_hours": "Always open",
+        "website": null,
+        "phone": null,
+        "admission_fee": "Free",
+        "accessibility": "Some accessible paths",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.87,
+          57.32
+        ]
+      },
+      "properties": {
+        "id": 4,
+        "name": "River Don Fishing",
+        "type": "leisure",
+        "subtype": "fishing",
+        "description": "Excellent salmon and trout fishing",
+        "opening_hours": "Season: Feb-Oct",
+        "website": "www.riverdon-angling.co.uk",
+        "phone": "+44 1975 651234",
+        "admission_fee": "Day permit \u00a325",
+        "accessibility": "Riverbank access varies",
+        "parking": 1,
+        "seasonal": 1,
+        "rating": 4.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.875,
+          57.33
+        ]
+      },
+      "properties": {
+        "id": 5,
+        "name": "Lumsden Viewpoint",
+        "type": "tourism",
+        "subtype": "viewpoint",
+        "description": "Panoramic views of Don Valley",
+        "opening_hours": "Always open",
+        "website": null,
+        "phone": null,
+        "admission_fee": "Free",
+        "accessibility": "Accessible by car",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.865,
+          57.335
+        ]
+      },
+      "properties": {
+        "id": 6,
+        "name": "Corgarff Castle",
+        "type": "historic",
+        "subtype": "castle",
+        "description": "16th-century tower house with star-shaped curtain wall",
+        "opening_hours": "Apr-Sep: 9:30-17:30",
+        "website": "www.historicenvironment.scot",
+        "phone": "+44 1975 651460",
+        "admission_fee": "Adult \u00a35, Child \u00a33",
+        "accessibility": "Partial wheelchair access",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.8833,
+          57.3167
+        ]
+      },
+      "properties": {
+        "id": 7,
+        "name": "Lumsden Heritage Trail",
+        "type": "tourism",
+        "subtype": "trail",
+        "description": "Self-guided heritage walk through village",
+        "opening_hours": "Always open",
+        "website": null,
+        "phone": null,
+        "admission_fee": "Free",
+        "accessibility": "Fully accessible",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.85,
+          57.34
+        ]
+      },
+      "properties": {
+        "id": 8,
+        "name": "Bellabeg Forest Walks",
+        "type": "natural",
+        "subtype": "forest",
+        "description": "Network of woodland paths with wildlife viewing",
+        "opening_hours": "Always open",
+        "website": null,
+        "phone": null,
+        "admission_fee": "Free",
+        "accessibility": "Some accessible paths",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.87,
+          57.32
+        ]
+      },
+      "properties": {
+        "id": 9,
+        "name": "River Don Fishing",
+        "type": "leisure",
+        "subtype": "fishing",
+        "description": "Excellent salmon and trout fishing",
+        "opening_hours": "Season: Feb-Oct",
+        "website": "www.riverdon-angling.co.uk",
+        "phone": "+44 1975 651234",
+        "admission_fee": "Day permit \u00a325",
+        "accessibility": "Riverbank access varies",
+        "parking": 1,
+        "seasonal": 1,
+        "rating": 4.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.875,
+          57.33
+        ]
+      },
+      "properties": {
+        "id": 10,
+        "name": "Lumsden Viewpoint",
+        "type": "tourism",
+        "subtype": "viewpoint",
+        "description": "Panoramic views of Don Valley",
+        "opening_hours": "Always open",
+        "website": null,
+        "phone": null,
+        "admission_fee": "Free",
+        "accessibility": "Accessible by car",
+        "parking": 1,
+        "seasonal": 0,
+        "rating": 4.5
+      }
+    }
+  ]
+}

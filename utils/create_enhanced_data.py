@@ -12,8 +12,8 @@ def create_enhanced_tourist_database():
     """Create a comprehensive tourist database for the Lumsden area"""
     
     # Create enhanced database
-    db_path = Path("../data/enhanced_data/lumsden_tourist.db")
-    db_path.parent.mkdir(exist_ok=True)
+    db_path = Path("enhanced_data/lumsden_tourist.db")
+    db_path.parent.mkdir(parents=True, exist_ok=True)
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -245,7 +245,8 @@ def export_database_to_geojson(db_path):
             "features": features
         }
         
-        output_file = Path(f"../data/enhanced_data/{table}.geojson")
+        output_file = Path(f"enhanced_data/{table}.geojson")
+        output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, 'w') as f:
             json.dump(geojson, f, indent=2)
         
@@ -289,7 +290,7 @@ def export_database_to_geojson(db_path):
         "features": trail_features
     }
     
-    with open("../data/enhanced_data/walking_trails.geojson", 'w') as f:
+    with open("enhanced_data/walking_trails.geojson", 'w') as f:
         json.dump(trails_geojson, f, indent=2)
     
     print(f"✓ Exported walking_trails: {len(trail_features)} features")
