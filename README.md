@@ -44,12 +44,21 @@ sudo apt-get install gdal-bin python3-mapnik
 # Install Python dependencies
 pip3 install -r requirements.txt
 
-# Run enhanced map generator
+# Run enhanced map generator (default A3 format)
 python3 map_generator.py
+
+# Generate mobile-friendly format
+python3 map_generator.py --format mobile_portrait    # 1080×1920 pixels
+python3 map_generator.py --format mobile_landscape   # 1920×1080 pixels  
+python3 map_generator.py --format tablet_portrait    # 1536×2048 pixels
+python3 map_generator.py -f preview                  # Small preview format
 ```
 
 ### Output
-- Enhanced Map: `lumsden_enhanced_tourist_map_A3.png` (3507×4960 pixels, A3 300DPI)
+- **A3 Print Format**: `lumsden_tourist_map_A3.png` (3507×4960 pixels, 297×420mm at 300 DPI)
+- **Mobile Portrait**: `lumsden_tourist_map_mobile_portrait.png` (1080×1920 pixels, optimized for phone screens)
+- **Mobile Landscape**: `lumsden_tourist_map_mobile_landscape.png` (1920×1080 pixels, optimized for phone screens)
+- **Tablet Format**: `lumsden_tourist_map_tablet_portrait.png` (1536×2048 pixels, optimized for tablet screens)
 - Style File: `tourist_map_style.xml` (Comprehensive Mapnik styling)
 - Enhanced Data: `enhanced_data/` directory with tourist database and GeoJSON files
 
@@ -102,7 +111,7 @@ enhanced_data/
 
 ### Phase 3: Advanced Features 
 - [ ] Web-based interactive map
-- [ ] Mobile-friendly version
+- [x] Mobile-friendly version
 - [ ] Multi-language support
 - [ ] User-generated content integration
 - [ ] Route planning capabilities
@@ -135,11 +144,17 @@ External APIs → Data Validation → SQLite Database → GeoJSON Export → Map
 
 ## Map Output Specifications
 
+### Available Formats
+- **A3 Print Format**: PNG image, 3507×4960 pixels (297×420mm at 300 DPI)
+- **Mobile Portrait**: PNG image, 1080×1920 pixels (optimized for phone screens at 150 DPI)
+- **Mobile Landscape**: PNG image, 1920×1080 pixels (optimized for phone screens at 150 DPI)
+- **Tablet Portrait**: PNG image, 1536×2048 pixels (optimized for tablet screens at 150 DPI)
+- **Preview Format**: PNG image, 590×832 pixels (small preview at 150 DPI)
+
+### General Specifications
 - Format: PNG image
-- Resolution: 3507×4960 pixels (A3 at 300 DPI)
-- Print Size: 297×420mm (standard A3)
 - Color Space: RGBA with transparency support
-- File Size: ~79KB (efficient for web and print)
+- File Size: 40-120KB depending on format (efficient for web and print)
 
 ## Documentation
 

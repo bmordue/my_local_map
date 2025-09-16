@@ -66,14 +66,24 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     return True
 
 def main():
+    import argparse
+    
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Lumsden Tourist Map Generator')
+    parser.add_argument('--format', '-f', default='A3', 
+                        choices=['A3', 'preview', 'mobile_portrait', 'mobile_landscape', 'tablet_portrait'],
+                        help='Output format (default: A3)')
+    args = parser.parse_args()
+    
     print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print(f"📱 Format: {args.format}")
 #    print("Downloading icons...")
 #    download_icons()
 #    print("=" * 50)
     
     # Load configuration
     area_config = load_area_config("lumsden")
-    output_format = load_output_format("A3")
+    output_format = load_output_format(args.format)
     width_px, height_px = calculate_pixel_dimensions(output_format)
     
     # Calculate area
@@ -129,13 +139,20 @@ def main():
     style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available)
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")
-    output_file = data_dir / "lumsden_tourist_map_A3.png"
+    format_display = args.format.replace('_', ' ').title()
+    print(f"\n🖨️  Rendering {format_display} map ({width_px}×{height_px} pixels)...")
+    output_file = data_dir / f"lumsden_tourist_map_{args.format}.png"
     
     if render_map(style_file, bbox, str(output_file), width_px, height_px):
         print("\n🎉 SUCCESS!")
         print(f"📄 Tourist map: {output_file}")
-        print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
+        
+        # Display format-appropriate dimensions
+        if "width_mm" in output_format and "height_mm" in output_format:
+            print(f"📐 Print size: {format_display} ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
+        else:
+            print(f"📱 Screen size: {width_px}×{height_px} pixels optimized for mobile devices")
+        
         print(f"🎯 Perfect for planning day trips around Lumsden!")
         return 0
     else:

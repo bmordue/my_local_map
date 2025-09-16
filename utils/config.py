@@ -21,7 +21,17 @@ def load_output_format(format_name="A3"):
 
 
 def calculate_pixel_dimensions(output_format):
-    """Calculate pixel dimensions from output format"""
-    width_px = int(output_format["width_mm"] / 25.4 * output_format["dpi"])
-    height_px = int(output_format["height_mm"] / 25.4 * output_format["dpi"])
+    """Calculate pixel dimensions from output format
+    
+    Supports both millimeter-based formats (with width_mm/height_mm) 
+    and pixel-based formats (with width_px/height_px)
+    """
+    if "width_px" in output_format and "height_px" in output_format:
+        # Direct pixel specification for mobile/screen formats
+        width_px = int(output_format["width_px"])
+        height_px = int(output_format["height_px"])
+    else:
+        # Traditional millimeter-based calculation for print formats
+        width_px = int(output_format["width_mm"] / 25.4 * output_format["dpi"])
+        height_px = int(output_format["height_mm"] / 25.4 * output_format["dpi"])
     return width_px, height_px

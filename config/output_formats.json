@@ -10,5 +10,23 @@
     "height_mm": 141,
     "dpi": 150,
     "description": "Small preview format for style comparison"
+  },
+  "mobile_portrait": {
+    "width_px": 1080,
+    "height_px": 1920,
+    "dpi": 150,
+    "description": "Mobile portrait format optimized for phone screens"
+  },
+  "mobile_landscape": {
+    "width_px": 1920,
+    "height_px": 1080,
+    "dpi": 150,
+    "description": "Mobile landscape format optimized for phone screens"
+  },
+  "tablet_portrait": {
+    "width_px": 1536,
+    "height_px": 2048,
+    "dpi": 150,
+    "description": "Tablet portrait format optimized for tablet screens"
   }
 }
