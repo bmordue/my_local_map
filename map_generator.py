@@ -124,6 +124,66 @@ def main():
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
     hillshade_available = hillshade_file is not None
     
+    # Run quality validation on enhanced data (optional)
+    quality_validation_enabled = os.environ.get('ENABLE_QUALITY_VALIDATION', '').lower() in ('1', 'true', 'yes')
+    if quality_validation_enabled:
+        print("\n🔍 Running data quality validation...")
+        try:
+            from utils.quality_validation import validate_data_quality
+            import json
+            
+            # Load enhanced data if available for validation
+            enhanced_data_path = Path("enhanced_data")
+            if enhanced_data_path.exists():
+                data_sources = {}
+                geojson_files = {
+                    'tourist_attractions': 'tourist_attractions.geojson',
+                    'accommodation': 'accommodation.geojson', 
+                    'dining': 'dining.geojson',
+                    'activities': 'activities.geojson',
+                    'walking_trails': 'walking_trails.geojson'
+                }
+                
+                for source_name, filename in geojson_files.items():
+                    file_path = enhanced_data_path / filename
+                    if file_path.exists():
+                        try:
+                            with open(file_path, 'r') as f:
+                                geojson_data = json.load(f)
+                                features = geojson_data.get('features', [])
+                                data_list = []
+                                
+                                for feature in features:
+                                    item = feature.get('properties', {}).copy()
+                                    geom = feature.get('geometry', {})
+                                    if geom.get('type') == 'Point':
+                                        coords = geom.get('coordinates', [])
+                                        if len(coords) >= 2:
+                                            item['lon'] = coords[0]
+                                            item['lat'] = coords[1]
+                                    data_list.append(item)
+                                
+                                if data_list:
+                                    data_sources[source_name] = data_list
+                        except Exception as e:
+                            print(f"⚠️  Warning: Could not load {filename} for validation: {e}")
+                
+                if data_sources:
+                    validation_report = validate_data_quality(data_sources, bbox)
+                    failed_checks = sum(1 for r in validation_report.results if not r.passed)
+                    if failed_checks > 0:
+                        print(f"⚠️  Quality validation found {failed_checks} issues (continuing with map generation)")
+                    else:
+                        print("✓ All data quality checks passed")
+                else:
+                    print("ℹ️  No enhanced data found for quality validation")
+            else:
+                print("ℹ️  Enhanced data directory not found - skipping quality validation")
+        except ImportError:
+            print("⚠️  Quality validation not available (utils.quality_validation not found)")
+        except Exception as e:
+            print(f"⚠️  Quality validation failed: {e}")
+    
     # Create map style
     print("\n🎨 Creating tourist map style...")
     style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available)
