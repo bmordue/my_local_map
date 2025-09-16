@@ -6,8 +6,8 @@ Simple validation script to check that the map generator can be imported and has
 import sys
 import os
 
-# Add the current directory to path so we can import the modules
-sys.path.insert(0, os.path.dirname(__file__))
+# Add the root directory to path so we can import the modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 def test_imports():
     """Test that all modules can be imported successfully"""
