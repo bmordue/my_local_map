@@ -1,0 +1,386 @@
+{
+  "validation_summary": {
+    "total_checks": 18,
+    "passed_checks": 17,
+    "failed_checks": 1,
+    "total_errors": 3,
+    "total_warnings": 6,
+    "overall_status": "FAILED"
+  },
+  "validation_details": [
+    {
+      "check_name": "attractions_coordinate_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 2,
+        "valid_coordinates": 2,
+        "invalid_coordinates": 0,
+        "out_of_bounds": 0
+      },
+      "details": {}
+    },
+    {
+      "check_name": "attractions_attribute_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 2,
+        "complete_items": 2,
+        "incomplete_items": 0,
+        "completeness_percentage": 100
+      },
+      "details": {}
+    },
+    {
+      "check_name": "attractions_temporal_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 2,
+        "valid_temporal": 1,
+        "invalid_temporal": 0,
+        "no_temporal_data": 1
+      },
+      "details": {}
+    },
+    {
+      "check_name": "accommodation_coordinate_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 2,
+        "valid_coordinates": 2,
+        "invalid_coordinates": 0,
+        "out_of_bounds": 0
+      },
+      "details": {}
+    },
+    {
+      "check_name": "accommodation_attribute_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 2,
+        "complete_items": 2,
+        "incomplete_items": 0,
+        "completeness_percentage": 100
+      },
+      "details": {}
+    },
+    {
+      "check_name": "accommodation_temporal_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 2,
+        "valid_temporal": 0,
+        "invalid_temporal": 0,
+        "no_temporal_data": 2
+      },
+      "details": {}
+    },
+    {
+      "check_name": "dining_coordinate_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 1,
+        "valid_coordinates": 1,
+        "invalid_coordinates": 0,
+        "out_of_bounds": 0
+      },
+      "details": {}
+    },
+    {
+      "check_name": "dining_attribute_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 1,
+        "complete_items": 1,
+        "incomplete_items": 0,
+        "completeness_percentage": 100
+      },
+      "details": {}
+    },
+    {
+      "check_name": "dining_temporal_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 1,
+        "valid_temporal": 1,
+        "invalid_temporal": 0,
+        "no_temporal_data": 0
+      },
+      "details": {}
+    },
+    {
+      "check_name": "activities_coordinate_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 1,
+        "valid_coordinates": 1,
+        "invalid_coordinates": 0,
+        "out_of_bounds": 0
+      },
+      "details": {}
+    },
+    {
+      "check_name": "activities_attribute_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 1,
+        "complete_items": 1,
+        "incomplete_items": 0,
+        "completeness_percentage": 100
+      },
+      "details": {}
+    },
+    {
+      "check_name": "activities_temporal_validation",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_items": 1,
+        "valid_temporal": 1,
+        "invalid_temporal": 0,
+        "no_temporal_data": 0
+      },
+      "details": {}
+    },
+    {
+      "check_name": "attractions_vs_accommodation_cross_reference",
+      "passed": false,
+      "errors": [
+        "Data conflict for 'lumsden castle ruins': 'type' differs: 'historic_site' vs 'inn'",
+        "Data conflict for 'lumsden castle ruins': 'type' differs: 'historic_site' vs 'bed_breakfast'",
+        "Data conflict for 'lumsden church': 'type' differs: 'religious_site' vs 'inn'"
+      ],
+      "warnings": [],
+      "stats": {
+        "total_primary_items": 2,
+        "matches_found": 2,
+        "conflicts_found": 3,
+        "missing_references": 0,
+        "match_percentage": 100
+      },
+      "details": {
+        "error_1": {
+          "primary": {
+            "name": "Lumsden Castle Ruins",
+            "lat": 57.3167,
+            "lon": -2.8833,
+            "type": "historic_site",
+            "description": "Medieval castle ruins with panoramic views",
+            "opening_hours": {
+              "monday": "09:00-17:00",
+              "tuesday": "09:00-17:00",
+              "wednesday": "09:00-17:00",
+              "thursday": "09:00-17:00",
+              "friday": "09:00-17:00",
+              "saturday": "10:00-16:00",
+              "sunday": "10:00-16:00"
+            },
+            "seasonal_info": "Open April to October"
+          },
+          "reference": {
+            "name": "Lumsden Inn",
+            "lat": 57.317,
+            "lon": -2.883,
+            "type": "inn",
+            "contact": "+44 1464 861234",
+            "amenities": [
+              "wifi",
+              "parking",
+              "restaurant"
+            ]
+          },
+          "conflicts": [
+            "'type' differs: 'historic_site' vs 'inn'"
+          ]
+        },
+        "error_2": {
+          "primary": {
+            "name": "Lumsden Castle Ruins",
+            "lat": 57.3167,
+            "lon": -2.8833,
+            "type": "historic_site",
+            "description": "Medieval castle ruins with panoramic views",
+            "opening_hours": {
+              "monday": "09:00-17:00",
+              "tuesday": "09:00-17:00",
+              "wednesday": "09:00-17:00",
+              "thursday": "09:00-17:00",
+              "friday": "09:00-17:00",
+              "saturday": "10:00-16:00",
+              "sunday": "10:00-16:00"
+            },
+            "seasonal_info": "Open April to October"
+          },
+          "reference": {
+            "name": "Aberdeenshire B&B",
+            "lat": 57.316,
+            "lon": -2.8825,
+            "type": "bed_breakfast",
+            "contact": "+44 1464 861456"
+          },
+          "conflicts": [
+            "'type' differs: 'historic_site' vs 'bed_breakfast'"
+          ]
+        },
+        "error_3": {
+          "primary": {
+            "name": "Lumsden Church",
+            "lat": 57.3165,
+            "lon": -2.884,
+            "type": "religious_site",
+            "description": "Historic parish church"
+          },
+          "reference": {
+            "name": "Lumsden Inn",
+            "lat": 57.317,
+            "lon": -2.883,
+            "type": "inn",
+            "contact": "+44 1464 861234",
+            "amenities": [
+              "wifi",
+              "parking",
+              "restaurant"
+            ]
+          },
+          "conflicts": [
+            "'type' differs: 'religious_site' vs 'inn'"
+          ]
+        }
+      }
+    },
+    {
+      "check_name": "attractions_vs_dining_cross_reference",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "stats": {
+        "total_primary_items": 2,
+        "matches_found": 2,
+        "conflicts_found": 0,
+        "missing_references": 0,
+        "match_percentage": 100
+      },
+      "details": {}
+    },
+    {
+      "check_name": "attractions_vs_activities_cross_reference",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "No reference found for: Lumsden Castle Ruins",
+        "No reference found for: Lumsden Church"
+      ],
+      "stats": {
+        "total_primary_items": 2,
+        "matches_found": 0,
+        "conflicts_found": 0,
+        "missing_references": 2,
+        "match_percentage": 0
+      },
+      "details": {
+        "warning_1": {
+          "index": 0,
+          "item": "lumsden castle ruins"
+        },
+        "warning_2": {
+          "index": 1,
+          "item": "lumsden church"
+        }
+      }
+    },
+    {
+      "check_name": "accommodation_vs_dining_cross_reference",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "No reference found for: Aberdeenshire B&B"
+      ],
+      "stats": {
+        "total_primary_items": 2,
+        "matches_found": 1,
+        "conflicts_found": 0,
+        "missing_references": 1,
+        "match_percentage": 50
+      },
+      "details": {
+        "warning_1": {
+          "index": 1,
+          "item": "aberdeenshire b&b"
+        }
+      }
+    },
+    {
+      "check_name": "accommodation_vs_activities_cross_reference",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "No reference found for: Lumsden Inn",
+        "No reference found for: Aberdeenshire B&B"
+      ],
+      "stats": {
+        "total_primary_items": 2,
+        "matches_found": 0,
+        "conflicts_found": 0,
+        "missing_references": 2,
+        "match_percentage": 0
+      },
+      "details": {
+        "warning_1": {
+          "index": 0,
+          "item": "lumsden inn"
+        },
+        "warning_2": {
+          "index": 1,
+          "item": "aberdeenshire b&b"
+        }
+      }
+    },
+    {
+      "check_name": "dining_vs_activities_cross_reference",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "No reference found for: Village Cafe"
+      ],
+      "stats": {
+        "total_primary_items": 1,
+        "matches_found": 0,
+        "conflicts_found": 0,
+        "missing_references": 1,
+        "match_percentage": 0
+      },
+      "details": {
+        "warning_1": {
+          "index": 0,
+          "item": "village cafe"
+        }
+      }
+    }
+  ],
+  "generated_at": "2025-09-16T17:21:46.438493",
+  "recommendations": [
+    "All quality checks passed - data quality is excellent!"
+  ]
+}
