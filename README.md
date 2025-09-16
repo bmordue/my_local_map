@@ -19,6 +19,13 @@ Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for 
 - Activities: Guided tours, outdoor activities, sports with booking info
 - Walking Trails: Detailed trail information with difficulty and facilities
 - **Topographic Features**: Elevation contours for outdoor activity planning
+- **Real-time Information**: Live weather conditions and local events (NEW!)
+
+### Real-time Features (Phase 2)
+- **Weather Information**: Current temperature, conditions, wind speed, and forecast
+- **Local Events**: Upcoming community events, cultural activities, and festivals  
+- **Smart Caching**: 1-hour data caching with fallback to static information
+- **Dynamic Display**: Weather shown in legend, events as map overlays with icons
 
 ## Quick Start
 
@@ -94,10 +101,10 @@ enhanced_data/
 - [x] Export data to mapping formats (GeoJSON)
 
 ### Phase 2: Content Expansion 
-- [ ] Integrate live OSM data with proper coordinates
-- [ ] Add elevation data and contour lines
+- [x] Integrate live OSM data with proper coordinates
+- [x] Add elevation data and contour lines  
 - [ ] Include Ordnance Survey data layers
-- [ ] Add real-time information (weather, events)
+- [x] Add real-time information (weather, events)
 - [ ] Implement quality validation systems
 
 ### Phase 3: Advanced Features 

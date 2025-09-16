@@ -11,17 +11,20 @@ from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours
 from utils.legend import MapLegend, add_legend_to_image
 from utils.elevation_processing import process_elevation_for_hillshading
+from utils.realtime_data import RealTimeDataManager, create_realtime_geojson
 #from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
 
-def create_mapnik_style(data_dir, area_config, hillshade_available=False):
+def create_mapnik_style(data_dir, area_config, hillshade_available=False, realtime_files=None):
     """Create a tourist-focused Mapnik XML style using template"""
-    style_file = build_mapnik_style("tourist", data_dir, area_config, hillshade_available)
+    if realtime_files is None:
+        realtime_files = []
+    style_file = build_mapnik_style("tourist", data_dir, area_config, hillshade_available, realtime_files)
     print(f"Created tourist-focused map style: {style_file}")
     return style_file
 
-def render_map(style_file, bbox, output_file, width_px, height_px):
+def render_map(style_file, bbox, output_file, width_px, height_px, realtime_data=None):
     """Render the map using Mapnik"""
     try:
         import mapnik
@@ -53,7 +56,7 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     # Create and add legend
     print("Adding map legend...")
     legend = MapLegend()
-    legend_data = legend.render_to_map(m)
+    legend_data = legend.render_to_map(m, realtime_data=realtime_data)
     
     # Add legend overlay to the image
     if add_legend_to_image(output_file, legend_data):
@@ -124,15 +127,50 @@ def main():
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
     hillshade_available = hillshade_file is not None
     
+    # Process real-time data if enabled
+    realtime_data = None
+    realtime_files = []
+    realtime_config = area_config.get("realtime", {})
+    if realtime_config.get("enabled", False):
+        print("\n🌐 Processing real-time information...")
+        try:
+            realtime_manager = RealTimeDataManager(realtime_config)
+            
+            # Try to get cached data first
+            cached_data = realtime_manager.get_cached_data()
+            if cached_data:
+                print("   ✓ Using cached real-time data")
+                realtime_data = cached_data
+            else:
+                # Fetch fresh data
+                realtime_data = realtime_manager.get_realtime_data(
+                    area_config["center"]["lat"], 
+                    area_config["center"]["lon"]
+                )
+            
+            # Create GeoJSON overlays for real-time data
+            if realtime_data:
+                print("   🗺️  Creating real-time overlays...")
+                realtime_dir = Path(osm_data_dir)
+                realtime_files = create_realtime_geojson(realtime_data, realtime_dir)
+                
+        except Exception as e:
+            print(f"   ⚠ Real-time data processing failed: {e}")
+            if realtime_config.get("fallback_mode", True):
+                print("   ✓ Continuing with static data only")
+            else:
+                print("   ❌ Real-time data required, exiting")
+                return 1
+    
     # Create map style
     print("\n🎨 Creating tourist map style...")
-    style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available)
+    style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available, realtime_files)
     
     # Render map
     print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")
     output_file = data_dir / "lumsden_tourist_map_A3.png"
     
-    if render_map(style_file, bbox, str(output_file), width_px, height_px):
+    if render_map(style_file, bbox, str(output_file), width_px, height_px, realtime_data):
         print("\n🎉 SUCCESS!")
         print(f"📄 Tourist map: {output_file}")
         print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")

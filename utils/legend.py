@@ -84,15 +84,39 @@ class MapLegend:
             LegendItem("Religious Sites", "icon", icon_path="icons/religious-christian-15.svg"),
         ])
     
-    def render_to_map(self, map_obj, legend_width=200, legend_height=None):
+    def render_to_map(self, map_obj, legend_width=200, legend_height=None, realtime_data=None):
         """Render legend directly onto the map object"""
         
-        # Calculate legend height based on number of items
+        # Add real-time information to legend items if available
+        current_items = self.items.copy()
+        if realtime_data and realtime_data.get("weather"):
+            weather_info = realtime_data["weather"]["current"]
+            weather_item = LegendItem(
+                f"Weather: {weather_info['condition']} ({weather_info['temperature']}°C)", 
+                "point", 
+                fill="#2c3e50"
+            )
+            # Insert weather at the beginning of the legend
+            current_items.insert(0, weather_item)
+            
+        if realtime_data and realtime_data.get("events"):
+            event_count = len(realtime_data["events"])
+            if event_count > 0:
+                events_item = LegendItem(
+                    f"Upcoming Events: {event_count} events",
+                    "point",
+                    fill="#8b4513"
+                )
+                # Add events info after weather
+                insert_pos = 1 if realtime_data.get("weather") else 0
+                current_items.insert(insert_pos, events_item)
+        
+        # Calculate legend height based on number of items (including real-time)
         if legend_height is None:
             item_height = 18  # pixels per legend item
             padding = 20
             title_height = 25
-            legend_height = len(self.items) * item_height + padding * 2 + title_height
+            legend_height = len(current_items) * item_height + padding * 2 + title_height
         
         # Position legend in bottom-right corner with margin
         map_width = map_obj.width
@@ -106,8 +130,8 @@ class MapLegend:
         return {
             'position': (legend_x, legend_y),
             'size': (legend_width, legend_height),
-            'items': self.items,
-            'title': 'Map Legend'
+            'items': current_items,
+            'title': 'Tourist Map Legend'
         }
     
     def get_legend_summary(self):

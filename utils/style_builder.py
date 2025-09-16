@@ -5,8 +5,10 @@ import string
 import re
 
 
-def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_available=False):
+def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_available=False, realtime_files=None):
     """Build Mapnik XML from template and data directory"""
+    if realtime_files is None:
+        realtime_files = []
     template_file = Path(f"styles/{style_name}.xml")
     
     if not template_file.exists():
@@ -88,6 +90,24 @@ def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_availab
         contour_major_width = major_style.get('width', 1.2)
         contour_major_opacity = major_style.get('opacity', 0.8)
     
+    # Real-time data configuration
+    realtime_weather_file = ""
+    realtime_events_file = ""
+    realtime_weather_status = "off" 
+    realtime_events_status = "off"
+    
+    if realtime_files:
+        for rt_file in realtime_files:
+            if "weather" in str(rt_file):
+                realtime_weather_file = str(Path(rt_file).resolve())
+                realtime_weather_status = "on"
+            elif "events" in str(rt_file):
+                realtime_events_file = str(Path(rt_file).resolve())
+                realtime_events_status = "on"
+        
+        if realtime_weather_file or realtime_events_file:
+            print(f"  ✓ Real-time overlays included in style")
+    
     style_xml = template.substitute(
         DATA_DIR=str(abs_data_dir), 
         ICONS_DIR=str(abs_icons_dir),
@@ -102,7 +122,11 @@ def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_availab
         CONTOUR_MINOR_OPACITY=contour_minor_opacity,
         CONTOUR_MAJOR_COLOR=contour_major_color,
         CONTOUR_MAJOR_WIDTH=contour_major_width,
-        CONTOUR_MAJOR_OPACITY=contour_major_opacity
+        CONTOUR_MAJOR_OPACITY=contour_major_opacity,
+        REALTIME_STATUS=realtime_weather_status,
+        REALTIME_WEATHER_FILE=realtime_weather_file,
+        REALTIME_EVENTS_FILE=realtime_events_file,
+        REALTIME_EVENTS_STATUS=realtime_events_status
     )
     
     output_file = f"styles/{style_name}_map_style.xml"

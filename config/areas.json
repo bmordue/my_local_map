@@ -34,6 +34,22 @@
       "altitude": 45,
       "z_factor": 1.0,
       "scale": 111120
+    },
+    "realtime": {
+      "enabled": true,
+      "weather": {
+        "enabled": true,
+        "display": "legend",
+        "api_key": null
+      },
+      "events": {
+        "enabled": true,
+        "display": "overlay",
+        "radius_km": 15,
+        "max_events": 5
+      },
+      "cache_duration_hours": 1,
+      "fallback_mode": true
     }
   }
 }
