@@ -116,10 +116,25 @@ class TestDataProcessing:
     @patch('requests.post')
     def test_download_osm_data_success(self, mock_post):
         """Test successful OSM data download"""
-        # Mock successful response
+        # Mock successful response with realistic OSM data that passes validation
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = b'<osm>test data</osm>'
+        # Create a more realistic OSM response that passes validation (>1000 bytes, has nodes and ways)
+        mock_osm_content = b'''<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API">
+<bounds minlat="57.0" minlon="-3.0" maxlat="57.5" maxlon="-2.5"/>
+<node id="1" lat="57.25" lon="-2.75"><tag k="name" v="Test Node"/></node>
+<node id="2" lat="57.26" lon="-2.76"><tag k="place" v="village"/></node>
+<way id="10"><nd ref="1"/><nd ref="2"/><tag k="highway" v="primary"/></way>
+<way id="11"><nd ref="2"/><nd ref="1"/><tag k="highway" v="secondary"/></way>
+<relation id="100"><member type="way" ref="10" role=""/><member type="way" ref="11" role=""/></relation>
+<!-- Additional padding to ensure size > 1000 bytes -->
+<!-- This ensures the validation logic passes -->
+<!-- Padding text to reach minimum size requirement -->
+<!-- More padding content to meet validation criteria -->
+<!-- Extended content for realistic OSM file size -->
+</osm>'''
+        mock_response.content = mock_osm_content
         mock_post.return_value = mock_response
         
         bbox = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}

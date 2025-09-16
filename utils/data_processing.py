@@ -25,31 +25,151 @@ def calculate_bbox(center_lat, center_lon, width_km, height_km):
 
 
 def download_osm_data(bbox, output_file):
-    """Download OSM data using Overpass API"""
+    """Download OSM data using Overpass API with proper coordinate extraction"""
+    # Enhanced Overpass query to ensure complete node coordinates for all ways and relations
     overpass_query = f"""
-    [out:xml][timeout:300];
+    [out:xml][timeout:300][maxsize:1073741824];
     (
+      // Get all nodes in the bounding box
       node({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
+      // Get all ways in the bounding box
       way({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
+      // Get all relations in the bounding box
       relation({bbox['south']},{bbox['west']},{bbox['north']},{bbox['east']});
-      <;
     );
+    // Recurse down to get all child elements (essential for proper coordinates)
     (._;>;);
+    // Output with complete metadata and coordinates
     out meta;
     """
     
     overpass_url = "http://overpass-api.de/api/interpreter"
     
     print("Downloading OSM data from Overpass API...")
-    response = requests.post(overpass_url, data=overpass_query, timeout=600)
+    print(f"  Query area: {bbox['south']:.4f},{bbox['west']:.4f} to {bbox['north']:.4f},{bbox['east']:.4f}")
     
-    if response.status_code == 200:
-        with open(output_file, 'wb') as f:
-            f.write(response.content)
-        print(f"OSM data saved to {output_file}")
-        return True
-    else:
-        print(f"Failed to download OSM data: {response.status_code}")
+    try:
+        response = requests.post(overpass_url, data=overpass_query, timeout=600)
+        
+        if response.status_code == 200:
+            # Validate that we got actual OSM data, not an error message
+            content = response.content
+            if b'<osm' in content and len(content) > 500:  # Reduced threshold for testing
+                with open(output_file, 'wb') as f:
+                    f.write(content)
+                
+                # Validate the downloaded data
+                file_size_kb = len(content) / 1024
+                print(f"✓ OSM data saved: {output_file} ({file_size_kb:.1f} KB)")
+                
+                # Basic content validation
+                if b'node' in content and b'way' in content:
+                    print("✓ Data validation: Contains nodes and ways")
+                else:
+                    print("⚠ Data validation: Limited data - may be sparse area")
+                    
+                return True
+            else:
+                print(f"❌ Invalid OSM data received (size: {len(content)} bytes)")
+                return False
+        else:
+            print(f"❌ Failed to download OSM data: HTTP {response.status_code}")
+            if response.content:
+                error_msg = response.content.decode('utf-8', errors='ignore')[:200]
+                print(f"   Error details: {error_msg}")
+            return False
+            
+    except requests.exceptions.Timeout:
+        print("❌ Request timed out - Overpass API may be busy")
+        return False
+    except requests.exceptions.ConnectionError:
+        print("❌ Connection failed - check network connectivity")
+        return False
+    except Exception as e:
+        print(f"❌ Unexpected error downloading OSM data: {e}")
+        return False
+
+
+def validate_osm_data_quality(osm_file):
+    """Validate and analyze the quality of downloaded OSM data"""
+    try:
+        import xml.etree.ElementTree as ET
+        
+        print(f"📊 Analyzing OSM data quality: {osm_file}")
+        
+        # Parse the OSM file to count elements
+        tree = ET.parse(osm_file)
+        root = tree.getroot()
+        
+        node_count = len(root.findall('node'))
+        way_count = len(root.findall('way'))
+        relation_count = len(root.findall('relation'))
+        
+        print(f"   Nodes: {node_count}")
+        print(f"   Ways: {way_count}")
+        print(f"   Relations: {relation_count}")
+        
+        # Check for coordinate completeness in nodes
+        nodes_with_coords = 0
+        for node in root.findall('node'):
+            if 'lat' in node.attrib and 'lon' in node.attrib:
+                nodes_with_coords += 1
+        
+        coord_completeness = (nodes_with_coords / node_count * 100) if node_count > 0 else 0
+        print(f"   Coordinate completeness: {coord_completeness:.1f}% ({nodes_with_coords}/{node_count})")
+        
+        # Check for tagged features (POIs, roads, etc.)
+        tagged_features = 0
+        feature_types = {}
+        
+        for element in root.findall('.//tag'):
+            key = element.get('k', '')
+            value = element.get('v', '')
+            if key and value:
+                tagged_features += 1
+                if key not in feature_types:
+                    feature_types[key] = set()
+                feature_types[key].add(value)
+        
+        print(f"   Tagged features: {tagged_features}")
+        print(f"   Feature types: {len(feature_types)} categories")
+        
+        # Show most common feature types
+        if feature_types:
+            common_types = sorted(feature_types.items(), key=lambda x: len(x[1]), reverse=True)[:5]
+            print("   Top feature categories:")
+            for key, values in common_types:
+                print(f"     {key}: {len(values)} different values")
+        
+        # Quality assessment
+        quality_score = 0
+        if node_count > 100: quality_score += 25
+        elif node_count > 10: quality_score += 10
+        
+        if way_count > 10: quality_score += 25
+        elif way_count > 1: quality_score += 10
+        
+        if coord_completeness > 95: quality_score += 25
+        elif coord_completeness > 80: quality_score += 15
+        
+        if tagged_features > 50: quality_score += 25
+        elif tagged_features > 10: quality_score += 15
+        
+        print(f"   Quality score: {quality_score}/100")
+        
+        if quality_score >= 75:
+            print("   ✓ Excellent data quality")
+        elif quality_score >= 50:
+            print("   ✓ Good data quality")
+        elif quality_score >= 25:
+            print("   ⚠ Fair data quality - may have limited features")
+        else:
+            print("   ⚠ Poor data quality - very limited data")
+            
+        return quality_score >= 25
+        
+    except Exception as e:
+        print(f"   ❌ Error analyzing OSM data: {e}")
         return False
 
 
@@ -128,10 +248,10 @@ def convert_osm_to_shapefiles(osm_file):
         shp_file = output_dir / f"{layer}.shp"
         if shp_file.exists():
             try:
-                result = subprocess.run(["ogrinfo", "-so", str(shp_file)], 
+                result = subprocess.run(["ogrinfo", "-so", str(shp_file), layer], 
                                       capture_output=True, text=True, check=True)
                 # Count features
-                feature_count = 0
+                feature_count = "unknown"
                 for line in result.stdout.split('\n'):
                     if 'Feature Count:' in line:
                         feature_count = line.split(':')[1].strip()

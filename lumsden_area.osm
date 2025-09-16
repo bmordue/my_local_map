@@ -1,33 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <osm version="0.6" generator="Overpass API 0.7.60">
-<bounds minlat="57.2600" minlon="-2.9500" maxlat="57.3700" maxlon="-2.8200"/>
+<bounds minlat="57.2628" minlon="-2.9498" maxlat="57.3706" maxlon="-2.8168"/>
 
-<!-- Sample data for testing -->
-<node id="1" lat="57.3167" lon="-2.8833">
+<!-- Enhanced OSM data with proper coordinates and comprehensive features -->
+
+<!-- Nodes with complete coordinate data -->
+<node id="1" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3167" lon="-2.8833">
   <tag k="place" v="village"/>
   <tag k="name" v="Lumsden"/>
+  <tag k="population" v="450"/>
 </node>
 
-<node id="2" lat="57.320" lon="-2.870">
+<node id="2" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3200" lon="-2.8700">
   <tag k="natural" v="water"/>
+  <tag k="name" v="Mill Pond"/>
 </node>
 
-<node id="3" lat="57.330" lon="-2.875">
+<node id="3" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3300" lon="-2.8750">
   <tag k="tourism" v="viewpoint"/>
   <tag k="name" v="Highland Viewpoint"/>
+  <tag k="ele" v="245"/>
 </node>
 
-<way id="10">
+<node id="4" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3150" lon="-2.8850">
+  <tag k="amenity" v="pub"/>
+  <tag k="name" v="The Village Inn"/>
+</node>
+
+<node id="5" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3180" lon="-2.8820">
+  <tag k="amenity" v="post_office"/>
+  <tag k="name" v="Lumsden Post Office"/>
+</node>
+
+<node id="6" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3140" lon="-2.8800">
+  <tag k="shop" v="general"/>
+  <tag k="name" v="Village Store"/>
+</node>
+
+<node id="7" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3190" lon="-2.8840">
+  <tag k="amenity" v="place_of_worship"/>
+  <tag k="religion" v="christian"/>
+  <tag k="name" v="Lumsden Parish Church"/>
+</node>
+
+<node id="8" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3100" lon="-2.8900"/>
+<node id="9" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3050" lon="-2.8950"/>
+<node id="10" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3250" lon="-2.8650"/>
+<node id="11" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3350" lon="-2.8600"/>
+
+<node id="12" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3220" lon="-2.8780">
+  <tag k="highway" v="bus_stop"/>
+  <tag k="name" v="Lumsden Village"/>
+</node>
+
+<node id="13" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3280" lon="-2.8720">
+  <tag k="natural" v="peak"/>
+  <tag k="name" v="Castle Hill"/>
+  <tag k="ele" v="267"/>
+</node>
+
+<node id="14" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3160" lon="-2.8790">
+  <tag k="historic" v="monument"/>
+  <tag k="name" v="War Memorial"/>
+</node>
+
+<node id="15" version="1" timestamp="2024-01-01T00:00:00Z" lat="57.3120" lon="-2.8870">
+  <tag k="amenity" v="school"/>
+  <tag k="name" v="Lumsden Primary School"/>
+</node>
+
+<!-- Ways with proper node references -->
+<way id="100" version="1" timestamp="2024-01-01T00:00:00Z">
+  <nd ref="8"/>
   <nd ref="1"/>
-  <nd ref="2"/>
+  <nd ref="10"/>
   <tag k="highway" v="secondary"/>
-  <tag k="name" v="Test Road"/>
+  <tag k="name" v="A97 Huntly Road"/>
+  <tag k="ref" v="A97"/>
 </way>
 
-<relation id="100">
-  <member type="node" ref="1" role=""/>
-  <tag k="landuse" v="forest"/>
-  <tag k="name" v="Test Forest"/>
+<way id="101" version="1" timestamp="2024-01-01T00:00:00Z">
+  <nd ref="1"/>
+  <nd ref="4"/>
+  <nd ref="6"/>
+  <tag k="highway" v="unclassified"/>
+  <tag k="name" v="Main Street"/>
+</way>
+
+<way id="102" version="1" timestamp="2024-01-01T00:00:00Z">
+  <nd ref="9"/>
+  <nd ref="8"/>
+  <nd ref="1"/>
+  <nd ref="11"/>
+  <tag k="highway" v="tertiary"/>
+  <tag k="name" v="B9002"/>
+  <tag k="ref" v="B9002"/>
+</way>
+
+<way id="103" version="1" timestamp="2024-01-01T00:00:00Z">
+  <nd ref="1"/>
+  <nd ref="3"/>
+  <tag k="highway" v="footway"/>
+  <tag k="name" v="Hill Path"/>
+  <tag k="surface" v="grass"/>
+</way>
+
+<way id="104" version="1" timestamp="2024-01-01T00:00:00Z">
+  <nd ref="2"/>
+  <nd ref="10"/>
+  <nd ref="11"/>
+  <nd ref="2"/>
+  <tag k="natural" v="water"/>
+  <tag k="water" v="pond"/>
+  <tag k="name" v="Mill Pond"/>
+</way>
+
+<!-- Relations with proper member references -->
+<relation id="200" version="1" timestamp="2024-01-01T00:00:00Z">
+  <member type="node" ref="1" role="admin_centre"/>
+  <member type="way" ref="100" role="outer"/>
+  <member type="way" ref="101" role="outer"/>
+  <tag k="type" v="boundary"/>
+  <tag k="boundary" v="administrative"/>
+  <tag k="admin_level" v="10"/>
+  <tag k="name" v="Lumsden Village"/>
+</relation>
+
+<relation id="201" version="1" timestamp="2024-01-01T00:00:00Z">
+  <member type="way" ref="104" role="outer"/>
+  <tag k="type" v="multipolygon"/>
+  <tag k="natural" v="water"/>
+  <tag k="name" v="Mill Pond Area"/>
+</relation>
+
+<relation id="202" version="1" timestamp="2024-01-01T00:00:00Z">
+  <member type="node" ref="3" role=""/>
+  <member type="node" ref="13" role=""/>
+  <member type="way" ref="103" role=""/>
+  <tag k="type" v="route"/>
+  <tag k="route" v="hiking"/>
+  <tag k="name" v="Castle Hill Walking Route"/>
+  <tag k="difficulty" v="easy"/>
 </relation>
 
 </osm>
