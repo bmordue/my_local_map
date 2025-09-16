@@ -1,12 +1,8 @@
-# Enhanced Lumsden Tourist Map
+# My local map
 
-A comprehensive tourist map generator for the Lumsden area of Aberdeenshire, Scotland, featuring rich content from multiple data sources to create detailed, informative maps for visitors.
+Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for printing.
 
-## Project Overview
-
-This project generates high-quality A3 tourist maps of the Lumsden area, enhanced with comprehensive points of interest, detailed land use information, transportation networks, and tourist-specific features. The map is designed to be a complete resource for visitors planning activities in this beautiful Highland area.
-
-## Enhanced Features
+## Features
 
 ### Map Content Categories (25+ types)
 - **Natural Features**: Forests, heath, moors, wetlands, grasslands, scree
@@ -17,8 +13,6 @@ This project generates high-quality A3 tourist maps of the Lumsden area, enhance
 - **Place Labels**: Towns, villages, farms with hierarchical text sizing
 - **Water Features**: Rivers, streams, springs, water bodies
 - **Elevation Data**: Contour lines showing terrain features and elevation changes
-
-### Tourist-Specific Information
 - Accommodation: Hotels, B&Bs, hostels, camping with amenities
 - Dining: Restaurants, cafes, pubs with cuisine types and features
 - Attractions: Historic sites, viewpoints, museums with ratings
@@ -33,15 +27,19 @@ This project generates high-quality A3 tourist maps of the Lumsden area, enhance
 - GDAL/OGR tools
 - Mapnik rendering library
 
-### Installation
+### Nix shell
+
+This project provides a shell.nix to install dependencies and set up a development environment.
+
+```bash
+nix-shell
+```
+
+### Manual installation
 ```bash
 # Install system dependencies (Ubuntu/Debian)
 sudo apt-get update
 sudo apt-get install gdal-bin python3-mapnik
-
-# Clone repository
-git clone https://github.com/bmordue/my_local_map.git
-cd my_local_map
 
 # Install Python dependencies
 pip3 install -r requirements.txt
@@ -73,16 +71,9 @@ enhanced_data/
 └── walking_trails.geojson     # 5 trails with distances & waymarking
 ```
 
-## Map Style Enhancements
+## Map Style
 
-### Visual Improvements
-- Color-coded land use with distinct styling for each category
-- Hierarchical road network with tourist-friendly colors
-- Color-coded POI categories for easy identification
-- Building categorization with type-specific colors
-- Typography system for place names and labels
-
-### Styling Categories
+### Categories
 ```xml
 <!-- 25+ comprehensive style categories -->
 - Enhanced Land Use (9 categories)
@@ -93,7 +84,7 @@ enhanced_data/
 - Place Labels (3 hierarchy levels)
 ```
 
-## Enhancement Plan Implementation
+## Project roadmap
 
 ### Phase 1: Foundation
 - [x] Fix OSM data extraction (Overpass query with complete nodes)
@@ -126,8 +117,6 @@ External APIs → Data Validation → SQLite Database → GeoJSON Export → Map
 ### Key Components
 - `map_generator.py`: Main map generation script with enhanced styling
 - `create_enhanced_data.py`: Tourist database creation and export
-- `MAP_ENHANCEMENT_PLAN.md`: Detailed enhancement roadmap
-- `DATA_SOURCES_INTEGRATION.md`: Integration guide for additional data
 
 ### Rendering Pipeline
 1. Data Collection: OSM download + enhanced tourist data
@@ -144,15 +133,6 @@ External APIs → Data Validation → SQLite Database → GeoJSON Export → Map
 - Sample Data: 15 POIs + 5 land use categories
 - Map Coverage: 8×12km area around Lumsden (96 square kilometers)
 
-### Sample Data Breakdown
-```
-Tourist Attractions: 5 sites (castles, trails, viewpoints)
-Accommodation: 4 options (hotel, B&B, cottage, hostel)
-Dining: 4 venues (tearoom, restaurant, fish & chips, coffee)
-Activities: 5 experiences (tours, bushcraft, kayaking, photography)
-Walking Trails: 5 routes (2.5-6.5km, various difficulty levels)
-```
-
 ## Map Output Specifications
 
 - Format: PNG image
@@ -166,81 +146,3 @@ Walking Trails: 5 routes (2.5-6.5km, various difficulty levels)
 - [MAP_ENHANCEMENT_PLAN.md](MAP_ENHANCEMENT_PLAN.md): Comprehensive plan for adding content
 - [DATA_SOURCES_INTEGRATION.md](DATA_SOURCES_INTEGRATION.md): Guide for external data integration
 - Style XML: Detailed Mapnik styling with extensive comments
-
-## Key Improvements Made
-
-### From Basic to Comprehensive
-Before: 4 basic feature types (roads, buildings, water, basic POIs)
-After: 25+ feature categories with detailed tourist information
-
-### Enhanced Categories Added
-- Land Use Diversity: 9 different land use types vs 3 basic categories
-- POI Expansion: 50+ amenity types vs 4 basic types  
-- Transportation Detail: Railways, cycle paths, walking trails added
-- Building Categorization: Type-specific styling for churches, schools, hospitals
-- Tourist Services: Comprehensive accommodation, dining, activity information
-- Trail Information: Detailed walking routes with distances and difficulty
-
-### Data Integration Capabilities
-- Database Backend: SQLite database with structured tourist information
-- Export Formats: GeoJSON for web mapping integration
-- External APIs: Framework for real-time data integration
-- Quality Assurance: Data validation and completeness checking
-
-## Tourist Map Benefits
-
-### For Visitors
-- Comprehensive Information: All tourist services in one map
-- Activity Planning: Detailed trail and activity information
-- Service Discovery: Easy identification of amenities and services
-- High-Quality Output: Print-ready A3 maps for field use
-
-### For Local Businesses
-- Visibility: Clear representation on tourist maps
-- Service Integration: Detailed business information included
-- Accessibility: Information about facilities and accessibility
-- Seasonal Planning: Support for seasonal business information
-
-## Future Development
-
-The enhanced map system provides a foundation for:
-- Interactive web maps with real-time information
-- Mobile applications for GPS-enabled guidance
-- Multi-language support for international visitors
-- Community integration with local knowledge
-- Business partnerships for live information updates
-
-## Automated Map Generation
-
-### PR Map Generation Workflow
-
-Every pull request to the `main` branch automatically generates a tourist map, allowing visual review of changes:
-
-How it works:
-1. Automatic Trigger: Workflow runs on every PR to `main`
-2. Map Generation: Creates the full Lumsden tourist map (A3, 3507×4960 pixels)
-3. Artifact Upload: Map files are uploaded as downloadable artifacts
-4. Visual Review: Download and compare maps to see the impact of your changes
-
-How to access generated maps:
-1. Go to the Actions tab of your PR
-2. Click on the "Generate Tourist Map on PR" workflow run
-3. Download the `lumsden-tourist-map-pr-{number}` artifact
-4. Extract and view the PNG file
-
-Generated artifacts include:
-- `lumsden_tourist_map_A3.png` - The complete tourist map
-- `tourist_map_style.xml` - Mapnik style definition
-
-Perfect for reviewing changes to styling, data processing, or map generation logic! 
-
-## Contributing
-
-This project demonstrates how to transform a basic map into a comprehensive tourist resource. The modular design allows for easy extension with additional data sources and features.
-
-Pull requests are welcome! The automated map generation workflow will help you visualize the impact of your changes.
-
----
-
-Created with: Python, Mapnik, GDAL, SQLite, OpenStreetMap data
-Output: High-resolution tourist maps perfect for visitors to the Lumsden area of Aberdeenshire
