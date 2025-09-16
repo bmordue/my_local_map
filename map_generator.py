@@ -2,15 +2,18 @@
 """
 Lightweight A3 Tourist Map Generator for Lumsden, Aberdeenshire
 Uses configuration-driven approach for maximum flexibility
+Now includes Phase 3: User-generated content integration
 """
 
 import os
+import json
 from pathlib import Path
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
 from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours
 from utils.legend import MapLegend, add_legend_to_image
 from utils.elevation_processing import process_elevation_for_hillshading
+from utils.user_content import UserContentManager
 #from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
@@ -123,6 +126,24 @@ def main():
     # Process elevation data for hillshading if enabled
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
     hillshade_available = hillshade_file is not None
+    
+    # Process user-generated content
+    print("\n👥 Processing user-generated content...")
+    user_content_manager = UserContentManager()
+    user_geojson = user_content_manager.export_user_content_to_geojson("lumsden")
+    
+    # Save user content GeoJSON for potential map integration
+    user_content_path = data_dir / "enhanced_data" / "user_contributions.geojson"
+    user_content_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(user_content_path, 'w') as f:
+        json.dump(user_geojson, f, indent=2)
+    
+    user_poi_count = len(user_geojson.get('features', []))
+    print(f"✓ Processed {user_poi_count} user-contributed POIs")
+    
+    if user_poi_count > 0:
+        print(f"📍 User contributions exported to: {user_content_path}")
     
     # Create map style
     print("\n🎨 Creating tourist map style...")

@@ -1,0 +1,27 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.88,
+          57.318
+        ]
+      },
+      "properties": {
+        "name": "The Glenlivet Caf\u00e9",
+        "description": "Cozy local caf\u00e9 serving homemade cakes and light lunches. Popular with cyclists and walkers.",
+        "poi_type": "dining",
+        "opening_hours": "Tue-Sun: 9:00-16:00",
+        "phone": "+44 1975 651999",
+        "website": null,
+        "amenities": "WiFi, Outdoor seating, Cycle parking",
+        "submitted_at": "2025-09-16 17:22:09",
+        "contributor": "Local Resident",
+        "data_source": "user_generated"
+      }
+    }
+  ]
+}

@@ -19,6 +19,17 @@ Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for 
 - Activities: Guided tours, outdoor activities, sports with booking info
 - Walking Trails: Detailed trail information with difficulty and facilities
 - **Topographic Features**: Elevation contours for outdoor activity planning
+- **User-Generated Content**: Community reviews, photos, local tips, and POI updates
+
+### Phase 3: User-Generated Content Integration ✅
+The map now includes comprehensive community contribution features:
+- **User Reviews & Ratings**: Submit and moderate reviews for any POI
+- **Local Tips & Knowledge**: Share insider information about access, seasonal conditions, photography spots
+- **POI Updates**: Add new points of interest or update existing information
+- **Photo Submissions**: Upload and moderate user photos (framework implemented)
+- **Content Moderation**: Manual and automated moderation systems
+- **Community Statistics**: Track contributions and top contributors
+- **GeoJSON Export**: Integration with map rendering pipeline
 
 ## Quick Start
 
@@ -26,6 +37,18 @@ Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for 
 - Python 3.12+
 - GDAL/OGR tools
 - Mapnik rendering library
+
+### Basic Usage
+```bash
+# Generate map with user content integration
+python3 map_generator.py
+
+# Manage user-generated content
+python3 user_content_cli.py --help
+python3 user_content_cli.py generate-sample  # Create sample content
+python3 user_content_cli.py stats             # View statistics
+python3 user_content_cli.py interactive       # Interactive interface
+```
 
 ### Nix shell
 
@@ -104,7 +127,7 @@ enhanced_data/
 - [ ] Web-based interactive map
 - [ ] Mobile-friendly version
 - [ ] Multi-language support
-- [ ] User-generated content integration
+- [x] User-generated content integration
 - [ ] Route planning capabilities
 
 ## Technical Implementation
@@ -117,12 +140,17 @@ External APIs → Data Validation → SQLite Database → GeoJSON Export → Map
 ### Key Components
 - `map_generator.py`: Main map generation script with enhanced styling
 - `create_enhanced_data.py`: Tourist database creation and export
+- `user_content_cli.py`: Command-line interface for user content management
+- `utils/user_content.py`: User-generated content management system
+- `utils/user_interface.py`: Interactive user content submission interface
+- `utils/moderation.py`: Content moderation and quality control system
 
 ### Rendering Pipeline
 1. Data Collection: OSM download + enhanced tourist data
-2. Processing: Convert to shapefiles and validate
-3. Styling: Apply comprehensive Mapnik style rules
-4. Rendering: Generate high-resolution A3 PNG output
+2. User Content Integration: Process community contributions
+3. Processing: Convert to shapefiles and validate
+4. Styling: Apply comprehensive Mapnik style rules
+5. Rendering: Generate high-resolution A3 PNG output
 
 ## Content Statistics
 
