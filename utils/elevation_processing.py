@@ -48,23 +48,30 @@ def generate_contours(elevation_file, contours_file, interval=10):
         return False
 
 
-def download_elevation_data(bbox, output_file, resolution=30):
+def download_elevation_data(bbox, output_file, resolution=30, force_subprocess=False):
     """
     Download elevation data for the given bounding box.
     For production use, this would connect to real elevation data sources.
     For now, creates a synthetic DEM for demonstration.
+    
+    Args:
+        bbox: Bounding box dictionary
+        output_file: Path to output file
+        resolution: Resolution in meters
+        force_subprocess: Force use of subprocess (for testing)
     """
     print(f"📊 Generating elevation data for hillshading...")
     
     # Create synthetic elevation data (since we can't access external DEM sources in sandbox)
     # This creates a simple elevation model based on distance from center
     try:
-        # Try to use GDAL Python bindings first
-        try:
-            from osgeo import gdal, osr
-            use_gdal_python = True
-        except ImportError:
-            use_gdal_python = False
+        # Try to use GDAL Python bindings first (unless forcing subprocess for tests)
+        use_gdal_python = not force_subprocess
+        if use_gdal_python:
+            try:
+                from osgeo import gdal, osr
+            except ImportError:
+                use_gdal_python = False
         
         # Create a simple synthetic DEM
         center_lat = (bbox['north'] + bbox['south']) / 2
