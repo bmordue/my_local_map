@@ -31,7 +31,7 @@
      y="0"
      id="canvas"
      style="fill:none;stroke:none;visibility:hidden" />
-    <circle cx="7" cy="7" r="7"
+    <circle cx="7" cy="7" r="3"
      id="village"
      style="fill:#000000;fill-opacity:1;stroke:none" />
 </svg>
