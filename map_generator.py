@@ -75,7 +75,7 @@ def main():
     area_config = load_area_config("lumsden")
     output_format = load_output_format("A3")
     width_px, height_px = calculate_pixel_dimensions(output_format)
-    
+
     # Calculate area
     bbox = calculate_bbox(
         area_config["center"]["lat"], 
@@ -87,19 +87,20 @@ def main():
     print(f"📏 Area: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
     print(f"🎯 Scale: 1:{area_config['scale']:,}")
     print()
-    
+
     # Ensure data directory exists for shapefiles and output
     data_dir = Path("data")
     data_dir.mkdir(exist_ok=True)
-    
-    # OSM file should be at repository root according to coding guidelines  
-    osm_file = Path("lumsden_area.osm")
+
+    # Determine OSM file path (configurable, default to data/lumsden_area.osm)
+    osm_file_path = area_config.get("osm_file", "data/lumsden_area.osm")
+    osm_file = Path(osm_file_path)
     if not osm_file.exists():
-        print("📡 Downloading OpenStreetMap data...")
+        print(f"📡 OSM file not found at {osm_file}. Downloading...")
         if not download_osm_data(bbox, str(osm_file)):
             return 1
     else:
-        print(f"📁 Using existing OSM data: {osm_file}")
+        print(f"📁 Using OSM data: {osm_file}")
     
     # Convert to shapefiles (no database!)
     print("\n🔄 Converting OSM data to shapefiles...")
