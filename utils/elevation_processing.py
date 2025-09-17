@@ -2,6 +2,7 @@
 
 import subprocess
 import math
+import struct
 from pathlib import Path
 
 
@@ -58,21 +59,25 @@ def download_elevation_data(bbox, output_file, resolution=30):
     # Create synthetic elevation data (since we can't access external DEM sources in sandbox)
     # This creates a simple elevation model based on distance from center
     try:
-        # Create a simple synthetic DEM using gdal_translate and VRT
+        # Try to use GDAL Python bindings first
+        try:
+            from osgeo import gdal, osr
+            use_gdal_python = True
+        except ImportError:
+            use_gdal_python = False
+        
+        # Create a simple synthetic DEM
         center_lat = (bbox['north'] + bbox['south']) / 2
         center_lon = (bbox['west'] + bbox['east']) / 2
         
-        width = max(100, int((bbox['east'] - bbox['west']) * 111120 * math.cos(math.radians(center_lat)) / resolution))  # approximate meters
+        width = max(100, int((bbox['east'] - bbox['west']) * 111120 * math.cos(math.radians(center_lat)) / resolution))
         height = max(100, int((bbox['north'] - bbox['south']) * 111120 / resolution))
         
-        # Create a temporary raw binary file with synthetic elevation data
-        temp_dir = Path(output_file).parent
-        temp_raw = temp_dir / "temp_elevation.raw"
-        
-        # Generate synthetic elevation as binary data
-        import struct
-        with open(temp_raw, 'wb') as f:
+        if use_gdal_python:
+            # Use GDAL Python bindings - create elevation data with basic Python lists
+            elevation_data = []
             for j in range(height):
+                row = []
                 for i in range(width):
                     # Normalize coordinates to 0-1 range
                     x_norm = i / width if width > 1 else 0.5
@@ -81,47 +86,93 @@ def download_elevation_data(bbox, output_file, resolution=30):
                     # Simple elevation model: higher in the center, lower at edges
                     dist_from_center = ((x_norm - 0.5) ** 2 + (y_norm - 0.5) ** 2) ** 0.5
                     elevation = 100 + (200 * (1 - min(1.0, dist_from_center * 2)))  # 100-300m elevation
+                    row.append(elevation)
+                elevation_data.append(row)
+            
+            # Create GeoTIFF file directly
+            driver = gdal.GetDriverByName('GTiff')
+            ds = driver.Create(str(output_file), width, height, 1, gdal.GDT_Float32,
+                              options=['COMPRESS=LZW'])
+            
+            if ds is None:
+                print("Warning: Could not create elevation GeoTIFF file")
+                return False
+            
+            # Set geotransform
+            geotransform = [
+                bbox['west'],                           # x origin (top left)
+                (bbox['east'] - bbox['west']) / width,  # x pixel size
+                0,                                      # x rotation
+                bbox['north'],                          # y origin (top left) 
+                0,                                      # y rotation
+                (bbox['south'] - bbox['north']) / height # y pixel size (negative)
+            ]
+            ds.SetGeoTransform(geotransform)
+            
+            # Set projection to WGS84
+            srs = osr.SpatialReference()
+            srs.ImportFromEPSG(4326)
+            ds.SetProjection(srs.ExportToWkt())
+            
+            # Write elevation data row by row
+            band = ds.GetRasterBand(1)
+            for j, row in enumerate(elevation_data):
+                band.WriteRaster(0, j, width, 1, struct.pack('f' * width, *row))
+            band.SetNoDataValue(-9999)
+            
+            # Close dataset
+            ds = None
+            
+            print(f"Generated synthetic elevation data: {output_file}")
+            return True
+        else:
+            # Fallback: create a simple grayscale image and convert to GeoTIFF
+            from PIL import Image
+            
+            # Create elevation as grayscale image
+            img_data = []
+            for j in range(height):
+                for i in range(width):
+                    # Normalize coordinates to 0-1 range
+                    x_norm = i / width if width > 1 else 0.5
+                    y_norm = j / height if height > 1 else 0.5
                     
-                    # Write as 32-bit float
-                    f.write(struct.pack('f', elevation))
-        
-        # Create VRT to describe the raw data
-        vrt_content = f'''<VRTDataset rasterXSize="{width}" rasterYSize="{height}">
-  <SRS>EPSG:4326</SRS>
-  <GeoTransform>{bbox['west']},{(bbox['east']-bbox['west'])/width},0,{bbox['north']},0,{(bbox['south']-bbox['north'])/height}</GeoTransform>
-  <VRTRasterBand dataType="Float32" band="1">
-    <SimpleSource>
-      <SourceFilename relativeToVRT="1">temp_elevation.raw</SourceFilename>
-      <SourceBand>1</SourceBand>
-      <SourceProperties RasterXSize="{width}" RasterYSize="{height}" DataType="Float32"/>
-    </SimpleSource>
-  </VRTRasterBand>
-</VRTDataset>'''
-        
-        temp_vrt = temp_dir / "temp_elevation.vrt"
-        with open(temp_vrt, 'w') as f:
-            f.write(vrt_content)
-        
-        # Convert VRT to GeoTIFF
-        cmd = [
-            'gdal_translate',
-            '-of', 'GTiff',
-            '-co', 'COMPRESS=LZW',
-            str(temp_vrt),
-            str(output_file)
-        ]
-        
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            print(f"Warning: Could not generate elevation data: {result.stderr}")
-            return False
-        
-        # Clean up temp files
-        temp_raw.unlink(missing_ok=True)
-        temp_vrt.unlink(missing_ok=True)
-        
-        print(f"✓ Generated synthetic elevation data: {output_file}")
-        return True
+                    # Simple elevation model: convert to grayscale (0-255)
+                    dist_from_center = ((x_norm - 0.5) ** 2 + (y_norm - 0.5) ** 2) ** 0.5
+                    elevation = 100 + (200 * (1 - min(1.0, dist_from_center * 2)))  # 100-300m elevation
+                    gray_value = int((elevation - 100) / 200 * 255)  # normalize to 0-255
+                    img_data.append(gray_value)
+            
+            # Create grayscale image
+            temp_dir = Path(output_file).parent
+            temp_png = temp_dir / "temp_elevation.png"
+            
+            img = Image.new('L', (width, height))
+            img.putdata(img_data)
+            img.save(temp_png)
+            
+            # Convert to GeoTIFF using gdal_translate
+            cmd = [
+                'gdal_translate',
+                '-of', 'GTiff',
+                '-a_srs', 'EPSG:4326',
+                '-a_ullr', str(bbox['west']), str(bbox['north']), str(bbox['east']), str(bbox['south']),
+                '-co', 'COMPRESS=LZW',
+                str(temp_png),
+                str(output_file)
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            
+            # Clean up temp file
+            temp_png.unlink(missing_ok=True)
+            
+            if result.returncode != 0:
+                print(f"Warning: Could not generate elevation data: {result.stderr}")
+                return False
+            
+            print(f"Generated synthetic elevation data: {output_file}")
+            return True
         
     except Exception as e:
         print(f"Warning: Could not generate elevation data: {e}")
