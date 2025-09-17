@@ -11,7 +11,7 @@
     "scale": 25000,
     "name": "Lumsden, Aberdeenshire",
     "contours": {
-      "enabled": true,
+      "enabled": false,
       "interval": 10,
       "major_interval": 50,
       "style": {
