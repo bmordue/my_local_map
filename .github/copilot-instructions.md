@@ -7,7 +7,15 @@ A Python-based tourist map generator for Lumsden, Aberdeenshire that creates A3 
 ## Working Effectively
 
 ### Bootstrap and Install Dependencies
-Run these commands in sequence to set up the development environment:
+
+**Recommended: Use Nix for environment setup**
+
+```bash
+nix-shell  # Enters reproducible environment with all dependencies
+python3 map_generator.py
+```
+
+**If Nix is unavailable, use manual setup:**
 
 ```bash
 # Install system dependencies
@@ -76,7 +84,7 @@ git checkout HEAD -- lumsden_area.osm
 ### Key Files
 ```
 map_generator.py     # Main application script
-shell.nix           # Nix environment configuration (optional)
+shell.nix           # Nix environment configuration (recommended)
 lumsden_area.osm    # Pre-downloaded OpenStreetMap data (~1MB)
 .gitignore          # Excludes osm_data/ and __pycache__/
 ```
@@ -137,15 +145,12 @@ Add hillshading configuration to `config/areas.json`:
 3. **Test**: `python3 map_generator.py`
 4. **Validate**: Check all output files are generated correctly
 
-### Alternative Environment (Nix)
-If Nix is available, use the provided shell configuration:
-```bash
-nix-shell  # Enters environment with all dependencies
-python3 map_generator.py
-```
+### Environment Setup (Nix recommended)
+- Use `nix-shell` for a reproducible environment with all dependencies
+- If Nix is unavailable, follow manual setup instructions above
 
 ### Debugging Common Issues
-- **Import errors**: Ensure python3-mapnik and gdal-bin are installed
+- **Import errors**: Ensure environment is activated (`nix-shell`) or python3-mapnik and gdal-bin are installed
 - **Permission errors**: Use sudo for apt install commands
 - **Network timeouts**: Use offline mode with existing lumsden_area.osm
 - **Empty shapefiles**: Normal for some areas - check the OSM data coverage
@@ -174,10 +179,10 @@ python3 map_generator.py
 
 ### Common Error Patterns
 1. **ModuleNotFoundError: No module named 'mapnik'**
-   - Solution: `sudo apt install -y python3-mapnik`
+   - Solution: Use `nix-shell` or `sudo apt install -y python3-mapnik`
    
 2. **ogr2ogr: command not found**
-   - Solution: `sudo apt install -y gdal-bin`
+   - Solution: Use `nix-shell` or `sudo apt install -y gdal-bin`
    
 3. **ConnectionError: overpass-api.de**
    - Solution: Use offline mode with existing OSM file
