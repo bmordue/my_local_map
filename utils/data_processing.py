@@ -179,18 +179,28 @@ def download_elevation_data(bbox, output_file="elevation_data.tif"):
                     lon = bbox['west'] + (x / width) * (bbox['east'] - bbox['west'])
                     lat = bbox['south'] + ((height - y) / height) * (bbox['north'] - bbox['south'])
                     
-                    # Generate realistic elevation for Scottish Highlands
-                    # Base elevation increases with distance from coastline
-                    base_elevation = 50 + (lat - 57.0) * 200  # Increase with latitude
+                    # Generate MORE realistic elevation for Scottish Highlands
+                    # Base elevation increases with latitude (Highland effect)
+                    base_elevation = 80 + (lat - 57.0) * 600  # Much stronger highland gradient
                     
-                    # Add topographic variation using simple math functions
-                    variation = (
-                        50 * math.sin(lon * 20) * math.cos(lat * 25) +
-                        30 * math.sin(lon * 15) * math.sin(lat * 18) +
-                        20 * math.cos(lon * 12) * math.cos(lat * 22)
+                    # Add multiple terrain features with more dramatic elevation changes
+                    # Primary ridge system
+                    ridge_1 = 180 * math.sin((lon + 2.9) * 25) * math.cos((lat - 57.3) * 30)
+                    ridge_2 = 120 * math.sin((lon + 2.85) * 18) * math.sin((lat - 57.32) * 25) 
+                    
+                    # Valley systems
+                    valley_1 = -100 * math.cos((lon + 2.88) * 35) * math.cos((lat - 57.31) * 28)
+                    valley_2 = -70 * math.sin((lon + 2.87) * 22) * math.sin((lat - 57.315) * 32)
+                    
+                    # Fine-scale topographic detail for more contour lines
+                    detail = (
+                        40 * math.sin(lon * 80) * math.cos(lat * 85) +
+                        25 * math.cos(lon * 65) * math.sin(lat * 75) +
+                        15 * math.sin(lon * 120) * math.cos(lat * 110) +
+                        10 * math.cos(lon * 150) * math.sin(lat * 140)
                     )
                     
-                    elevation = max(0, base_elevation + variation)
+                    elevation = max(20, base_elevation + ridge_1 + ridge_2 + valley_1 + valley_2 + detail)
                     temp_f.write(f"{lon} {lat} {elevation:.1f}\n")
             
             # Rewind file after writing
@@ -263,7 +273,7 @@ def generate_contour_lines(elevation_file, output_dir, interval=10):
             # Get feature count for reporting
             try:
                 info_result = subprocess.run(
-                    ["ogrinfo", "-so", str(contour_file)], 
+                    ["ogrinfo", "-so", str(contour_file), "contours"], 
                     capture_output=True, text=True, check=True
                 )
                 feature_count = "unknown"
