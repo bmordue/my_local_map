@@ -11,6 +11,7 @@ pkgs.mkShell {
     python312Packages.pillow
     python312Packages.gdal  # GDAL Python bindings (osgeo module)
     python312Packages.numpy # For elevation processing
+    python312Packages.elevation # For real DEM data
 
     # GDAL for OSM conversion
     gdal
