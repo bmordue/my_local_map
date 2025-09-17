@@ -2,15 +2,16 @@
 Tests for improved temporary file handling in elevation data processing
 """
 
-import pytest
 import tempfile
-import os
 from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from utils.data_processing import (
-    download_elevation_data, 
-    generate_contour_lines, 
-    process_elevation_and_contours
+    download_elevation_data,
+    generate_contour_lines,
+    process_elevation_and_contours,
 )
 
 

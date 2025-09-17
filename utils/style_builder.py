@@ -1,8 +1,8 @@
 """Style generation utilities"""
 
-from pathlib import Path
-import string
 import re
+import string
+from pathlib import Path
 
 
 def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_available=False):
@@ -22,7 +22,7 @@ def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_availab
     
     # Remove contour-related sections if contour data doesn't exist
     if not has_contours:
-        print(f"  ⚠ No contour data found, excluding contour layers from style")
+        print("  ⚠ No contour data found, excluding contour layers from style")
         # Remove contour style definition
         template_content = re.sub(
             r'<!-- CONTOUR LINES.*?</Style>',
@@ -38,7 +38,7 @@ def build_mapnik_style(style_name, data_dir, area_config=None, hillshade_availab
             flags=re.DOTALL
         )
     else:
-        print(f"  ✓ Contour data found, including contour layers in style")
+        print("  ✓ Contour data found, including contour layers in style")
     
     # Create template and substitute variables
     template = string.Template(template_content)

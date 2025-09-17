@@ -5,12 +5,12 @@ Test script for legend functionality
 
 import os
 import sys
-from pathlib import Path
 
 # Add the parent directory to the path so we can import our modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.legend import MapLegend, add_legend_to_image
+
 
 def test_legend_creation():
     """Test that legend can be created with expected items"""
@@ -84,7 +84,7 @@ def test_legend_image_processing():
                 print(f"✓ Output image larger than original ({legend_size} vs {original_size} bytes)")
                 return True
             else:
-                print(f"❌ Output image not larger than original")
+                print("❌ Output image not larger than original")
                 return False
         else:
             print("❌ Output image not created")

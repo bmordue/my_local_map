@@ -6,6 +6,7 @@ Test script for style preview functionality
 import sys
 from pathlib import Path
 
+
 def test_style_templates():
     """Test that all style templates exist and are valid XML"""
     styles_dir = Path("styles")

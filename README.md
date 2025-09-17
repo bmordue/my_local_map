@@ -48,6 +48,24 @@ pip3 install -r requirements.txt
 python3 map_generator.py
 ```
 
+### Development
+
+This project uses Ruff for linting and code quality checks. To run linting:
+
+```bash
+# Check for linting issues
+make lint
+
+# Automatically fix linting issues
+make fix
+
+# Run tests
+make test
+
+# Run both linting and tests
+make check
+```
+
 ### Output
 - Enhanced Map: `lumsden_enhanced_tourist_map_A3.png` (3507×4960 pixels, A3 300DPI)
 - Style File: `tourist_map_style.xml` (Comprehensive Mapnik styling)

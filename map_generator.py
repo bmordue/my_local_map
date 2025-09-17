@@ -5,12 +5,29 @@ Uses configuration-driven approach for maximum flexibility
 """
 
 import os
+import sys
+
+try:
+    import mapnik
+except ImportError:
+    mapnik = None
 from pathlib import Path
-from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
-from utils.style_builder import build_mapnik_style
-from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours
-from utils.legend import MapLegend, add_legend_to_image
+
+from utils.config import (
+    calculate_pixel_dimensions,
+    load_area_config,
+    load_output_format,
+)
+from utils.data_processing import (
+    calculate_bbox,
+    convert_osm_to_shapefiles,
+    download_osm_data,
+    process_elevation_and_contours,
+)
 from utils.elevation_processing import process_elevation_for_hillshading
+from utils.legend import MapLegend, add_legend_to_image
+from utils.style_builder import build_mapnik_style
+
 #from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
@@ -23,9 +40,7 @@ def create_mapnik_style(data_dir, area_config, hillshade_available=False):
 
 def render_map(style_file, bbox, output_file, width_px, height_px):
     """Render the map using Mapnik"""
-    try:
-        import mapnik
-    except ImportError:
+    if mapnik is None:
         print("Error: python-mapnik not available. Install with: pip install mapnik")
         return False
     
@@ -136,13 +151,12 @@ def main():
         print("\n🎉 SUCCESS!")
         print(f"📄 Tourist map: {output_file}")
         print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
-        print(f"🎯 Perfect for planning day trips around Lumsden!")
+        print("🎯 Perfect for planning day trips around Lumsden!")
         return 0
     else:
         print("\n❌ Map rendering failed")
         return 1
 
 if __name__ == "__main__":
-    import sys
     sys.exit(main())
 

@@ -224,6 +224,7 @@ def add_legend_to_image(image_path, legend_data, output_path=None):
                 if icon_path and Path(icon_path).exists():
                     try:
                         from io import BytesIO
+
                         import cairosvg
                         from PIL import Image
                         # Convert SVG to PNG in-memory
