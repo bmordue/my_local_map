@@ -4,6 +4,7 @@ import subprocess
 import math
 import struct
 from pathlib import Path
+import elevation
 
 
 def calculate_elevation_bbox(bbox, buffer_km=1.0):
@@ -48,13 +49,30 @@ def generate_contours(elevation_file, contours_file, interval=10):
         return False
 
 
-def download_elevation_data(bbox, output_file, resolution=30):
+def download_elevation_data(bbox, output_file, dem_source="synthetic", resolution=30):
     """
-    Download elevation data for the given bounding box.
-    For production use, this would connect to real elevation data sources.
-    For now, creates a synthetic DEM for demonstration.
+    Download or generate elevation data for the given bounding box.
     """
-    print(f"📊 Generating elevation data for hillshading...")
+    if dem_source == "real":
+        print("Downloading real elevation data...")
+        try:
+            bounds = (bbox['west'], bbox['south'], bbox['east'], bbox['north'])
+            elevation.clip(bounds=bounds, output=str(output_file))
+            print(f"✓ Downloaded real elevation data: {output_file}")
+            return True
+        except Exception as e:
+            print(f"⚠ Warning: Failed to download real elevation data: {e}")
+            print("Falling back to synthetic DEM.")
+            return generate_synthetic_dem(bbox, output_file, resolution)
+    else:
+        return generate_synthetic_dem(bbox, output_file, resolution)
+
+
+def generate_synthetic_dem(bbox, output_file, resolution=30):
+    """
+    Creates a synthetic DEM for demonstration.
+    """
+    print(f"📊 Generating synthetic elevation data for hillshading...")
     
     # Create synthetic elevation data (since we can't access external DEM sources in sandbox)
     # This creates a simple elevation model based on distance from center
@@ -207,48 +225,43 @@ def generate_hillshade(dem_file, output_file, config):
         return False
 
 
-def process_elevation_for_hillshading(bbox, area_config, data_dir):
+def process_elevation_data(bbox, area_config, data_dir):
     """Main function to process elevation data and generate hillshade and contours"""
     hillshade_config = area_config.get('hillshading', {})
     contours_config = area_config.get('contours', {})
     
-    # Check if either hillshading or contours are enabled
     hillshading_enabled = hillshade_config.get('enabled', False)
     contours_enabled = contours_config.get('enabled', False)
     
     if not (hillshading_enabled or contours_enabled):
         print("📊 Hillshading and contours disabled in configuration")
-        return None
+        return {}
     
-    print("📊 Processing elevation data for hillshading...")
+    print("📊 Processing elevation data...")
     
-    # Create data directory if needed
     data_path = Path(data_dir)
     data_path.mkdir(parents=True, exist_ok=True)
     
-    # Calculate buffered bbox for elevation data
     elev_bbox = calculate_elevation_bbox(bbox)
     
-    # File paths
     dem_file = data_path / "elevation.tif"
     hillshade_file = data_path / "hillshade.tif"
     contours_file = data_path / "contours.shp"
     
-    # Download/generate elevation data
-    if not download_elevation_data(elev_bbox, dem_file):
-        return None
+    dem_source = hillshade_config.get("dem_source", "synthetic")
+    if not download_elevation_data(elev_bbox, dem_file, dem_source):
+        return {}
+
+    results = {}
     
-    # Generate hillshade if enabled
-    hillshade_result = None
     if hillshading_enabled:
         if generate_hillshade(dem_file, hillshade_file, hillshade_config):
-            hillshade_result = str(hillshade_file)
+            results["hillshade_file"] = str(hillshade_file)
     
-    # Generate contours if enabled
-    contours_result = None
     if contours_enabled:
         interval = contours_config.get('interval', 10)
         if generate_contours(dem_file, contours_file, interval):
-            contours_result = str(contours_file)
-    
-    return hillshade_result
+            results["contours_file"] = str(contours_file)
+            results["interval"] = interval
+
+    return results

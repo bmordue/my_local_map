@@ -8,9 +8,9 @@ import os
 from pathlib import Path
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
-from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles, process_elevation_and_contours
+from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles
 from utils.legend import MapLegend, add_legend_to_image
-from utils.elevation_processing import process_elevation_for_hillshading
+from utils.elevation_processing import process_elevation_data
 #from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
@@ -105,24 +105,10 @@ def main():
     print("\n🔄 Converting OSM data to shapefiles...")
     osm_data_dir = convert_osm_to_shapefiles(str(osm_file))
     
-    # Process elevation data and generate contours if enabled
-    print("\n📏 Processing elevation data and contours...")
-    contour_config = area_config.get("contours", {})
-    contour_data = process_elevation_and_contours(
-        bbox, 
-        osm_data_dir,
-        contour_interval=contour_config.get("interval", 10),
-        enable_contours=contour_config.get("enabled", True)
-    )
-    
-    if contour_data:
-        print(f"✓ Contour lines generated with {contour_data['interval']}m intervals")
-    else:
-        print("⚠ Contour generation skipped or failed")
-
-    # Process elevation data for hillshading if enabled
-    hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
-    hillshade_available = hillshade_file is not None
+    # Process elevation data for hillshading and contours
+    print("\n🏔️  Processing elevation data for hillshading and contours...")
+    elevation_data = process_elevation_data(bbox, area_config, osm_data_dir)
+    hillshade_available = elevation_data.get("hillshade_file") is not None
     
     # Create map style
     print("\n🎨 Creating tourist map style...")

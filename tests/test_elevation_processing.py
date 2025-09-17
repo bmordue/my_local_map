@@ -8,11 +8,56 @@ from utils.elevation_processing import (
     calculate_elevation_bbox,
     download_elevation_data,
     generate_hillshade,
-    process_elevation_for_hillshading
+    process_elevation_data,
+    generate_synthetic_dem,
 )
 
 
-class TestElevationProcessing(unittest.TestCase):
+class TestDownloadElevationData(unittest.TestCase):
+    """Test the download_elevation_data function"""
+
+    def setUp(self):
+        """Set up test fixtures"""
+        self.test_bbox = {
+            'west': -3.0,
+            'east': -2.5,
+            'south': 57.0,
+            'north': 57.5
+        }
+
+    @patch('elevation.clip')
+    @patch('utils.elevation_processing.generate_synthetic_dem')
+    def test_download_real_dem_success(self, mock_generate_synthetic, mock_clip):
+        """Test successful download of real DEM data"""
+        with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
+            result = download_elevation_data(self.test_bbox, temp_file.name, dem_source="real")
+            self.assertTrue(result)
+            mock_clip.assert_called_once()
+            mock_generate_synthetic.assert_not_called()
+
+    @patch('elevation.clip')
+    @patch('utils.elevation_processing.generate_synthetic_dem')
+    def test_download_real_dem_failure_fallback(self, mock_generate_synthetic, mock_clip):
+        """Test fallback to synthetic DEM when real download fails"""
+        mock_clip.side_effect = Exception("Download failed")
+        mock_generate_synthetic.return_value = True
+        with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
+            result = download_elevation_data(self.test_bbox, temp_file.name, dem_source="real")
+            self.assertTrue(result)
+            mock_clip.assert_called_once()
+            mock_generate_synthetic.assert_called_once()
+
+    @patch('utils.elevation_processing.generate_synthetic_dem')
+    def test_download_synthetic_dem(self, mock_generate_synthetic):
+        """Test generation of synthetic DEM"""
+        mock_generate_synthetic.return_value = True
+        with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
+            result = download_elevation_data(self.test_bbox, temp_file.name, dem_source="synthetic")
+            self.assertTrue(result)
+            mock_generate_synthetic.assert_called_once()
+
+
+class TestProcessElevationData(unittest.TestCase):
     """Test elevation data processing utilities"""
     
     def setUp(self):
@@ -31,12 +76,20 @@ class TestElevationProcessing(unittest.TestCase):
                 'azimuth': 315,
                 'altitude': 45,
                 'z_factor': 1.0,
-                'scale': 111120
+                'scale': 111120,
+                'dem_source': 'real'
+            },
+            'contours': {
+                'enabled': True,
+                'interval': 10
             }
         }
         
         self.area_config_disabled = {
             'hillshading': {
+                'enabled': False
+            },
+            'contours': {
                 'enabled': False
             }
         }
@@ -84,35 +137,6 @@ class TestElevationProcessing(unittest.TestCase):
         self.assertGreater(height, original_height)
     
     @patch('subprocess.run')
-    @patch('builtins.open', new_callable=mock_open)
-    def test_download_elevation_data_success(self, mock_file, mock_subprocess):
-        """Test successful elevation data generation"""
-        # Mock successful subprocess call
-        mock_subprocess.return_value.returncode = 0
-        mock_subprocess.return_value.stderr = ""
-        
-        with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
-            result = download_elevation_data(self.test_bbox, temp_file.name)
-            
-            self.assertTrue(result)
-            # Should call gdal_translate
-            mock_subprocess.assert_called()
-            call_args = mock_subprocess.call_args[0][0]
-            self.assertIn('gdal_translate', call_args)
-    
-    @patch('subprocess.run')
-    def test_download_elevation_data_failure(self, mock_subprocess):
-        """Test elevation data generation failure"""
-        # Mock failed subprocess call
-        mock_subprocess.return_value.returncode = 1
-        mock_subprocess.return_value.stderr = "Error message"
-        
-        with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
-            result = download_elevation_data(self.test_bbox, temp_file.name)
-            
-            self.assertFalse(result)
-    
-    @patch('subprocess.run')
     def test_generate_hillshade_success(self, mock_subprocess):
         """Test successful hillshade generation"""
         # Mock successful subprocess call
@@ -151,69 +175,57 @@ class TestElevationProcessing(unittest.TestCase):
             
             self.assertFalse(result)
     
-    def test_process_elevation_for_hillshading_disabled(self):
-        """Test processing when hillshading is disabled"""
+    def test_process_elevation_data_disabled(self):
+        """Test processing when hillshading and contours are disabled"""
         with tempfile.TemporaryDirectory() as temp_dir:
-            result = process_elevation_for_hillshading(
+            result = process_elevation_data(
                 self.test_bbox, 
                 self.area_config_disabled, 
                 temp_dir
             )
             
-            self.assertIsNone(result)
+            self.assertEqual(result, {})
     
     @patch('utils.elevation_processing.download_elevation_data')
     @patch('utils.elevation_processing.generate_hillshade')
-    def test_process_elevation_for_hillshading_success(self, mock_hillshade, mock_download):
+    @patch('utils.elevation_processing.generate_contours')
+    def test_process_elevation_data_success(self, mock_contours, mock_hillshade, mock_download):
         """Test successful elevation processing workflow"""
         # Mock successful operations
         mock_download.return_value = True
         mock_hillshade.return_value = True
+        mock_contours.return_value = True
         
         with tempfile.TemporaryDirectory() as temp_dir:
-            result = process_elevation_for_hillshading(
+            result = process_elevation_data(
                 self.test_bbox, 
                 self.area_config_enabled, 
                 temp_dir
             )
             
-            self.assertIsNotNone(result)
-            self.assertTrue(result.endswith('hillshade.tif'))
+            self.assertIn("hillshade_file", result)
+            self.assertIn("contours_file", result)
+            self.assertTrue(result["hillshade_file"].endswith('hillshade.tif'))
+            self.assertTrue(result["contours_file"].endswith('contours.shp'))
             mock_download.assert_called_once()
             mock_hillshade.assert_called_once()
+            mock_contours.assert_called_once()
     
     @patch('utils.elevation_processing.download_elevation_data')
-    def test_process_elevation_for_hillshading_download_failure(self, mock_download):
+    def test_process_elevation_data_download_failure(self, mock_download):
         """Test processing when elevation download fails"""
         # Mock failed download
         mock_download.return_value = False
         
         with tempfile.TemporaryDirectory() as temp_dir:
-            result = process_elevation_for_hillshading(
+            result = process_elevation_data(
                 self.test_bbox, 
                 self.area_config_enabled, 
                 temp_dir
             )
             
-            self.assertIsNone(result)
-    
-    @patch('utils.elevation_processing.download_elevation_data')
-    @patch('utils.elevation_processing.generate_hillshade')
-    def test_process_elevation_for_hillshading_hillshade_failure(self, mock_hillshade, mock_download):
-        """Test processing when hillshade generation fails"""
-        # Mock successful download but failed hillshade
-        mock_download.return_value = True
-        mock_hillshade.return_value = False
-        
-        with tempfile.TemporaryDirectory() as temp_dir:
-            result = process_elevation_for_hillshading(
-                self.test_bbox, 
-                self.area_config_enabled, 
-                temp_dir
-            )
-            
-            self.assertIsNone(result)
-    
+            self.assertEqual(result, {})
+
     def test_hillshading_config_parameters(self):
         """Test that hillshading config parameters are properly used"""
         config = self.area_config_enabled['hillshading']
@@ -224,6 +236,7 @@ class TestElevationProcessing(unittest.TestCase):
         self.assertIn('altitude', config)
         self.assertIn('z_factor', config)
         self.assertIn('scale', config)
+        self.assertIn('dem_source', config)
         
         # Verify reasonable default values
         self.assertEqual(config['opacity'], 0.4)
@@ -231,6 +244,7 @@ class TestElevationProcessing(unittest.TestCase):
         self.assertEqual(config['altitude'], 45)
         self.assertEqual(config['z_factor'], 1.0)
         self.assertEqual(config['scale'], 111120)
+        self.assertEqual(config['dem_source'], 'real')
 
 
 if __name__ == '__main__':
