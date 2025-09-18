@@ -10,8 +10,9 @@
     },
     "scale": 25000,
     "name": "Lumsden, Aberdeenshire",
+    "osm_file": "data/lumsden_area.osm",
     "contours": {
-      "enabled": true,
+      "enabled": false,
       "interval": 10,
       "major_interval": 50,
       "style": {
