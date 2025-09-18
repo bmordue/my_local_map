@@ -18,7 +18,7 @@ This document provides a detailed analysis of the `my_local_map` repository base
 
 ### Assessment
 - **Database Queries**: The project uses a SQLite database in a pre-processing step (`utils/create_enhanced_data.py`) to generate GeoJSON files. The main map generation script (`map_generator.py`) does not interact with the database directly. The queries are simple and not a performance concern.
-- **Caching Strategy**: The `map_generator.py` script implements a basic caching mechanism by checking for the existence of the `lumsden_area.osm` file before attempting to download it. This is effective for repeated runs.
+- **Caching Strategy**: The `map_generator.py` script implements a basic caching mechanism by checking for the existence of the OSM file specified in the configuration (`osm_file` in `config/areas.json`) before attempting to download it. This is effective for repeated runs.
 - **Resource Usage**: The most resource-intensive operations are the `ogr2ogr` conversion process and the Mapnik rendering engine. Generating a high-resolution A3 map is likely to be memory and CPU intensive. The script provides good feedback on the process, which is helpful.
 - **Horizontal Scaling**: This is not applicable to this project. As a command-line tool that generates a static output file, there are no requirements for horizontal scaling.
 

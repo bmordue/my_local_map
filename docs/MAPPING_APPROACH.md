@@ -3,7 +3,7 @@
 This document describes the approach used to customize and enhance the Lumsden tourist map generator, with a focus on making the process repeatable for other mapping projects using OpenStreetMap (OSM), GDAL/OGR, and Mapnik.
 
 ## 1. Data Extraction and Preparation
-- **Source:** OSM extract for the area of interest (e.g., `lumsden_area.osm`).
+- **Source:** OSM extract for the area of interest (see `osm_file` in `config/areas.json`, e.g., `data/lumsden_area.osm`).
 - **Conversion:** Use `ogr2ogr` (from GDAL) to convert OSM data to shapefiles for points, lines, multilinestrings, and multipolygons.
 - **Environment:** Always use `nix-shell` with GDAL and Mapnik to ensure all dependencies are available and consistent.
 
