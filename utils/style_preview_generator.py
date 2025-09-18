@@ -155,7 +155,7 @@ def main():
     )
     
     # Ensure data is available
-    osm_file = Path("lumsden_area.osm")
+    osm_file = Path(area_config.get("osm_file", "data/lumsden_area.osm"))
     
     if not osm_file.exists():
         print("OSM data file not found. Run map_generator.py first to download data.")
