@@ -66,12 +66,13 @@ def download_elevation_data(bbox, output_file, resolution=30, force_subprocess=F
     # This creates a simple elevation model based on distance from center
     try:
         # Try to use GDAL Python bindings first (unless forcing subprocess for tests)
-        use_gdal_python = not force_subprocess
-        if use_gdal_python:
+        use_gdal_python = False
+        if not force_subprocess:
             try:
                 from osgeo import gdal, osr
+                use_gdal_python = True
             except ImportError:
-                use_gdal_python = False
+                pass
         
         # Create a simple synthetic DEM
         center_lat = (bbox['north'] + bbox['south']) / 2
