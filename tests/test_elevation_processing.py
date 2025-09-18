@@ -92,7 +92,7 @@ class TestElevationProcessing(unittest.TestCase):
         mock_subprocess.return_value.stderr = ""
         
         with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
-            result = download_elevation_data(self.test_bbox, temp_file.name)
+            result = download_elevation_data(self.test_bbox, temp_file.name, force_subprocess=True)
             
             self.assertTrue(result)
             # Should call gdal_translate
@@ -108,7 +108,7 @@ class TestElevationProcessing(unittest.TestCase):
         mock_subprocess.return_value.stderr = "Error message"
         
         with tempfile.NamedTemporaryFile(suffix='.tif') as temp_file:
-            result = download_elevation_data(self.test_bbox, temp_file.name)
+            result = download_elevation_data(self.test_bbox, temp_file.name, force_subprocess=True)
             
             self.assertFalse(result)
     

@@ -72,16 +72,16 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     
     # Add legend overlay to the image
     if add_legend_to_image(output_file, legend_data):
-        print("✓ Legend added successfully")
+        print("Legend added successfully")
     else:
-        print("⚠ Legend could not be added (continuing without legend)")
+        print("Legend could not be added (continuing without legend)")
     
     file_size_mb = os.path.getsize(output_file) / 1024 / 1024
-    print(f"✓ Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
+    print(f"Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
 def main():
-    print("🗺️  Lightweight Lumsden Tourist Map Generator")
+    print("Lightweight Lumsden Tourist Map Generator")
 #    print("Downloading icons...")
 #    download_icons()
 #    print("=" * 50)
@@ -90,7 +90,7 @@ def main():
     area_config = load_area_config("lumsden")
     output_format = load_output_format("A3")
     width_px, height_px = calculate_pixel_dimensions(output_format)
-    
+
     # Calculate area
     bbox = calculate_bbox(
         area_config["center"]["lat"], 
@@ -98,30 +98,31 @@ def main():
         area_config["coverage"]["width_km"], 
         area_config["coverage"]["height_km"]
     )
-    print(f"📍 Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
-    print(f"📏 Area: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
-    print(f"🎯 Scale: 1:{area_config['scale']:,}")
+    print(f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
+    print(f"Area: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
+    print(f"Scale: 1:{area_config['scale']:,}")
     print()
-    
+
     # Ensure data directory exists for shapefiles and output
     data_dir = Path("data")
     data_dir.mkdir(exist_ok=True)
-    
-    # OSM file should be at repository root according to coding guidelines  
-    osm_file = Path("lumsden_area.osm")
+
+    # Determine OSM file path (configurable, default to data/lumsden_area.osm)
+    osm_file_path = area_config.get("osm_file", "data/lumsden_area.osm")
+    osm_file = Path(osm_file_path)
     if not osm_file.exists():
-        print("📡 Downloading OpenStreetMap data...")
+        print(f"OSM file not found at {osm_file}. Downloading...")
         if not download_osm_data(bbox, str(osm_file)):
             return 1
     else:
-        print(f"📁 Using existing OSM data: {osm_file}")
+        print(f"Using OSM data: {osm_file}")
     
     # Convert to shapefiles (no database!)
-    print("\n🔄 Converting OSM data to shapefiles...")
+    print("\nConverting OSM data to shapefiles...")
     osm_data_dir = convert_osm_to_shapefiles(str(osm_file))
     
     # Process elevation data and generate contours if enabled
-    print("\n📏 Processing elevation data and contours...")
+    print("\nProcessing elevation data and contours...")
     contour_config = area_config.get("contours", {})
     contour_data = process_elevation_and_contours(
         bbox, 
@@ -131,30 +132,29 @@ def main():
     )
     
     if contour_data:
-        print(f"✓ Contour lines generated with {contour_data['interval']}m intervals")
+        print(f"Contour lines generated with {contour_data['interval']}m intervals")
     else:
-        print("⚠ Contour generation skipped or failed")
+        print("Contour generation skipped or failed")
 
     # Process elevation data for hillshading if enabled
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
     hillshade_available = hillshade_file is not None
     
     # Create map style
-    print("\n🎨 Creating tourist map style...")
+    print("\nCreating tourist map style...")
     style_file = create_mapnik_style(osm_data_dir, area_config, hillshade_available)
     
     # Render map
-    print(f"\n🖨️  Rendering A3 map ({width_px}×{height_px} pixels)...")
+    print(f"\nRendering A3 map ({width_px}×{height_px} pixels)...")
     output_file = data_dir / "lumsden_tourist_map_A3.png"
     
     if render_map(style_file, bbox, str(output_file), width_px, height_px):
-        print("\n🎉 SUCCESS!")
-        print(f"📄 Tourist map: {output_file}")
-        print(f"📐 Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
-        print("🎯 Perfect for planning day trips around Lumsden!")
+        print("\nSUCCESS!")
+        print(f"Output: {output_file}")
+        print(f"Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
         return 0
     else:
-        print("\n❌ Map rendering failed")
+        print("\nMap rendering failed")
         return 1
 
 if __name__ == "__main__":
