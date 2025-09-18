@@ -121,7 +121,7 @@ class TestCreateMapnikStyleUnit:
             result = map_generator.create_mapnik_style("/test/data", area_config, True)
             
             assert result == "tourist_map_style.xml"
-            mock_build.assert_called_once_with("tourist", "/test/data", area_config, True)
+            mock_build.assert_called_once_with("tourist", "/test/data", area_config, True, None)
 
 
 class TestConfigurationHandling:

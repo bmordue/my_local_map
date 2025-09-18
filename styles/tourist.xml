@@ -384,6 +384,49 @@
     </Rule>
   </Style>
 
+  <!-- ORDNANCE SURVEY DATA STYLES -->
+  
+  <!-- OS Roads -->
+  <Style name="os_roads">
+    <Rule>
+      <Filter>[class] = 'A Road'</Filter>
+      <LineSymbolizer stroke="$OS_ROADS_PRIMARY_COLOR" stroke-width="$OS_ROADS_PRIMARY_WIDTH" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[class] = 'B Road'</Filter>
+      <LineSymbolizer stroke="$OS_ROADS_SECONDARY_COLOR" stroke-width="$OS_ROADS_SECONDARY_WIDTH" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <LineSymbolizer stroke="$OS_ROADS_SECONDARY_COLOR" stroke-width="1.0" stroke-opacity="0.6"/>
+    </Rule>
+  </Style>
+  
+  <!-- OS Boundaries -->
+  <Style name="os_boundaries">
+    <Rule>
+      <Filter>[type] = 'Administrative'</Filter>
+      <LineSymbolizer stroke="$OS_BOUNDARIES_ADMIN_COLOR" stroke-width="$OS_BOUNDARIES_ADMIN_WIDTH" stroke-dasharray="5,3" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <LineSymbolizer stroke="$OS_BOUNDARIES_ADMIN_COLOR" stroke-width="0.8" stroke-dasharray="3,2" stroke-opacity="0.6"/>
+    </Rule>
+  </Style>
+  
+  <!-- OS Rights of Way -->
+  <Style name="os_rights_of_way">
+    <Rule>
+      <Filter>[type] = 'Footpath'</Filter>
+      <LineSymbolizer stroke="$OS_RIGHTS_OF_WAY_FOOTPATH_COLOR" stroke-width="$OS_RIGHTS_OF_WAY_FOOTPATH_WIDTH" stroke-dasharray="2,2" stroke-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <Filter>[type] = 'Bridleway'</Filter>
+      <LineSymbolizer stroke="#32CD32" stroke-width="1.2" stroke-dasharray="3,2" stroke-opacity="0.7"/>
+    </Rule>
+    <Rule>
+      <LineSymbolizer stroke="$OS_RIGHTS_OF_WAY_FOOTPATH_COLOR" stroke-width="1.0" stroke-dasharray="2,2" stroke-opacity="0.6"/>
+    </Rule>
+  </Style>
+
   <!-- LAYER DEFINITIONS -->
   
   <!-- Hillshade layer - rendered first as background -->
@@ -459,7 +502,33 @@
       <Parameter name="file">$DATA_DIR/lines.shp</Parameter>
     </Datasource>
   </Layer>
+
+  <!-- ORDNANCE SURVEY LAYERS -->
   
+  <Layer name="os_boundaries" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs" status="$OS_STATUS">
+    <StyleName>os_boundaries</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$OS_BOUNDARIES_DIR/boundaries.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="os_roads" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs" status="$OS_STATUS">
+    <StyleName>os_roads</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$OS_ROADS_DIR/roads.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <Layer name="os_rights_of_way" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs" status="$OS_STATUS">
+    <StyleName>os_rights_of_way</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$OS_RIGHTS_OF_WAY_DIR/rights_of_way.shp</Parameter>
+    </Datasource>
+  </Layer>
+
   <Layer name="poi" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
     <StyleName>poi</StyleName>
     <Datasource>

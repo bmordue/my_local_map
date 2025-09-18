@@ -23,6 +23,14 @@ This document outlines how to integrate various data sources to enhance the Lums
 
 - **GeoJSON Export**: Exported all tourist data to GeoJSON format for mapping integration
 
+- **✨ Ordnance Survey Data Integration**: Added comprehensive OS data layer support including:
+  - **OS Open Roads**: Road network data with classification (A roads, B roads, unclassified)
+  - **OS Boundary-Line**: Administrative and electoral boundaries  
+  - **OS Open Greenspace**: Public rights of way and green spaces
+  - **Configurable styling**: Customizable colors, line weights, and opacity for each layer type
+  - **Graceful fallback**: Robust error handling when OS data is unavailable
+  - **Mock data support**: Demonstration capabilities for development and testing
+
 ### 🔧 Data Source Integration Options
 
 #### 1. OpenStreetMap Enhancement
@@ -32,20 +40,46 @@ This document outlines how to integrate various data sources to enhance the Lums
 - Implement local OSM data enhancement with missing features
 - Add quality validation and data completeness checking
 
-#### 2. Ordnance Survey Data
-**Potential Integration**:
-- **OS Open Data**: Free datasets including roads, boundaries, terrain
-- **OS MasterMap**: High-detail topographic data (commercial license)
-- **Elevation Models**: Contour lines and hill shading
-- **Rights of Way**: Official footpath and bridleway network
+#### 2. Ordnance Survey Data ✅ **IMPLEMENTED**
+**Current Integration**:
+- **OS Open Roads**: Integrated road network with A/B road classification
+- **OS Boundary-Line**: Administrative boundaries for context
+- **OS Open Greenspace**: Rights of way including footpaths and bridleways
+- **Mock Data System**: Demonstrates integration capabilities
+- **Configuration Support**: Enable/disable layers via `config/areas.json`
 
-**Implementation**: 
+**Configuration Example**:
+```json
+"ordnance_survey": {
+  "enabled": true,
+  "layers": ["roads", "boundaries", "rights_of_way"],
+  "style": {
+    "roads": {
+      "primary_color": "#CC6600",
+      "primary_width": 2.0,
+      "secondary_color": "#FF9933",
+      "secondary_width": 1.5
+    },
+    "boundaries": {
+      "admin_color": "#8B4513",
+      "admin_width": 1.2,
+      "admin_opacity": 0.8
+    },
+    "rights_of_way": {
+      "footpath_color": "#228B22",
+      "footpath_width": 1.0
+    }
+  }
+}
+```
+
+**Real Implementation Notes**:
 ```bash
-# Download OS Open Data
-wget https://api.os.uk/downloads/v1/products/OpenMapLocal/downloads?area=GB&format=ESRI%C2%AE+Shapefile&redirect
+# In production, would download actual OS Open Data:
+wget https://api.os.uk/downloads/v1/products/OpenRoads/downloads?area=GB&format=ESRI+Shapefile
 
-# Convert to map-ready format
-ogr2ogr -f "ESRI Shapefile" enhanced_data/os_roads.shp OS_OpenMapLocal_roads.shp
+# Convert to map-ready format:
+ogr2ogr -f "ESRI Shapefile" enhanced_data/os_roads.shp OS_OpenRoads.shp
 ```
 
 #### 3. Historic Environment Data
