@@ -109,12 +109,11 @@ class OSDataProcessor:
         # Write CSV data
         if mock_data:
             with open(csv_file, 'w', newline='') as f:
-                if mock_data:
-                    header = list(mock_data[0].keys())
-                    f.write(','.join(header) + '\n')
-                    for row in mock_data:
-                        values = [str(row.get(col, '')) for col in header]
-                        f.write(','.join(values) + '\n')
+                header = list(mock_data[0].keys())
+                f.write(','.join(header) + '\n')
+                for row in mock_data:
+                    values = [str(row.get(col, '')) for col in header]
+                    f.write(','.join(values) + '\n')
         
         # Also create the referenced output file so the conversion doesn't fail
         with open(output_path, 'w') as f:
