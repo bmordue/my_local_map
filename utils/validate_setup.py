@@ -3,8 +3,8 @@
 Simple validation script to check that the map generator can be imported and has basic functionality
 """
 
-import sys
 import os
+import sys
 
 # Add the current directory to path so we can import the modules
 sys.path.insert(0, os.path.dirname(__file__))
@@ -26,7 +26,11 @@ def test_imports():
 def test_configuration_loading():
     """Test that configuration files can be loaded"""
     try:
-        from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
+        from utils.config import (
+            calculate_pixel_dimensions,
+            load_area_config,
+            load_output_format,
+        )
         
         area_config = load_area_config("lumsden")
         print(f"✓ Area config loaded: {area_config['name']}")

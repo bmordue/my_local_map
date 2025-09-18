@@ -4,10 +4,16 @@ Style Preview Generator for Lumsden Tourist Map
 Creates a grid of map previews showing different styling options including hillshading variants
 """
 
+import math
 import os
 import sys
-import math
+
+try:
+    import mapnik
+except ImportError:
+    mapnik = None
 from pathlib import Path
+
 from PIL import Image, ImageDraw, ImageFont
 
 # Add project root to Python path to handle imports when run from utils directory
@@ -15,16 +21,23 @@ PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 sys.path.insert(0, str(PROJECT_ROOT))
 # Define project root as a constant to be reused
 
-from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
-from utils.style_builder import build_mapnik_style
-from utils.data_processing import calculate_bbox, convert_osm_to_shapefiles, process_elevation_and_contours
+from utils.config import (
+    calculate_pixel_dimensions,
+    load_area_config,
+    load_output_format,
+)
+from utils.data_processing import (
+    calculate_bbox,
+    convert_osm_to_shapefiles,
+    process_elevation_and_contours,
+)
 from utils.elevation_processing import process_elevation_for_hillshading
+from utils.style_builder import build_mapnik_style
+
 
 def render_preview_map(style_name, data_dir, bbox, width_px, height_px, area_config=None, hillshade_available=False):
     """Render a small preview map using a specific style"""
-    try:
-        import mapnik
-    except ImportError:
+    if mapnik is None:
         print("Error: python-mapnik not available. Install with: pip install mapnik")
         return None
     
@@ -267,7 +280,6 @@ def main():
         standard_count = len(base_styles)
         hillshade_count = len(base_styles)
         print(f"Grid shows {standard_count} standard styles + {hillshade_count} hillshading variants")
-        print(f"Hillshading enhances topographical visualization with terrain relief")
     else:
         print(f"Grid shows {len(styles)} different style options at lower resolution")
         print(f"Enable hillshading in config/areas.json to see terrain variants")
@@ -275,5 +287,4 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    import sys
     sys.exit(main())

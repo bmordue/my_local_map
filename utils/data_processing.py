@@ -1,11 +1,11 @@
 """Geographic and data processing utilities"""
 
 import math
-import requests
 import subprocess
 import tempfile
-import os
 from pathlib import Path
+
+import requests
 
 
 def calculate_bbox(center_lat, center_lon, width_km, height_km):
@@ -64,8 +64,8 @@ def convert_osm_to_shapefiles(osm_file):
     try:
         result = subprocess.run(["ogr2ogr", "--version"], capture_output=True, text=True, check=True)
         print(f"  Using GDAL/OGR version: {result.stdout.strip()}")
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        print(f"  Error: Could not find or run 'ogr2ogr'. Is GDAL installed and in your PATH?")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("  Error: Could not find or run 'ogr2ogr'. Is GDAL installed and in your PATH?")
         return None
 
     # First, let's see what layers are available in the OSM file
@@ -285,7 +285,7 @@ def generate_contour_lines(elevation_file, output_dir, interval=10):
             return None
             
     except subprocess.CalledProcessError as e:
-        print(f"⚠ Error generating contour lines:")
+        print("⚠ Error generating contour lines:")
         print(f"  Command: {' '.join(cmd)}")
         error_msg = e.stderr.strip() if e.stderr else "No error details available"
         print(f"  Error: {error_msg}")

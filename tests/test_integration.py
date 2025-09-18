@@ -1,8 +1,10 @@
 """Integration tests for the main map generator application"""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from PIL import Image
+
 
 class TestMapGeneratorIntegration:
     """Integration tests for the complete map generation process"""

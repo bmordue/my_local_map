@@ -4,9 +4,9 @@ Enhanced Map Data Integration - Demonstrating Additional Data Sources
 """
 
 import json
-import csv
-from pathlib import Path
 import sqlite3
+from pathlib import Path
+
 
 def create_enhanced_tourist_database():
     """Create a comprehensive tourist database for the Lumsden area"""

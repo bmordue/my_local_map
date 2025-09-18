@@ -2,14 +2,16 @@
 Tests for contour line generation functionality
 """
 
-import pytest
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from utils.data_processing import (
-    download_elevation_data, 
-    generate_contour_lines, 
-    process_elevation_and_contours
+    download_elevation_data,
+    generate_contour_lines,
+    process_elevation_and_contours,
 )
 
 

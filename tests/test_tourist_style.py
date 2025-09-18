@@ -1,8 +1,9 @@
 """Tests for tourist.xml style validation and pattern matching improvements."""
 
 import os
-import xml.etree.ElementTree as ET
 import re
+import xml.etree.ElementTree as ET
+
 import pytest
 
 

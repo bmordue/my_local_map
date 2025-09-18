@@ -11,6 +11,7 @@ pkgs.mkShell {
     python312Packages.pillow
     python312Packages.gdal  # GDAL Python bindings (osgeo module)
     python312Packages.numpy # For elevation processing
+    python312Packages.ruff  # Python linter
 
     # GDAL for OSM conversion
     gdal
@@ -31,6 +32,7 @@ pkgs.mkShell {
     echo "  GDAL Python bindings (osgeo module)"
     echo "  Mapnik (for rendering)"
     echo "  NumPy (for elevation processing)"
+    echo "  Ruff (Python linter)"
     echo ""
     echo "Ready to run: python map_generator.py"
     echo ""

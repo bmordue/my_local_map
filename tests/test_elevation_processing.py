@@ -1,14 +1,14 @@
 """Test elevation processing and hillshading functionality"""
 
-import unittest
-from unittest.mock import patch, mock_open
 import tempfile
+import unittest
+from unittest.mock import mock_open, patch
 
 from utils.elevation_processing import (
     calculate_elevation_bbox,
     download_elevation_data,
     generate_hillshade,
-    process_elevation_for_hillshading
+    process_elevation_for_hillshading,
 )
 
 

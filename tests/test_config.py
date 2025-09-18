@@ -1,11 +1,15 @@
 """Unit tests for configuration utilities"""
 
 import json
-import pytest
-from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
-from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
+import pytest
+
+from utils.config import (
+    calculate_pixel_dimensions,
+    load_area_config,
+    load_output_format,
+)
 
 
 class TestConfigUtilities:

@@ -1,8 +1,8 @@
 """Elevation data processing and hillshading utilities"""
 
-import subprocess
 import math
 import struct
+import subprocess
 from pathlib import Path
 
 
@@ -60,7 +60,7 @@ def download_elevation_data(bbox, output_file, resolution=30, force_subprocess=F
         resolution: Resolution in meters
         force_subprocess: Force use of subprocess (for testing)
     """
-    print(f"📊 Generating elevation data for hillshading...")
+    print("📊 Generating elevation data for hillshading...")
     
     # Create synthetic elevation data (since we can't access external DEM sources in sandbox)
     # This creates a simple elevation model based on distance from center

@@ -1,11 +1,15 @@
 """Unit tests for data processing utilities"""
 
 import math
-import pytest
-from unittest.mock import patch, MagicMock, mock_open
-from pathlib import Path
+from unittest.mock import MagicMock, mock_open, patch
 
-from utils.data_processing import calculate_bbox, download_osm_data, convert_osm_to_shapefiles
+import pytest
+
+from utils.data_processing import (
+    calculate_bbox,
+    convert_osm_to_shapefiles,
+    download_osm_data,
+)
 
 
 class TestDataProcessing:
