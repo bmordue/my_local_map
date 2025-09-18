@@ -174,10 +174,6 @@
       <Filter>[leisure] = 'track'</Filter>
       <LineSymbolizer stroke="#e67e22" stroke-width="2" stroke-opacity="0.8"/>
     </Rule>
-    <Rule>
-      <Filter>[sport] != ''</Filter>
-      <PointSymbolizer file="$ICONS_DIR/soccer-15.svg" allow-overlap="true" ignore-placement="true"/>
-    </Rule>
   </Style>
   
   <!-- BUILDINGS -->
@@ -390,22 +386,6 @@
     </Rule>
   </Style>
   
-  <!-- Emergency and safety features -->
-  <Style name="emergency">
-    <Rule>
-      <Filter>[emergency] = 'defibrillator'</Filter>
-      <PointSymbolizer file="$ICONS_DIR/hospital-15.svg" allow-overlap="true" ignore-placement="true"/>
-    </Rule>
-    <Rule>
-      <Filter>[emergency] = 'phone'</Filter>
-      <PointSymbolizer file="$ICONS_DIR/telephone-15.svg" allow-overlap="true" ignore-placement="true"/>
-    </Rule>
-    <Rule>
-      <Filter>[amenity] = 'veterinary'</Filter>
-      <PointSymbolizer file="$ICONS_DIR/veterinary-15.svg" allow-overlap="true" ignore-placement="true"/>
-    </Rule>
-  </Style>
-  
   <!-- CONTOUR LINES - elevation representation -->
   <Style name="contours">
     <!-- Major contour lines (every 50m) -->
@@ -530,15 +510,6 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
-    </Datasource>
-  </Layer>
-  
-  <!-- Emergency layer -->
-  <Layer name="emergency" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>emergency</StyleName>
-    <Datasource>
-      <Parameter name="type">shape</Parameter>
-      <Parameter name="file">$DATA_DIR/points.shp</Parameter>
     </Datasource>
   </Layer>
   
