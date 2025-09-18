@@ -121,7 +121,12 @@ def main():
         print("⚠ Contour generation skipped or failed")
 
     # Process elevation data for hillshading if enabled
-    hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
+    # Only process if we have a valid data directory
+    if osm_data_dir:
+        hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
+    else:
+        print("⚠ Skipping hillshading due to missing OSM data directory")
+        hillshade_file = None
     hillshade_available = hillshade_file is not None
     
     # Create map style

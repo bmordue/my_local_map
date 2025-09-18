@@ -34,6 +34,10 @@
       "altitude": 45,
       "z_factor": 1.0,
       "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
     }
   }
 }
