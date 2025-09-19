@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Lightweight A3 Tourist Map Generator for Lumsden, Aberdeenshire
+Lightweight A3 Tourist Map Generator for Aberdeenshire
 Uses configuration-driven approach for maximum flexibility
 """
 
 import os
+import argparse
 from pathlib import Path
 from utils.config import load_area_config, load_output_format, calculate_pixel_dimensions
 from utils.style_builder import build_mapnik_style
@@ -65,14 +66,23 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     print(f"Map rendered successfully: {output_file} ({file_size_mb:.1f} MB)")
     return True
 
-def main():
-    print("Lightweight Lumsden Tourist Map Generator")
+def main(area_name="lumsden"):
+    print(f"Lightweight {area_name.title()} Tourist Map Generator")
 #    print("Downloading icons...")
 #    download_icons()
 #    print("=" * 50)
     
     # Load configuration
-    area_config = load_area_config("lumsden")
+    try:
+        area_config = load_area_config(area_name)
+    except KeyError:
+        print(f"Error: Area '{area_name}' not found in configuration.")
+        print("Available areas:")
+        from utils.config import list_areas
+        for area in list_areas():
+            print(f"  - {area}")
+        return 1
+        
     output_format = load_output_format("A3")
     width_px, height_px = calculate_pixel_dimensions(output_format)
 
@@ -93,7 +103,7 @@ def main():
     data_dir.mkdir(exist_ok=True)
 
     # Determine OSM file path (configurable, default to data/lumsden_area.osm)
-    osm_file_path = area_config.get("osm_file", "data/lumsden_area.osm")
+    osm_file_path = area_config.get("osm_file", f"data/{area_name}_area.osm")
     osm_file = Path(osm_file_path)
     if not osm_file.exists():
         print(f"OSM file not found at {osm_file}. Downloading...")
@@ -136,19 +146,27 @@ def main():
     
     # Render map
     print(f"\nRendering A3 map ({width_px}×{height_px} pixels)...")
-    output_file = data_dir / "lumsden_tourist_map_A3.png"
+    output_file = data_dir / f"{area_name}_tourist_map_A3.png"
     
     if render_map(style_file, bbox, str(output_file), width_px, height_px):
         print("\nSUCCESS!")
         print(f"Tourist map: {output_file}")
         print(f"Print size: A3 ({output_format['width_mm']}×{output_format['height_mm']}mm at {output_format['dpi']} DPI)")
-        print(f"Perfect for planning day trips around Lumsden!")
+        print(f"Perfect for planning day trips around {area_config['name']}!")
         return 0
     else:
         print("\nMap rendering failed")
         return 1
 
 if __name__ == "__main__":
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Generate a tourist map for a specified area in Aberdeenshire")
+    parser.add_argument("area", nargs="?", default="lumsden", help="The area to generate a map for (default: lumsden)")
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    # Run main with the specified area
     import sys
-    sys.exit(main())
+    sys.exit(main(args.area))
 
