@@ -143,7 +143,8 @@ class TestConfigurationHandling:
             # Setup return values
             area_config = {"center": {"lat": 57.3167, "lon": -2.8833}, 
                           "coverage": {"width_km": 8, "height_km": 12},
-                          "scale": 25000}
+                          "scale": 25000,
+                          "name": "Lumsden, Aberdeenshire"}
             output_format = {"width_mm": 297, "height_mm": 420, "dpi": 300}
             mock_load_area.return_value = area_config
             mock_load_output.return_value = output_format
@@ -169,7 +170,7 @@ class TestFileHandling:
         
         with patch('pathlib.Path.exists') as mock_exists, \
              patch('pathlib.Path.mkdir') as mock_mkdir, \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
+             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000, "name": "Lumsden, Aberdeenshire"}), \
              patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
              patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
              patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
@@ -194,7 +195,7 @@ class TestFileHandling:
         
         with patch('pathlib.Path.exists') as mock_exists, \
              patch('pathlib.Path.mkdir') as mock_mkdir, \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
+             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000, "name": "Lumsden, Aberdeenshire"}), \
              patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
              patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
              patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
@@ -224,7 +225,7 @@ class TestErrorHandling:
         
         with patch('pathlib.Path.exists', return_value=False), \
              patch('pathlib.Path.mkdir'), \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
+             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000, "name": "Lumsden, Aberdeenshire"}), \
              patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
              patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
              patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
@@ -247,7 +248,7 @@ class TestErrorHandling:
         
         with patch('pathlib.Path.exists', return_value=True), \
              patch('pathlib.Path.mkdir'), \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
+             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000, "name": "Lumsden, Aberdeenshire"}), \
              patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
              patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
              patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \

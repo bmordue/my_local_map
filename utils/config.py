@@ -12,6 +12,14 @@ def load_area_config(area_name="lumsden"):
     return areas[area_name]
 
 
+def list_areas():
+    """List all available geographic areas"""
+    config_file = Path("config/areas.json")
+    with open(config_file) as f:
+        areas = json.load(f)
+    return list(areas.keys())
+
+
 def load_output_format(format_name="A3"):
     """Load output format specifications"""
     config_file = Path("config/output_formats.json")
