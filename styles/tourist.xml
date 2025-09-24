@@ -59,6 +59,12 @@
       <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
       <PolygonSymbolizer fill="#c8facc" fill-opacity="0.8"/>
     </Rule>
+    <!-- Nature reserves -->
+    <Rule>
+      <Filter>[leisure] = 'nature_reserve'</Filter>
+      <PolygonSymbolizer fill="#27ae60" fill-opacity="0.3"/>
+      <LineSymbolizer stroke="#27ae60" stroke-width="1" stroke-opacity="0.8" stroke-dasharray="4,2"/>
+    </Rule>
   </Style>
 
   <!-- WATER -->
@@ -137,12 +143,37 @@
       <Filter>[highway] = 'cycleway'</Filter>
       <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
     </Rule>
-    <!-- Commented out route filter as it's not available in OSM shapefiles
+    <!-- Hiking trails -->
     <Rule>
-      <Filter>[route] = 'hiking'</Filter>
+      <Filter>[other_tags].match('.*route.*hiking.*')</Filter>
       <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
     </Rule>
-    -->
+    <!-- Horse riding trails -->
+    <Rule>
+      <Filter>[other_tags].match('.*horse.*yes.*')</Filter>
+      <LineSymbolizer stroke="#8e44ad" stroke-width="2" stroke-dasharray="6,4" stroke-opacity="0.8"/>
+    </Rule>
+  </Style>
+  
+  <!-- OUTDOOR RECREATION - Parks, trails, and activity areas -->
+  <Style name="recreation">
+    <Rule>
+      <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
+      <PolygonSymbolizer fill="#c8facc" fill-opacity="0.6"/>
+      <LineSymbolizer stroke="#27ae60" stroke-width="1" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'playground'</Filter>
+      <PolygonSymbolizer fill="#f9e79f" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'pitch'</Filter>
+      <PolygonSymbolizer fill="#f8c471" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'track'</Filter>
+      <LineSymbolizer stroke="#e67e22" stroke-width="2" stroke-opacity="0.8"/>
+    </Rule>
   </Style>
   
   <!-- BUILDINGS -->
@@ -278,6 +309,11 @@
     <Rule>
       <Filter>[other_tags].match('.*heritage.*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/monument-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
+    <!-- Castle -->
+    <Rule>
+      <Filter>[other_tags].match('.*castle.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/castle-14.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
   </Style>
   
@@ -534,6 +570,15 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- Recreation layer -->
+  <Layer name="recreation" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>recreation</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   

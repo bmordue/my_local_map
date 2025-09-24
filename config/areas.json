@@ -66,6 +66,429 @@
         }
       },
       "priority": "overlay"
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "balmoral_castle": {
+    "center": {
+      "lat": 57.4509,
+      "lon": -3.3639
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Balmoral Castle, Aberdeenshire",
+    "osm_file": "data/balmoral_castle_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "crathes_castle": {
+    "center": {
+      "lat": 57.2910,
+      "lon": -2.5290
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Crathes Castle, Aberdeenshire",
+    "osm_file": "data/crathes_castle_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "dunnottar_castle": {
+    "center": {
+      "lat": 57.1473,
+      "lon": -2.2217
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Dunnottar Castle, Aberdeenshire",
+    "osm_file": "data/dunnottar_castle_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "cairngorms_national_park": {
+    "center": {
+      "lat": 57.0027,
+      "lon": -3.5284
+    },
+    "coverage": {
+      "width_km": 15,
+      "height_km": 20
+    },
+    "scale": 50000,
+    "name": "Cairngorms National Park, Aberdeenshire",
+    "osm_file": "data/cairngorms_national_park_area.osm",
+    "contours": {
+      "enabled": true,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "fraserburgh": {
+    "center": {
+      "lat": 57.6932,
+      "lon": -2.0054
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Fraserburgh, Aberdeenshire",
+    "osm_file": "data/fraserburgh_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "peterhead": {
+    "center": {
+      "lat": 57.5052,
+      "lon": -1.7852
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Peterhead, Aberdeenshire",
+    "osm_file": "data/peterhead_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "huntly": {
+    "center": {
+      "lat": 57.4265,
+      "lon": -2.7908
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Huntly, Aberdeenshire",
+    "osm_file": "data/huntly_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "stonehaven": {
+    "center": {
+      "lat": 56.9637,
+      "lon": -2.2114
+    },
+    "coverage": {
+      "width_km": 8,
+      "height_km": 12
+    },
+    "scale": 25000,
+    "name": "Stonehaven, Aberdeenshire",
+    "osm_file": "data/stonehaven_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "lochnagar": {
+    "center": {
+      "lat": 57.0459,
+      "lon": -3.2726
+    },
+    "coverage": {
+      "width_km": 10,
+      "height_km": 15
+    },
+    "scale": 25000,
+    "name": "Lochnagar, Aberdeenshire",
+    "osm_file": "data/lochnagar_area.osm",
+    "contours": {
+      "enabled": true,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
+    }
+  },
+  "ythan_estuary": {
+    "center": {
+      "lat": 57.4035,
+      "lon": -2.1143
+    },
+    "coverage": {
+      "width_km": 10,
+      "height_km": 15
+    },
+    "scale": 25000,
+    "name": "Ythan Estuary, Aberdeenshire",
+    "osm_file": "data/ythan_estuary_area.osm",
+    "contours": {
+      "enabled": false,
+      "interval": 10,
+      "major_interval": 50,
+      "style": {
+        "minor": {
+          "color": "#996633",
+          "width": 0.3,
+          "opacity": 0.5
+        },
+        "major": {
+          "color": "#663300",
+          "width": 1.8,
+          "opacity": 0.9
+        }
+      }
+    },
+    "hillshading": {
+      "enabled": true,
+      "opacity": 0.4,
+      "azimuth": 315,
+      "altitude": 45,
+      "z_factor": 1.0,
+      "scale": 111120
+    },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30
     }
   }
 }
