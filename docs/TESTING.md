@@ -143,7 +143,7 @@ Key mocked components:
 
 Run the validation script to check basic functionality:
 ```bash
-python validate_setup.py
+python utils/system_validation.py
 ```
 
 This tests:

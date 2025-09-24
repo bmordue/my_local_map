@@ -90,7 +90,7 @@ Container for validation results with:
 Run comprehensive validation on all data sources:
 
 ```bash
-python3 validate_data_quality.py
+python3 utils/run_quality_validation.py
 ```
 
 This will:
@@ -273,7 +273,7 @@ The validation system is optimized for performance:
 Quality validation is integrated into the existing setup validation:
 
 ```bash
-python3 utils/validate_setup.py
+python3 utils/system_validation.py
 ```
 
 Now includes quality validation system checks.
