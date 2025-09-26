@@ -143,6 +143,7 @@ class TestCreateMapnikStyleUnit:
                 "tourist", "/test/data", area_config, True, None
             )
 
+
 class TestConfigurationHandling:
     """Test configuration loading in main function"""
 
