@@ -187,7 +187,7 @@ def validate_osm_data_quality(osm_file):
 
         return quality_score >= 25
 
-    except Exception as e:
+    except (xml.etree.ElementTree.ParseError, FileNotFoundError) as e:
         print(f"   ❌ Error analyzing OSM data: {e}")
         return False
 
