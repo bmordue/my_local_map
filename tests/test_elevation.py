@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test script for elevation data processing"""
+"""Test script for elevation data processing - updated for real DEM sources only"""
 
 import os
 import sys
@@ -22,21 +22,23 @@ def main():
     output_dir = Path("test_output")
     output_dir.mkdir(exist_ok=True)
 
-    # Test synthetic elevation data
-    print("Testing synthetic elevation data generation...")
+    # Test that synthetic elevation data is no longer available
+    print("Testing that synthetic elevation data generation has been removed...")
     synthetic_file = output_dir / "synthetic_elevation.tif"
-    if download_elevation_data(elev_bbox, str(synthetic_file), dem_source="synthetic"):
-        print(f"✓ Successfully generated synthetic elevation data: {synthetic_file}")
+    result = download_elevation_data(elev_bbox, str(synthetic_file), dem_source="synthetic")
+    if not result:
+        print("✓ Successfully confirmed synthetic elevation data generation removed")
     else:
-        print("✗ Failed to generate synthetic elevation data")
+        print("✗ Synthetic elevation data generation still available (should be removed)")
 
-    # Test SRTM elevation data (will fall back to synthetic)
-    print("\nTesting SRTM elevation data generation...")
+    # Test SRTM elevation data (should fail gracefully without real implementation)
+    print("\nTesting SRTM elevation data (should fail gracefully)...")
     srtm_file = output_dir / "srtm_elevation.tif"
-    if download_elevation_data(elev_bbox, str(srtm_file), dem_source="srtm"):
-        print(f"✓ Successfully generated SRTM-like elevation data: {srtm_file}")
+    result = download_elevation_data(elev_bbox, str(srtm_file), dem_source="srtm")
+    if not result:
+        print("✓ SRTM elevation data correctly fails without real DEM implementation")
     else:
-        print("✗ Failed to generate SRTM-like elevation data")
+        print("✗ SRTM elevation data unexpectedly succeeded")
 
 
 if __name__ == "__main__":
