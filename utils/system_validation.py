@@ -6,8 +6,8 @@ Simple validation script to check that the map generator can be imported and has
 import os
 import sys
 
-# Add the current directory to path so we can import the modules
-sys.path.insert(0, os.path.dirname(__file__))
+# Add the root directory to path so we can import the modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 
 def test_imports():
@@ -64,6 +64,28 @@ def test_data_processing():
         print(f"✗ Data processing error: {e}")
         return False
 
+def test_quality_validation():
+    """Test quality validation system functionality"""
+    try:
+        from utils.quality_validation import (
+            ValidationResult, CoordinateValidator, AttributeValidator,
+            TemporalValidator, CrossReferenceValidator, validate_data_quality
+        )
+        
+        # Test basic validation functionality
+        bbox = {'south': 57.26, 'north': 57.37, 'west': -2.95, 'east': -2.82}
+        coord_validator = CoordinateValidator(bbox)
+        
+        # Test with sample data
+        sample_data = [{'lat': 57.32, 'lon': -2.88, 'name': 'Test Location'}]
+        result = coord_validator.validate_coordinates(sample_data)
+        
+        print(f"✓ Quality validation system functional: {result.stats.get('valid_coordinates', 0)} valid coordinates")
+        
+        return True
+    except Exception as e:
+        print(f"✗ Quality validation error: {e}")
+        return False
 
 def main():
     """Run all validation tests"""
@@ -76,6 +98,7 @@ def main():
         ("Module imports", test_imports),
         ("Configuration loading", test_configuration_loading),
         ("Data processing", test_data_processing),
+        ("Quality validation system", test_quality_validation),
     ]
 
     for test_name, test_func in tests:

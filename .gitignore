@@ -2,6 +2,10 @@ data/
 __pycache__/
 *.pyc
 
+# Generated reports and validation outputs 
+validation_reports/
+quality_reports/
+
 # Testing artifacts
 .pytest_cache/
 .coverage
