@@ -7,7 +7,7 @@ A Python-based tourist map generator that creates high-quality A3 printable maps
 ## Project Overview
 
 ### Supported Geographic Areas
-The application supports **12 geographic areas** in Aberdeenshire, configured in `config/areas.json`:
+The application supports **11 geographic areas** in Aberdeenshire, configured in `config/areas.json`:
 - Lumsden, Balmoral Castle, Crathes Castle, Dunnottar Castle
 - Cairngorms National Park, Fraserburgh, Peterhead, Huntly  
 - Stonehaven, Lochnagar, Ythan Estuary
@@ -143,14 +143,14 @@ utils/                   # Utility modules (NEW modular structure)
 └── create_enhanced_data.py  # Tourism database creation
 
 config/                 # Configuration files
-├── areas.json          # 12 geographic area configurations  
+├── areas.json          # 11 geographic area configurations  
 └── output_formats.json # Output format specifications (A3, preview)
 
-tests/                  # Comprehensive test suite (15+ test files)
+tests/                  # Comprehensive test suite (14 test files)
 ├── test_integration.py # Full workflow integration tests
 ├── test_config.py      # Configuration validation tests
 ├── test_data_processing.py # Data processing tests
-└── ... (12 more test files)
+└── ... (11 more test files)
 ```
 
 ### Generated Files (Not in Git)
@@ -170,7 +170,7 @@ enhanced_data/                # Tourism data (when enabled)
 ```
 
 ### Core Configuration
-Located in `config/areas.json` with 12+ areas:
+Located in `config/areas.json` with 11+ areas:
 - **Center coordinates**: Lat/Lon for each geographic area
 - **Coverage area**: Width/height in kilometers per area
 - **Map scale**: Typically 1:25,000 for tourist planning (1:50,000 for large areas)
