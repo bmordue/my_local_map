@@ -1,6 +1,6 @@
 # My local map
 
-Render a local map for the Lumsden area of Aberdeenshire, Scotland suitable for printing.
+Render a local map suitable for printing.
 
 ## Features
 
