@@ -9,6 +9,13 @@ pkgs.mkShell {
     python312Packages.pytest
     python312Packages.cairosvg
     python312Packages.pillow
+    python312Packages.gdal  # GDAL Python bindings (osgeo module)
+    python312Packages.numpy # For elevation processing
+
+    # dev dependencies, linting etc
+    python312Packages.flake8
+    python312Packages.black
+    python312Packages.isort
 
     # GDAL for OSM conversion
     gdal
@@ -24,9 +31,11 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "Made available:"
-    echo "  Python 3.12 + requests"
+    echo "  Python 3.12 + requests + Pillow"
     echo "  GDAL/OGR (for data conversion)"
+    echo "  GDAL Python bindings (osgeo module)"
     echo "  Mapnik (for rendering)"
+    echo "  NumPy (for elevation processing)"
     echo ""
     echo "Ready to run: python map_generator.py"
     echo ""

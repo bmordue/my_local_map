@@ -182,7 +182,7 @@ def main():
     bbox = calculate_bbox(area_config)
     
     # Process data (unchanged logic)
-    data_dir = convert_osm_to_shapefiles(osm_file)
+    data_dir = convert_osm_to_shapefiles(area_config["osm_file"])
     
     # Build style from template
     style_file = build_mapnik_style("tourist", data_dir)
