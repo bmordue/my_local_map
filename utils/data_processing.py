@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 import requests
+import xml
 
 
 def calculate_bbox(center_lat, center_lon, width_km, height_km):
