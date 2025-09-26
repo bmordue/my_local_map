@@ -66,7 +66,7 @@ def demonstrate_live_osm_integration():
                             for line in result.stdout.split("\n"):
                                 if "Feature Count:" in line or "Extent:" in line:
                                     print(f"   {layer}: {line.strip()}")
-                        except:
+                        except subprocess.CalledProcessError:
                             pass
 
     print("\n✨ Integration Summary:")
