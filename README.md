@@ -98,7 +98,7 @@ enhanced_data/
 - [ ] Add elevation data and contour lines
 - [x] Include Ordnance Survey data layers
 - [ ] Add real-time information (weather, events)
-- [ ] Implement quality validation systems
+- [x] Implement quality validation systems
 
 ### Phase 3: Advanced Features 
 - [ ] Web-based interactive map
@@ -145,4 +145,27 @@ External APIs → Data Validation → SQLite Database → GeoJSON Export → Map
 
 - [MAP_ENHANCEMENT_PLAN.md](MAP_ENHANCEMENT_PLAN.md): Comprehensive plan for adding content
 - [DATA_SOURCES_INTEGRATION.md](DATA_SOURCES_INTEGRATION.md): Guide for external data integration
+- [QUALITY_VALIDATION.md](docs/QUALITY_VALIDATION.md): Quality validation system documentation
+- [TESTING.md](docs/TESTING.md): Testing infrastructure and guidelines
 - Style XML: Detailed Mapnik styling with extensive comments
+
+## Quality Validation System
+
+The project includes a comprehensive quality validation system that ensures data accuracy and completeness:
+
+- **Coordinate Validation**: Ensures all points fall within map bounds and use valid coordinate formats
+- **Attribute Completeness**: Verifies required fields are populated with configurable rules per data type
+- **Temporal Validation**: Validates opening hours and seasonal information in multiple formats  
+- **Cross-Reference Validation**: Compares multiple sources for consistency and detects conflicts
+
+Run quality validation:
+```bash
+# System validation (checks imports, configuration, basic functionality)
+python3 utils/system_validation.py
+
+# Data quality validation (comprehensive data checking)
+python3 utils/run_quality_validation.py
+
+# Integrated with map generation
+ENABLE_QUALITY_VALIDATION=1 python3 map_generator.py
+```
