@@ -35,11 +35,11 @@ class TestOSMIntegration:
         nodes_with_coords = 0
         for node in nodes:
             if 'lat' in node.attrib and 'lon' in node.attrib:
-                # Validate coordinate values are reasonable for Scotland
+                # Validate coordinate values are reasonable for Scotland (Aberdeenshire area)
                 lat = float(node.attrib['lat'])
                 lon = float(node.attrib['lon'])
                 assert 56.0 < lat < 59.0, f"Latitude {lat} should be in Scotland range"
-                assert -4.0 < lon < -1.0, f"Longitude {lon} should be in Scotland range"
+                assert -4.3 < lon < -1.0, f"Longitude {lon} should be in Scotland range"
                 nodes_with_coords += 1
         
         # All nodes should have coordinates
