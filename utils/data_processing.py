@@ -294,90 +294,24 @@ def convert_osm_to_shapefiles(osm_file):
     return str(output_dir)
 
 
+# Synthetic elevation data generation removed per issue requirements
+# Real DEM data sources should be used instead
 def download_elevation_data(bbox, output_file="elevation_data.tif"):
     """
-    Download elevation data for the given bounding box using SRTM data
-    For minimal implementation, creates a sample elevation dataset
-    In production, this would download from USGS or similar sources
+    Download elevation data for the given bounding box using real DEM sources.
+    Synthetic elevation data generation has been removed.
+    
+    Args:
+        bbox: Bounding box dictionary with north, south, east, west
+        output_file: Path to output elevation file
+        
+    Returns:
+        None - Real DEM data download not implemented
     """
-    print("📊 Preparing elevation data for contour generation...")
-
-    # For this implementation, we'll create a synthetic elevation dataset
-    # based on the geographic location (Scotland Highlands have elevation)
-    # This provides a working demonstration without external dependencies
-
-    try:
-        # Calculate approximate elevation based on distance from sea level
-        # and typical Highland topography patterns
-        center_lat = (bbox["north"] + bbox["south"]) / 2
-        center_lon = (bbox["east"] + bbox["west"]) / 2
-
-        # Create a simple elevation model using GDAL
-        # This is a simplified approach for demonstration
-        width = int((bbox["east"] - bbox["west"]) * 111000 / 30)  # ~30m resolution
-        height = int((bbox["north"] - bbox["south"]) * 111000 / 30)  # ~30m resolution
-
-        # Ensure minimum reasonable size
-        width = max(width, 100)
-        height = max(height, 100)
-
-        # Use temporary file with proper cleanup instead of current directory
-        with tempfile.NamedTemporaryFile(
-            mode="w+", suffix=".xyz", delete=True
-        ) as temp_f:
-            # Generate synthetic elevation data representing Highland topography
-            for y in range(height):
-                for x in range(width):
-                    # Map pixel coordinates to geographic coordinates
-                    lon = bbox["west"] + (x / width) * (bbox["east"] - bbox["west"])
-                    lat = bbox["south"] + ((height - y) / height) * (
-                        bbox["north"] - bbox["south"]
-                    )
-
-                    # Generate realistic elevation for Scottish Highlands
-                    # Base elevation increases with distance from coastline
-                    base_elevation = 50 + (lat - 57.0) * 200  # Increase with latitude
-
-                    # Add topographic variation using simple math functions
-                    variation = (
-                        50 * math.sin(lon * 20) * math.cos(lat * 25)
-                        + 30 * math.sin(lon * 15) * math.sin(lat * 18)
-                        + 20 * math.cos(lon * 12) * math.cos(lat * 22)
-                    )
-
-                    elevation = max(0, base_elevation + variation)
-                    temp_f.write(f"{lon} {lat} {elevation:.1f}\n")
-
-            # Rewind file after writing
-            temp_f.seek(0)
-
-            # Convert XYZ to GeoTIFF using GDAL
-            cmd = [
-                "gdal_translate",
-                "-of",
-                "GTiff",
-                "-a_srs",
-                "EPSG:4326",  # WGS84
-                "-ot",
-                "Float32",
-                temp_f.name,
-                str(output_file),
-            ]
-
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-
-        # The temporary file is automatically deleted when the 'with' block is exited
-
-        if Path(output_file).exists():
-            print(f"✓ Created elevation data: {output_file}")
-            return str(output_file)
-        else:
-            print("⚠ Elevation data creation failed")
-            return None
-
-    except Exception as e:
-        print(f"⚠ Error creating elevation data: {e}")
-        return None
+    print("❌ Real DEM data download not implemented")
+    print("❌ Synthetic elevation data generation removed per requirements")
+    print("❌ Please implement real DEM sources (SRTM, ASTER, OS Terrain, EU-DEM)")
+    return None
 
 
 def generate_contour_lines(elevation_file, output_dir, interval=10):
