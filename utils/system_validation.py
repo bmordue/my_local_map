@@ -64,28 +64,36 @@ def test_data_processing():
         print(f"✗ Data processing error: {e}")
         return False
 
+
 def test_quality_validation():
     """Test quality validation system functionality"""
     try:
         from utils.quality_validation import (
-            ValidationResult, CoordinateValidator, AttributeValidator,
-            TemporalValidator, CrossReferenceValidator, validate_data_quality
+            AttributeValidator,
+            CoordinateValidator,
+            CrossReferenceValidator,
+            TemporalValidator,
+            ValidationResult,
+            validate_data_quality,
         )
-        
+
         # Test basic validation functionality
-        bbox = {'south': 57.26, 'north': 57.37, 'west': -2.95, 'east': -2.82}
+        bbox = {"south": 57.26, "north": 57.37, "west": -2.95, "east": -2.82}
         coord_validator = CoordinateValidator(bbox)
-        
+
         # Test with sample data
-        sample_data = [{'lat': 57.32, 'lon': -2.88, 'name': 'Test Location'}]
+        sample_data = [{"lat": 57.32, "lon": -2.88, "name": "Test Location"}]
         result = coord_validator.validate_coordinates(sample_data)
-        
-        print(f"✓ Quality validation system functional: {result.stats.get('valid_coordinates', 0)} valid coordinates")
-        
+
+        print(
+            f"✓ Quality validation system functional: {result.stats.get('valid_coordinates', 0)} valid coordinates"
+        )
+
         return True
     except Exception as e:
         print(f"✗ Quality validation error: {e}")
         return False
+
 
 def main():
     """Run all validation tests"""

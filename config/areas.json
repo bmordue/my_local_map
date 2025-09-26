@@ -36,9 +36,39 @@
       "z_factor": 1.0,
       "scale": 111120
     },
-    "elevation": {
-      "source": "srtm",
-      "resolution": 30
+    "ordnance_survey": {
+      "enabled": true,
+      "layers": ["roads", "boundaries", "rights_of_way"],
+      "style": {
+        "roads": {
+          "primary_color": "#CC6600",
+          "primary_width": 2.0,
+          "secondary_color": "#FF9933", 
+          "secondary_width": 1.5,
+          "tertiary_color": "#FFCC99",
+          "tertiary_width": 1.0
+        },
+        "boundaries": {
+          "admin_color": "#8B4513",
+          "admin_width": 1.2,
+          "admin_opacity": 0.8,
+          "parish_color": "#CD853F",
+          "parish_width": 0.8,
+          "parish_opacity": 0.6
+        },
+        "rights_of_way": {
+          "footpath_color": "#228B22",
+          "footpath_width": 1.0,
+          "bridleway_color": "#32CD32",
+          "bridleway_width": 1.2,
+          "byway_color": "#90EE90",
+          "byway_width": 1.5
+        }
+      },
+      "priority": "overlay",
+      "elevation": {
+        "source": "srtm",
+        "resolution": 30
     }
   },
   "balmoral_castle": {
