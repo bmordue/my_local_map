@@ -65,10 +65,10 @@
           "byway_width": 1.5
         }
       },
-      "priority": "overlay"
-    "elevation": {
-      "source": "srtm",
-      "resolution": 30
+      "priority": "overlay",
+      "elevation": {
+        "source": "srtm",
+        "resolution": 30
     }
   },
   "balmoral_castle": {
