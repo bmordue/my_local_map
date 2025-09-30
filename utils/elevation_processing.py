@@ -192,7 +192,7 @@ def _create_synthetic_dem_fallback(bbox, output_file, resolution=30):
 
 def download_elevation_data(
     bbox, output_file, resolution=30, force_subprocess=False, dem_source="srtm", 
-    allow_synthetic_fallback=False
+    allow_synthetic_fallback=True
 ):
     """
     Download elevation data for the given bounding box.
