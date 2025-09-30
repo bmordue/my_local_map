@@ -10,7 +10,7 @@
     },
     "scale": 25000,
     "name": "Lumsden, Aberdeenshire",
-    "osm_file": "data/lumsden_area.osm",
+    "osm_file": "lumsden_area.osm",
     "contours": {
       "enabled": false,
       "interval": 10,
@@ -38,7 +38,8 @@
     },
     "elevation": {
       "source": "srtm",
-      "resolution": 30
+      "resolution": 30,
+      "allow_synthetic_fallback": true
     }
   },
   "balmoral_castle": {

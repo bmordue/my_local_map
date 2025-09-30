@@ -37,3 +37,16 @@ build/
 
 test_output/
 
+# DEM cache directory (elevation data should not be committed)
+**/.my_local_map/
+**/dem_cache/
+
+# Generated map outputs
+*.png
+tourist_map_style.xml
+
+# Data files (OSM shapefiles, elevation data)
+osm_data/
+data/osm_data/
+enhanced_data/
+
