@@ -19,44 +19,23 @@ from utils.data_processing import (
 class TestTempFileHandling:
     """Test that temporary files are handled properly and cleaned up"""
 
-    def test_download_elevation_data_uses_tempfile(self):
-        """Test that download_elevation_data uses tempfile.NamedTemporaryFile"""
+    def test_download_elevation_data_no_tempfile_required(self):
+        """Test that download_elevation_data no longer uses tempfiles since synthetic generation removed"""
         bbox = {"north": 57.37, "south": 57.26, "east": -2.82, "west": -2.95}
 
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "test_elevation.tif"
 
-            # Mock subprocess.run to avoid actual GDAL execution
-            with patch("subprocess.run") as mock_run:
-                mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-
-                # Mock Path.exists to simulate successful file creation
-                with patch("pathlib.Path.exists", return_value=True):
-                    # Mock tempfile.NamedTemporaryFile to track its usage
-                    with patch("tempfile.NamedTemporaryFile") as mock_temp:
-                        mock_temp_file = MagicMock()
-                        mock_temp_file.name = "/tmp/test_temp.xyz"
-                        mock_temp_file.__enter__ = MagicMock(
-                            return_value=mock_temp_file
-                        )
-                        mock_temp_file.__exit__ = MagicMock(return_value=None)
-                        mock_temp.return_value = mock_temp_file
-
-                        result = download_elevation_data(bbox, str(output_file))
-
-                        # Verify tempfile.NamedTemporaryFile was called with correct parameters
-                        mock_temp.assert_called_once_with(
-                            mode="w+", suffix=".xyz", delete=True
-                        )
-
-                        # Verify the temporary file was used in gdal_translate command
-                        mock_run.assert_called_once()
-                        cmd = mock_run.call_args[0][0]
-                        assert "gdal_translate" in cmd
-                        assert mock_temp_file.name in cmd
-                        assert str(output_file) in cmd
-
-                        assert result == str(output_file)
+            # Since synthetic data generation is removed, this should return None immediately
+            # without creating any temporary files
+            with patch("tempfile.NamedTemporaryFile") as mock_temp:
+                result = download_elevation_data(bbox, str(output_file))
+                
+                # Should return None because real DEM sources not implemented
+                assert result is None
+                
+                # Should not create any temporary files
+                mock_temp.assert_not_called()
 
     def test_no_temp_files_left_in_current_directory(self):
         """Test that no temporary files are left in the current working directory"""
@@ -115,7 +94,7 @@ class TestTempFileHandling:
             ), "Temporary .xyz files left after exception"
 
     def test_multiple_concurrent_instances_no_conflicts(self):
-        """Test that multiple instances can run without file conflicts"""
+        """Test that multiple instances handle absence of synthetic data correctly"""
         bbox = {"north": 57.37, "south": 57.26, "east": -2.82, "west": -2.95}
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -123,62 +102,20 @@ class TestTempFileHandling:
                 Path(temp_dir) / f"test_elevation_{i}.tif" for i in range(3)
             ]
 
-            # Mock subprocess.run to avoid actual GDAL execution
-            with patch("subprocess.run") as mock_run:
-                mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+            # Since synthetic data generation is removed, all instances should return None
+            # without creating any temporary files or conflicts
+            with patch("tempfile.NamedTemporaryFile") as mock_temp:
+                # Run multiple instances
+                results = []
+                for output_file in output_files:
+                    result = download_elevation_data(bbox, str(output_file))
+                    results.append(result)
 
-                with patch("pathlib.Path.exists", return_value=True):
-                    # Mock tempfile.NamedTemporaryFile to return different names each time
-                    temp_names = [f"/tmp/test_temp_{i}.xyz" for i in range(3)]
-
-                    with patch("tempfile.NamedTemporaryFile") as mock_temp:
-
-                        def create_mock_temp(name):
-                            mock_temp_file = MagicMock()
-                            mock_temp_file.name = name
-                            mock_temp_file.__enter__ = MagicMock(
-                                return_value=mock_temp_file
-                            )
-                            mock_temp_file.__exit__ = MagicMock(return_value=None)
-                            return mock_temp_file
-
-                        mock_temp.side_effect = [
-                            create_mock_temp(name) for name in temp_names
-                        ]
-
-                        # Run multiple instances
-                        results = []
-                        for output_file in output_files:
-                            result = download_elevation_data(bbox, str(output_file))
-                            results.append(result)
-
-                        # All should succeed
-                        assert all(
-                            result == str(output_files[i])
-                            for i, result in enumerate(results)
-                        )
-
-                        # Verify each instance used a different temporary file
-                        assert mock_temp.call_count == 3
-
-                        # Verify gdal_translate was called with different temp files
-                        assert mock_run.call_count == 3
-                        used_temp_files = set()
-                        for call in mock_run.call_args_list:
-                            cmd = call[0][0]
-                            # Find the temp file name in the command
-                            temp_file_in_cmd = None
-                            for arg in cmd:
-                                if arg.startswith("/tmp/test_temp_") and arg.endswith(
-                                    ".xyz"
-                                ):
-                                    temp_file_in_cmd = arg
-                                    break
-                            assert temp_file_in_cmd is not None
-                            used_temp_files.add(temp_file_in_cmd)
-
-                        # All temp files should be different
-                        assert len(used_temp_files) == 3
+                # All should return None (real DEM sources not implemented)
+                assert all(result is None for result in results)
+                
+                # Should not create any temporary files
+                mock_temp.assert_not_called()
 
 
 @pytest.mark.unit
