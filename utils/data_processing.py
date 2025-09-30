@@ -4,10 +4,10 @@ import math
 import os
 import subprocess
 import tempfile
+import xml
 from pathlib import Path
 
 import requests
-import xml
 
 
 def calculate_bbox(center_lat, center_lon, width_km, height_km):

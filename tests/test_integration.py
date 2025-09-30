@@ -140,7 +140,7 @@ class TestCreateMapnikStyleUnit:
 
             assert result == "tourist_map_style.xml"
             mock_build.assert_called_once_with(
-                "tourist", "/test/data", area_config, True
+                "tourist", "/test/data", area_config, True, None
             )
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def build_mapnik_style(
-    style_name, data_dir, area_config=None, hillshade_available=False
+    style_name, data_dir, area_config=None, hillshade_available=False, os_data_dirs=None
 ):
     """Build Mapnik XML from template and data directory"""
     template_file = Path(f"styles/{style_name}.xml")
@@ -89,6 +89,60 @@ def build_mapnik_style(
         contour_major_width = major_style.get("width", 1.2)
         contour_major_opacity = major_style.get("opacity", 0.8)
 
+    # Ordnance Survey data configuration
+    os_roads_dir = ""
+    os_boundaries_dir = ""
+    os_rights_of_way_dir = ""
+    os_status = "off"
+    os_roads_primary_color = "#CC6600"
+    os_roads_primary_width = 2.0
+    os_roads_secondary_color = "#FF9933"
+    os_roads_secondary_width = 1.5
+    os_boundaries_admin_color = "#8B4513"
+    os_boundaries_admin_width = 1.2
+    os_rights_of_way_footpath_color = "#228B22"
+    os_rights_of_way_footpath_width = 1.0
+
+    if (
+        os_data_dirs
+        and area_config
+        and area_config.get("ordnance_survey", {}).get("enabled", False)
+    ):
+        # Only enable OS layers if we actually have valid data
+        valid_os_dirs = {k: v for k, v in os_data_dirs.items() if v is not None}
+
+        if valid_os_dirs:
+            os_status = "on"
+            os_config = area_config["ordnance_survey"]
+            style_config = os_config.get("style", {})
+
+            # Set OS data directories (use absolute paths)
+            if "roads" in valid_os_dirs:
+                os_roads_dir = str(Path(valid_os_dirs["roads"]).resolve())
+            if "boundaries" in valid_os_dirs:
+                os_boundaries_dir = str(Path(valid_os_dirs["boundaries"]).resolve())
+            if "rights_of_way" in valid_os_dirs:
+                os_rights_of_way_dir = str(
+                    Path(valid_os_dirs["rights_of_way"]).resolve()
+                )
+
+            # Configure roads styling
+            roads_style = style_config.get("roads", {})
+            os_roads_primary_color = roads_style.get("primary_color", "#CC6600")
+            os_roads_primary_width = roads_style.get("primary_width", 2.0)
+            os_roads_secondary_color = roads_style.get("secondary_color", "#FF9933")
+            os_roads_secondary_width = roads_style.get("secondary_width", 1.5)
+
+            # Configure boundaries styling
+            boundaries_style = style_config.get("boundaries", {})
+            os_boundaries_admin_color = boundaries_style.get("admin_color", "#8B4513")
+            os_boundaries_admin_width = boundaries_style.get("admin_width", 1.2)
+
+            # Configure rights of way styling
+            row_style = style_config.get("rights_of_way", {})
+            os_rights_of_way_footpath_color = row_style.get("footpath_color", "#228B22")
+            os_rights_of_way_footpath_width = row_style.get("footpath_width", 1.0)
+
     style_xml = template.substitute(
         DATA_DIR=str(abs_data_dir),
         ICONS_DIR=str(abs_icons_dir),
@@ -104,6 +158,18 @@ def build_mapnik_style(
         CONTOUR_MAJOR_COLOR=contour_major_color,
         CONTOUR_MAJOR_WIDTH=contour_major_width,
         CONTOUR_MAJOR_OPACITY=contour_major_opacity,
+        OS_STATUS=os_status,
+        OS_ROADS_DIR=os_roads_dir,
+        OS_BOUNDARIES_DIR=os_boundaries_dir,
+        OS_RIGHTS_OF_WAY_DIR=os_rights_of_way_dir,
+        OS_ROADS_PRIMARY_COLOR=os_roads_primary_color,
+        OS_ROADS_PRIMARY_WIDTH=os_roads_primary_width,
+        OS_ROADS_SECONDARY_COLOR=os_roads_secondary_color,
+        OS_ROADS_SECONDARY_WIDTH=os_roads_secondary_width,
+        OS_BOUNDARIES_ADMIN_COLOR=os_boundaries_admin_color,
+        OS_BOUNDARIES_ADMIN_WIDTH=os_boundaries_admin_width,
+        OS_RIGHTS_OF_WAY_FOOTPATH_COLOR=os_rights_of_way_footpath_color,
+        OS_RIGHTS_OF_WAY_FOOTPATH_WIDTH=os_rights_of_way_footpath_width,
     )
 
     output_file = f"styles/{style_name}_map_style.xml"
