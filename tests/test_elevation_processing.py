@@ -70,37 +70,35 @@ class TestElevationProcessing(unittest.TestCase):
         self.assertGreater(width, original_width)
         self.assertGreater(height, original_height)
 
-    @patch("subprocess.run")
-    @patch("builtins.open", new_callable=mock_open)
-    def test_download_elevation_data_success(self, mock_file, mock_subprocess):
-        """Test successful elevation data generation"""
-        # Mock successful subprocess call
-        mock_subprocess.return_value.returncode = 0
-        mock_subprocess.return_value.stderr = ""
+    def test_download_elevation_data_no_real_dem(self):
+        """Test that elevation data download fails when real DEM sources unavailable"""
+        with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
+            # Test SRTM source
+            result = download_elevation_data(
+                self.test_bbox, temp_file.name, dem_source="srtm"
+            )
+            self.assertFalse(result)
+            
+            # Test other DEM sources
+            for source in ["aster", "os_terrain", "eu_dem"]:
+                result = download_elevation_data(
+                    self.test_bbox, temp_file.name, dem_source=source
+                )
+                self.assertFalse(result)
+            
+            # Test unknown source
+            result = download_elevation_data(
+                self.test_bbox, temp_file.name, dem_source="unknown"
+            )
+            self.assertFalse(result)
 
+    def test_download_elevation_data_failure(self):
+        """Test elevation data download failure when real DEM unavailable"""
         with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
             result = download_elevation_data(
-                self.test_bbox, temp_file.name, force_subprocess=True
+                self.test_bbox, temp_file.name, dem_source="srtm"
             )
-
-            self.assertTrue(result)
-            # Should call gdal_translate
-            mock_subprocess.assert_called()
-            call_args = mock_subprocess.call_args[0][0]
-            self.assertIn("gdal_translate", call_args)
-
-    @patch("subprocess.run")
-    def test_download_elevation_data_failure(self, mock_subprocess):
-        """Test elevation data generation failure"""
-        # Mock failed subprocess call
-        mock_subprocess.return_value.returncode = 1
-        mock_subprocess.return_value.stderr = "Error message"
-
-        with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
-            result = download_elevation_data(
-                self.test_bbox, temp_file.name, force_subprocess=True
-            )
-
+            # Should fail because real SRTM implementation not available
             self.assertFalse(result)
 
     @patch("subprocess.run")

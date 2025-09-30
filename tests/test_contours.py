@@ -18,23 +18,16 @@ from utils.data_processing import (
 class TestContourGeneration:
     """Test contour line generation functionality"""
 
-    def test_download_elevation_data_success(self):
-        """Test successful elevation data generation"""
+    def test_download_elevation_data_unavailable(self):
+        """Test that elevation data download fails when real DEM sources unavailable"""
         bbox = {"north": 57.37, "south": 57.26, "east": -2.82, "west": -2.95}
 
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "test_elevation.tif"
-
-            # Mock GDAL command execution
-            with patch("subprocess.run") as mock_run:
-                mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-
-                # Mock file existence after creation
-                with patch("pathlib.Path.exists", return_value=True):
-                    result = download_elevation_data(bbox, str(output_file))
-
-                assert result == str(output_file)
-                mock_run.assert_called_once()
+            
+            # Should return None because real DEM sources not implemented
+            result = download_elevation_data(bbox, str(output_file))
+            assert result is None
 
     def test_download_elevation_data_failure(self):
         """Test elevation data generation failure"""
