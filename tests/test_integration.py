@@ -39,27 +39,30 @@ class TestMapGeneratorIntegration:
         ) as mock_load_output, patch(
             "map_generator.calculate_pixel_dimensions"
         ) as mock_calc_pixels, patch(
-            "pathlib.Path.exists"
-        ) as mock_exists, patch(
+            "map_generator.calculate_bbox"
+        ) as mock_calc_bbox, patch(
             "pathlib.Path.mkdir"
-        ) as mock_mkdir, patch(
-            "map_generator.download_osm_data"
-        ) as mock_download, patch(
-            "map_generator.convert_osm_to_shapefiles"
-        ) as mock_convert, patch(
-            "map_generator.create_mapnik_style"
-        ) as mock_create_style, patch(
-            "map_generator.render_map"
-        ) as mock_render:
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline"
+        ) as mock_pipeline, patch(
+            "utils.quality_validation.run_enhanced_data_validation"
+        ) as mock_validation, patch(
+            "utils.map_renderer.execute_map_rendering"
+        ) as mock_rendering:
 
             # Setup mocks
             mock_load_area.return_value = mock_dependencies["area_config"]
             mock_load_output.return_value = mock_dependencies["output_format"]
             mock_calc_pixels.return_value = (3507, 4960)
-            mock_exists.return_value = True  # OSM file exists
-            mock_convert.return_value = "/mock/osm_data"
-            mock_create_style.return_value = "mock_style.xml"
-            mock_render.return_value = True
+            mock_calc_bbox.return_value = {
+                "south": 57.0,
+                "north": 57.5,
+                "west": -3.0,
+                "east": -2.5,
+            }
+            mock_pipeline.return_value = ("/mock/osm_data", True, True)
+            mock_validation.return_value = True
+            mock_rendering.return_value = True
 
             # Run main function
             result = map_generator.main()
@@ -159,13 +162,13 @@ class TestConfigurationHandling:
         ) as mock_calc_pixels, patch(
             "map_generator.calculate_bbox"
         ) as mock_calc_bbox, patch(
-            "pathlib.Path.exists", return_value=True
+            "pathlib.Path.mkdir"
         ), patch(
-            "map_generator.convert_osm_to_shapefiles", return_value="data"
+            "utils.data_pipeline.process_data_pipeline", return_value=("osm_data", True, True)
         ), patch(
-            "map_generator.create_mapnik_style", return_value="style.xml"
+            "utils.quality_validation.run_enhanced_data_validation", return_value=True
         ), patch(
-            "map_generator.render_map", return_value=True
+            "utils.map_renderer.execute_map_rendering", return_value=True
         ):
             # Setup return values
             area_config = {
