@@ -37,7 +37,11 @@ def _download_file_with_progress(url, output_path, timeout=30):
         response = requests.get(url, timeout=timeout, stream=True)
         response.raise_for_status()
         
-        total_size = int(response.headers.get('content-length', 0))
+        content_length = response.headers.get('content-length', None)
+        try:
+            total_size = int(content_length) if content_length and content_length.isdigit() else 0
+        except (ValueError, TypeError):
+            total_size = 0
         
         with open(output_path, 'wb') as f:
             downloaded = 0
