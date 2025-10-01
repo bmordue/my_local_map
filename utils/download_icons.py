@@ -1,6 +1,11 @@
+import logging
 import os
 
 import requests
+
+
+logger = logging.getLogger(__name__)
+
 
 # List of (filename, url) pairs
 icons = [
@@ -23,13 +28,13 @@ os.makedirs(icons_dir, exist_ok=True)
 
 for filename, url in icons:
     dest = os.path.join(icons_dir, filename)
-    print(f"Downloading {filename} ...")
+    logger.info(f"Downloading {filename} ...")
     r = requests.get(url)
     if r.status_code == 200:
         with open(dest, "wb") as f:
             f.write(r.content)
-        print(f"Saved to {dest}")
+        logger.info(f"Saved to {dest}")
     else:
-        print(f"Failed to download {url} (status {r.status_code})")
+        logger.info(f"Failed to download {url} (status {r.status_code})")
 
-print("All downloads complete.")
+logger.info("All downloads complete.")

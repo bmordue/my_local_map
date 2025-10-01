@@ -676,18 +676,18 @@ class QualityValidationReport:
 
     def print_summary(self):
         """Print a formatted summary of validation results"""
-        print("\n" + "=" * 60)
-        print("🔍 QUALITY VALIDATION SUMMARY")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("🔍 QUALITY VALIDATION SUMMARY")
+        logger.info("=" * 60)
 
         for result in self.results:
             status = "✓ PASSED" if result.passed else "✗ FAILED"
-            print(f"{status} {result.check_name}")
+            logger.info(f"{status} {result.check_name}")
 
             if result.errors:
-                print(f"   Errors: {len(result.errors)}")
+                logger.info(f"   Errors: {len(result.errors)}")
             if result.warnings:
-                print(f"   Warnings: {len(result.warnings)}")
+                logger.info(f"   Warnings: {len(result.warnings)}")
 
             # Print key statistics
             for key, value in result.stats.items():
@@ -696,7 +696,7 @@ class QualityValidationReport:
                     or key.endswith("_count")
                     or key.endswith("items")
                 ):
-                    print(f"   {key.replace('_', ' ').title()}: {value}")
+                    logger.info(f"   {key.replace('_', ' ').title()}: {value}")
 
         summary = {
             "total_checks": len(self.results),
@@ -706,15 +706,17 @@ class QualityValidationReport:
             "total_warnings": sum(len(r.warnings) for r in self.results),
         }
 
-        print("\n" + "=" * 60)
-        print(
+        logger.info("\n" + "=" * 60)
+        logger.info(
             f"Overall Status: {'✓ ALL PASSED' if summary['failed_checks'] == 0 else '✗ ISSUES FOUND'}"
         )
-        print(f"Checks: {summary['passed_checks']}/{summary['total_checks']} passed")
-        print(
+        logger.info(
+            f"Checks: {summary['passed_checks']}/{summary['total_checks']} passed"
+        )
+        logger.info(
             f"Issues: {summary['total_errors']} errors, {summary['total_warnings']} warnings"
         )
-        print("=" * 60)
+        logger.info("=" * 60)
 
 
 def validate_data_quality(
@@ -837,7 +839,7 @@ def run_enhanced_data_validation(bbox):
     if not quality_validation_enabled:
         return True
 
-    print("\n🔍 Running data quality validation...")
+    logger.info("\n🔍 Running data quality validation...")
     try:
         # Load enhanced data if available for validation
         enhanced_data_path = Path("enhanced_data")
@@ -873,7 +875,7 @@ def run_enhanced_data_validation(bbox):
                             if data_list:
                                 data_sources[source_name] = data_list
                     except Exception as e:
-                        print(
+                        logger.info(
                             f"⚠️  Warning: Could not load {filename} for validation: {e}"
                         )
 
@@ -883,21 +885,23 @@ def run_enhanced_data_validation(bbox):
                     1 for r in validation_report.results if not r.passed
                 )
                 if failed_checks > 0:
-                    print(
+                    logger.info(
                         f"⚠️  Quality validation found {failed_checks} issues (continuing with map generation)"
                     )
                 else:
-                    print("✓ All data quality checks passed")
+                    logger.info("✓ All data quality checks passed")
             else:
-                print("ℹ️  No enhanced data found for quality validation")
+                logger.info(" No enhanced data found for quality validation")
         else:
-            print("ℹ️  Enhanced data directory not found - skipping quality validation")
+            logger.info(
+                " Enhanced data directory not found - skipping quality validation"
+            )
         return True
     except ImportError:
-        print(
+        logger.info(
             "⚠️  Quality validation not available (utils.quality_validation not found)"
         )
         return True
     except Exception as e:
-        print(f"⚠️  Quality validation failed: {e}")
+        logger.warning(f" Quality validation failed: {e}")
         return True
