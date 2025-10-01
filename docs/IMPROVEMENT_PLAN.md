@@ -56,13 +56,13 @@ This document provides a detailed analysis of the `my_local_map` repository base
 ## 5. Observability & Monitoring
 
 ### Assessment
-- **Logging Strategy**: The script uses `print()` statements for output. This is adequate for a simple command-line tool, but it does not provide the flexibility of a structured logging solution (e.g., log levels, logging to a file).
+- **Logging Strategy**: ✅ **IMPLEMENTED** - The project now uses Python's standard `logging` module throughout the codebase. A centralized logging configuration (`utils/logging_config.py`) provides structured logging with different log levels (DEBUG, INFO, WARNING, ERROR), colored console output with emoji support, and a verbose mode flag (`-v`/`--verbose`) for debug-level logging.
 - **Metrics Collection**: Not applicable for this type of application.
 - **Error Handling**: The `main` function has a basic error handling mechanism, returning different exit codes on success or failure. The `render_map` function correctly handles an `ImportError` for `mapnik`. However, other potential errors (like file not found or subprocess errors) are not always handled gracefully and may cause the script to terminate with a traceback.
 - **Health Checks**: Not applicable for this type of application.
 
 ### Suggestions
-- [ ] **Implement Structured Logging**: Replace the `print()` statements with the standard Python `logging` module. This would allow for different log levels (e.g., `INFO`, `WARNING`, `ERROR`), and the output could be easily redirected to a file for debugging purposes. A verbose flag (`-v`) could be added to the script to control the log level.
+- [x] **Implement Structured Logging**: ✅ **COMPLETED** - Replaced all `print()` statements with the standard Python `logging` module. The logging framework supports different log levels (DEBUG, INFO, WARNING, ERROR), maintains the existing emoji-based output style for better readability, and can be easily redirected to files if needed. A verbose flag (`-v`/`--verbose`) has been added to the script to enable DEBUG level logging.
 - [ ] **Improve Exception Handling**: Wrap file operations and subprocess calls in `try...except` blocks to handle potential errors more gracefully. For example, `FileNotFoundError` when loading templates, or `subprocess.CalledProcessError` when running `ogr2ogr`. This would provide more user-friendly error messages and prevent the script from crashing unexpectedly.
 
 ## 6. Documentation & Knowledge Sharing

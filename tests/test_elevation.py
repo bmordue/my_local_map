@@ -8,7 +8,8 @@ from pathlib import Path
 # Add the utils directory to the path so we can import our modules
 sys.path.insert(0, str(Path(__file__).parent.parent / "utils"))
 
-from elevation_processing import calculate_elevation_bbox, download_elevation_data
+from elevation_processing import (calculate_elevation_bbox,
+                                  download_elevation_data)
 
 
 def main():
@@ -25,11 +26,15 @@ def main():
     # Test that synthetic elevation data is no longer available
     print("Testing that synthetic elevation data generation has been removed...")
     synthetic_file = output_dir / "synthetic_elevation.tif"
-    result = download_elevation_data(elev_bbox, str(synthetic_file), dem_source="synthetic")
+    result = download_elevation_data(
+        elev_bbox, str(synthetic_file), dem_source="synthetic"
+    )
     if not result:
         print("✓ Successfully confirmed synthetic elevation data generation removed")
     else:
-        print("✗ Synthetic elevation data generation still available (should be removed)")
+        print(
+            "✗ Synthetic elevation data generation still available (should be removed)"
+        )
 
     # Test SRTM elevation data (should fail gracefully without real implementation)
     print("\nTesting SRTM elevation data (should fail gracefully)...")

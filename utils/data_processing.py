@@ -5,10 +5,10 @@ import math
 import os
 import subprocess
 import tempfile
+import xml
 from pathlib import Path
 
 import requests
-import xml
 
 logger = logging.getLogger(__name__)
 
@@ -260,7 +260,9 @@ def convert_osm_to_shapefiles(osm_file):
                 logger.info(f"    ✓ Created {output_file}")
                 created_files.append(layer_name)
             else:
-                logger.info(f"    ⚠ Command succeeded but file not found: {output_file}")
+                logger.info(
+                    f"    ⚠ Command succeeded but file not found: {output_file}"
+                )
                 if result.stdout:
                     logger.info(f"      ogr2ogr stdout:\n{result.stdout}")
                 if result.stderr:
@@ -271,7 +273,9 @@ def convert_osm_to_shapefiles(osm_file):
             logger.info(f"      Stderr: {e.stderr.strip()}")
             logger.info(f"      Stdout: {e.stdout.strip()}")
 
-    logger.info(f"  Successfully created {len(created_files)} shapefiles: {created_files}")
+    logger.info(
+        f"  Successfully created {len(created_files)} shapefiles: {created_files}"
+    )
 
     # Verify files exist and show their info
     for layer in created_files:
@@ -303,11 +307,11 @@ def download_elevation_data(bbox, output_file="elevation_data.tif"):
     """
     Download elevation data for the given bounding box using real DEM sources.
     Synthetic elevation data generation has been removed.
-    
+
     Args:
         bbox: Bounding box dictionary with north, south, east, west
         output_file: Path to output elevation file
-        
+
     Returns:
         None - Real DEM data download not implemented
     """
@@ -440,4 +444,3 @@ def process_elevation_and_contours(
         }
     else:
         return None
-

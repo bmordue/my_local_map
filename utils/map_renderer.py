@@ -71,10 +71,19 @@ def render_map(style_file, bbox, output_file, width_px, height_px):
     return True
 
 
-def execute_map_rendering(area_name, area_config, output_format, bbox, osm_data_dir, hillshade_available, width_px, height_px):
+def execute_map_rendering(
+    area_name,
+    area_config,
+    output_format,
+    bbox,
+    osm_data_dir,
+    hillshade_available,
+    width_px,
+    height_px,
+):
     """
     Execute the complete map rendering workflow.
-    
+
     Args:
         area_name: Name of the geographic area
         area_config: Area configuration dictionary
@@ -83,7 +92,7 @@ def execute_map_rendering(area_name, area_config, output_format, bbox, osm_data_
         osm_data_dir: Directory containing OSM shapefiles
         hillshade_available: Whether hillshading is available
         width_px, height_px: Output dimensions in pixels
-        
+
     Returns:
         bool: Success flag
     """

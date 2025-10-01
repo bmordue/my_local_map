@@ -13,7 +13,6 @@ import logging
 import sys
 from typing import Optional
 
-
 # Emoji mappings for log levels (maintaining existing output style)
 LEVEL_EMOJIS = {
     logging.DEBUG: "🔍",
@@ -26,69 +25,84 @@ LEVEL_EMOJIS = {
 
 class EmojiFormatter(logging.Formatter):
     """Custom formatter that adds emoji prefixes to log messages"""
-    
+
     def format(self, record):
         # Add emoji prefix based on level
         emoji = LEVEL_EMOJIS.get(record.levelno, "")
-        
+
         # For INFO level, check if message already has an emoji
         if record.levelno == logging.INFO:
             # Common emoji used in existing code
-            existing_emojis = ["🗺️", "📍", "📏", "🎯", "📁", "🔄", "🎨", "🖼️", "⛰️", "🏔️", "✓", "🎉", "📄", "📐"]
+            existing_emojis = [
+                "🗺️",
+                "📍",
+                "📏",
+                "🎯",
+                "📁",
+                "🔄",
+                "🎨",
+                "🖼️",
+                "⛰️",
+                "🏔️",
+                "✓",
+                "🎉",
+                "📄",
+                "📐",
+            ]
             if any(record.msg.startswith(e) for e in existing_emojis):
                 emoji = ""  # Don't add duplicate emoji
-        
+
         if emoji:
             record.msg = f"{emoji} {record.msg}"
-        
+
         return super().format(record)
 
 
 def setup_logging(level: int = logging.INFO, verbose: bool = False) -> logging.Logger:
     """
     Configure logging for the application.
-    
+
     Args:
         level: Base logging level (default: INFO)
         verbose: Enable verbose output (sets DEBUG level)
-        
+
     Returns:
         Logger instance configured for the application
     """
     # Use DEBUG level if verbose is enabled
     if verbose:
         level = logging.DEBUG
-    
+
     # Configure root logger
     root_logger = logging.getLogger()
-    
+
     # Remove existing handlers to avoid duplicates
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
-    
+
     root_logger.setLevel(level)
-    
+
     # Create console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(level)
-    
+
     # Create formatter - simpler format to match existing output style
-    formatter = EmojiFormatter('%(message)s')
+    formatter = EmojiFormatter("%(message)s")
     console_handler.setFormatter(formatter)
-    
+
     # Add handler to root logger
     root_logger.addHandler(console_handler)
-    
+
     return root_logger
 
 
 def get_logger(name: Optional[str] = None) -> logging.Logger:
     """
     Get a logger instance for a specific module.
-    
+
     Args:
         name: Logger name (typically __name__ of the calling module)
-        
+
     Returns:
         Logger instance
     """

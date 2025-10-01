@@ -10,6 +10,8 @@ import sys
 # Add the root directory to path so we can import the modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+logger = logging.getLogger(__name__)
+
 
 def test_imports():
     """Test that all modules can be imported successfully"""
@@ -31,11 +33,8 @@ def test_imports():
 def test_configuration_loading():
     """Test that configuration files can be loaded"""
     try:
-        from utils.config import (
-            calculate_pixel_dimensions,
-            load_area_config,
-            load_output_format,
-        )
+        from utils.config import (calculate_pixel_dimensions, load_area_config,
+                                  load_output_format)
 
         area_config = load_area_config("lumsden")
         logger.info(f"✓ Area config loaded: {area_config['name']}")
@@ -65,28 +64,34 @@ def test_data_processing():
         logger.error(f"✗ Data processing error: {e}")
         return False
 
+
 def test_quality_validation():
     """Test quality validation system functionality"""
     try:
-        from utils.quality_validation import (
-            ValidationResult, CoordinateValidator, AttributeValidator,
-            TemporalValidator, CrossReferenceValidator, validate_data_quality
-        )
-        
+        from utils.quality_validation import (AttributeValidator,
+                                              CoordinateValidator,
+                                              CrossReferenceValidator,
+                                              TemporalValidator,
+                                              ValidationResult,
+                                              validate_data_quality)
+
         # Test basic validation functionality
-        bbox = {'south': 57.26, 'north': 57.37, 'west': -2.95, 'east': -2.82}
+        bbox = {"south": 57.26, "north": 57.37, "west": -2.95, "east": -2.82}
         coord_validator = CoordinateValidator(bbox)
-        
+
         # Test with sample data
-        sample_data = [{'lat': 57.32, 'lon': -2.88, 'name': 'Test Location'}]
+        sample_data = [{"lat": 57.32, "lon": -2.88, "name": "Test Location"}]
         result = coord_validator.validate_coordinates(sample_data)
-        
-        logger.info(f"✓ Quality validation system functional: {result.stats.get('valid_coordinates', 0)} valid coordinates")
-        
+
+        logger.info(
+            f"✓ Quality validation system functional: {result.stats.get('valid_coordinates', 0)} valid coordinates"
+        )
+
         return True
     except Exception as e:
         logger.error(f"✗ Quality validation error: {e}")
         return False
+
 
 def main():
     """Run all validation tests"""

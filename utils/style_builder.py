@@ -5,8 +5,6 @@ import re
 import string
 from pathlib import Path
 
-
-
 logger = logging.getLogger(__name__)
 
 

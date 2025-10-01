@@ -3,8 +3,6 @@
 import logging
 from pathlib import Path
 
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -356,7 +354,9 @@ def add_legend_to_image(image_path, legend_data, output_path=None):
                         # Paste PNG onto legend
                         img.paste(icon_img, (symbol_x, symbol_y), icon_img)
                     except Exception as e:
-                        logger.info(f"Warning: Failed to render icon '{icon_path}': {e}")
+                        logger.info(
+                            f"Warning: Failed to render icon '{icon_path}': {e}"
+                        )
                         # Fallback: draw a placeholder rectangle if conversion fails
                         fill_color = (142, 68, 173)  # Purple
                         symbol_coords = [

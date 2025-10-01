@@ -8,11 +8,10 @@ from pathlib import Path
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
-from utils.data_processing import (
-    download_elevation_data,
-    generate_contour_lines,
-    process_elevation_and_contours,
-)
+
+from utils.data_processing import (download_elevation_data,
+                                   generate_contour_lines,
+                                   process_elevation_and_contours)
 
 
 @pytest.mark.unit
@@ -30,10 +29,10 @@ class TestTempFileHandling:
             # without creating any temporary files
             with patch("tempfile.NamedTemporaryFile") as mock_temp:
                 result = download_elevation_data(bbox, str(output_file))
-                
+
                 # Should return None because real DEM sources not implemented
                 assert result is None
-                
+
                 # Should not create any temporary files
                 mock_temp.assert_not_called()
 
@@ -113,7 +112,7 @@ class TestTempFileHandling:
 
                 # All should return None (real DEM sources not implemented)
                 assert all(result is None for result in results)
-                
+
                 # Should not create any temporary files
                 mock_temp.assert_not_called()
 

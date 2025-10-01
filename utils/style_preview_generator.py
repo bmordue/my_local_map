@@ -17,20 +17,12 @@ PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 sys.path.insert(0, str(PROJECT_ROOT))
 # Define project root as a constant to be reused
 
-from utils.config import (
-    calculate_pixel_dimensions,
-    load_area_config,
-    load_output_format,
-)
-from utils.data_processing import (
-    calculate_bbox,
-    convert_osm_to_shapefiles,
-    process_elevation_and_contours,
-)
+from utils.config import (calculate_pixel_dimensions, load_area_config,
+                          load_output_format)
+from utils.data_processing import (calculate_bbox, convert_osm_to_shapefiles,
+                                   process_elevation_and_contours)
 from utils.elevation_processing import process_elevation_for_hillshading
 from utils.style_builder import build_mapnik_style
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +40,9 @@ def render_preview_map(
     try:
         import mapnik
     except ImportError:
-        logger.info("Error: python-mapnik not available. Install with: pip install mapnik")
+        logger.info(
+            "Error: python-mapnik not available. Install with: pip install mapnik"
+        )
         return None
 
     # Build the style with hillshading configuration
@@ -196,7 +190,9 @@ def main():
     preview_format = load_output_format("preview")
     preview_width, preview_height = calculate_pixel_dimensions(preview_format)
 
-    logger.info(f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
+    logger.info(
+        f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}"
+    )
     logger.info(f"Preview size: {preview_width}×{preview_height} pixels")
     logger.info()
 
@@ -212,7 +208,9 @@ def main():
     osm_file = Path(area_config.get("osm_file", "data/lumsden_area.osm"))
 
     if not osm_file.exists():
-        logger.info("OSM data file not found. Run map_generator.py first to download data.")
+        logger.info(
+            "OSM data file not found. Run map_generator.py first to download data."
+        )
         return 1
 
     # Convert to shapefiles if needed
@@ -336,9 +334,13 @@ def main():
         logger.info(
             f"Grid shows {standard_count} standard styles + {hillshade_count} hillshading variants"
         )
-        logger.info(f"Hillshading enhances topographical visualization with terrain relief")
+        logger.info(
+            f"Hillshading enhances topographical visualization with terrain relief"
+        )
     else:
-        logger.info(f"Grid shows {len(styles)} different style options at lower resolution")
+        logger.info(
+            f"Grid shows {len(styles)} different style options at lower resolution"
+        )
         logger.info(f"Enable hillshading in config/areas.json to see terrain variants")
 
     return 0
