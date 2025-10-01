@@ -795,4 +795,3 @@ def run_enhanced_data_validation(bbox):
     except Exception as e:
         print(f"⚠️  Quality validation failed: {e}")
         return True
-    validation_report = validate_data_quality(sample_data, lumsden_bbox)
