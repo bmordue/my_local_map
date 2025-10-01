@@ -91,7 +91,7 @@ class TestDEMSources(unittest.TestCase):
             # Test all supported sources - should fail gracefully in sandboxed environment
             for source in ["srtm", "aster", "os_terrain", "eu_dem"]:
                 result = download_elevation_data(
-                    self.test_bbox_uk, output_file, dem_source=source
+                    self.test_bbox_uk, output_file, dem_source=source, allow_synthetic_fallback=False
                 )
                 # In sandboxed environment, all should return False
                 self.assertFalse(result, f"Source {source} should fail without network access")
@@ -102,7 +102,7 @@ class TestDEMSources(unittest.TestCase):
             output_file = Path(temp_dir) / "test_elevation.tif"
             
             result = download_elevation_data(
-                self.test_bbox_uk, output_file, dem_source="unknown_source"
+                self.test_bbox_uk, output_file, dem_source="unknown_source", allow_synthetic_fallback=False
             )
             self.assertFalse(result)
 
@@ -143,13 +143,13 @@ class TestDEMSources(unittest.TestCase):
             
             # UK area should try OS Terrain (then fallback to SRTM)
             result = download_elevation_data(
-                self.test_bbox_uk, output_file, dem_source="os_terrain"
+                self.test_bbox_uk, output_file, dem_source="os_terrain", allow_synthetic_fallback=False
             )
             self.assertFalse(result)  # Should fail in sandboxed environment
             
             # Non-UK area should reject OS Terrain immediately
             result = download_elevation_data(
-                self.test_bbox_global, output_file, dem_source="os_terrain"
+                self.test_bbox_global, output_file, dem_source="os_terrain", allow_synthetic_fallback=False
             )
             self.assertFalse(result)
 
@@ -160,13 +160,13 @@ class TestDEMSources(unittest.TestCase):
             
             # European area should try EU-DEM (then fallback to SRTM)
             result = download_elevation_data(
-                self.test_bbox_europe, output_file, dem_source="eu_dem"
+                self.test_bbox_europe, output_file, dem_source="eu_dem", allow_synthetic_fallback=False
             )
             self.assertFalse(result)  # Should fail in sandboxed environment
             
             # Non-European area should reject EU-DEM immediately
             result = download_elevation_data(
-                self.test_bbox_global, output_file, dem_source="eu_dem"
+                self.test_bbox_global, output_file, dem_source="eu_dem", allow_synthetic_fallback=False
             )
             self.assertFalse(result)
 
