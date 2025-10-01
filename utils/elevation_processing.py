@@ -60,9 +60,9 @@ def _download_file_with_progress(url, output_path, timeout=30):
                     downloaded += len(chunk)
                     if total_size > 0:
                         percent = (downloaded / total_size) * 100
-                        logger.info(f"  📊 Progress: {percent:.1f}%", end="\r")
+                        logger.debug(f"  📊 Progress: {percent:.1f}%")
 
-        logger.info()  # New line after progress
+        logger.info("  ✓ Download complete")
         return True
     except Exception as e:
         logger.info(f"  ❌ Download failed: {e}")

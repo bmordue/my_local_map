@@ -192,7 +192,7 @@ def main():
             f"🗺️  Map bounds: {bbox['south']:.4f}°S to {bbox['north']:.4f}°N, "
             f"{bbox['west']:.4f}°W to {bbox['east']:.4f}°E"
         )
-        logger.info()
+        logger.info("")
 
         # Load data sources
         logger.info("📂 Loading data sources...")
@@ -200,7 +200,7 @@ def main():
 
         total_items = sum(len(data) for data in data_sources.values())
         logger.info(f"📊 Total items to validate: {total_items}")
-        logger.info()
+        logger.info("")
 
         # Run quality validation
         validation_report = validate_data_quality(

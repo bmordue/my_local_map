@@ -17,10 +17,16 @@ PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 sys.path.insert(0, str(PROJECT_ROOT))
 # Define project root as a constant to be reused
 
-from utils.config import (calculate_pixel_dimensions, load_area_config,
-                          load_output_format)
-from utils.data_processing import (calculate_bbox, convert_osm_to_shapefiles,
-                                   process_elevation_and_contours)
+from utils.config import (
+    calculate_pixel_dimensions,
+    load_area_config,
+    load_output_format,
+)
+from utils.data_processing import (
+    calculate_bbox,
+    convert_osm_to_shapefiles,
+    process_elevation_and_contours,
+)
 from utils.elevation_processing import process_elevation_for_hillshading
 from utils.style_builder import build_mapnik_style
 
@@ -194,7 +200,7 @@ def main():
         f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}"
     )
     logger.info(f"Preview size: {preview_width}×{preview_height} pixels")
-    logger.info()
+    logger.info("")
 
     # Calculate area
     bbox = calculate_bbox(
@@ -284,7 +290,7 @@ def main():
     for style_name, style_title, _, hillshade_enabled in styles:
         hillshade_status = "with hillshading" if hillshade_enabled else "standard"
         logger.info(f"  - {style_title} ({hillshade_status})")
-    logger.info()
+    logger.info("")
 
     # Create the style grid
     grid_img = create_style_grid(
