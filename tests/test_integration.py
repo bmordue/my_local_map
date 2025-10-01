@@ -114,9 +114,7 @@ class TestRenderMapUnit:
                 img = Image.new("RGB", (10, 10), color="white")
                 img.save(output_file)
                 try:
-                    result = render_map(
-                        style_file, bbox, output_file, 1000, 1000
-                    )
+                    result = render_map(style_file, bbox, output_file, 1000, 1000)
                     assert result is True
                     mock_mapnik.Map.assert_called_once_with(1000, 1000)
                 finally:
@@ -164,7 +162,8 @@ class TestConfigurationHandling:
         ) as mock_calc_bbox, patch(
             "pathlib.Path.mkdir"
         ), patch(
-            "utils.data_pipeline.process_data_pipeline", return_value=("osm_data", True, True)
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("osm_data", True, True),
         ), patch(
             "utils.quality_validation.run_enhanced_data_validation", return_value=True
         ), patch(
@@ -224,7 +223,8 @@ class TestFileHandling:
             "map_generator.calculate_bbox",
             return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
         ), patch(
-            "utils.data_pipeline.process_data_pipeline", return_value=("/data", True, True)
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("/data", True, True),
         ) as mock_pipeline, patch(
             "utils.quality_validation.run_enhanced_data_validation"
         ), patch(
@@ -264,7 +264,8 @@ class TestFileHandling:
             "map_generator.calculate_bbox",
             return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
         ), patch(
-            "utils.data_pipeline.process_data_pipeline", return_value=("/data", True, True)
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("/data", True, True),
         ) as mock_pipeline, patch(
             "utils.quality_validation.run_enhanced_data_validation"
         ), patch(
@@ -308,7 +309,8 @@ class TestErrorHandling:
             "map_generator.calculate_bbox",
             return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
         ), patch(
-            "utils.data_pipeline.process_data_pipeline", return_value=(None, False, False)
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=(None, False, False),
         ) as mock_pipeline, patch(
             "utils.quality_validation.run_enhanced_data_validation"
         ), patch(
@@ -348,7 +350,8 @@ class TestErrorHandling:
             "map_generator.calculate_bbox",
             return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
         ), patch(
-            "utils.data_pipeline.process_data_pipeline", return_value=("/data", True, True)
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("/data", True, True),
         ), patch(
             "utils.quality_validation.run_enhanced_data_validation"
         ), patch(

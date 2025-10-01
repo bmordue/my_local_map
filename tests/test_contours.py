@@ -7,11 +7,10 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from utils.data_processing import (
-    download_elevation_data,
-    generate_contour_lines,
-    process_elevation_and_contours,
-)
+
+from utils.data_processing import (download_elevation_data,
+                                   generate_contour_lines,
+                                   process_elevation_and_contours)
 
 
 @pytest.mark.unit
@@ -24,7 +23,7 @@ class TestContourGeneration:
 
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "test_elevation.tif"
-            
+
             # Should return None because real DEM sources not implemented
             result = download_elevation_data(bbox, str(output_file))
             assert result is None

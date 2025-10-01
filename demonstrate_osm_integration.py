@@ -7,12 +7,9 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from utils.data_processing import (
-    calculate_bbox,
-    convert_osm_to_shapefiles,
-    download_osm_data,
-    validate_osm_data_quality,
-)
+from utils.data_processing import (calculate_bbox, convert_osm_to_shapefiles,
+                                   download_osm_data,
+                                   validate_osm_data_quality)
 
 
 def demonstrate_live_osm_integration():

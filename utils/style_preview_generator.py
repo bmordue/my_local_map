@@ -4,6 +4,7 @@ Style Preview Generator for Lumsden Tourist Map
 Creates a grid of map previews showing different styling options including hillshading variants
 """
 
+import logging
 import math
 import os
 import sys
@@ -29,6 +30,8 @@ from utils.data_processing import (
 from utils.elevation_processing import process_elevation_for_hillshading
 from utils.style_builder import build_mapnik_style
 
+logger = logging.getLogger(__name__)
+
 
 def render_preview_map(
     style_name,
@@ -43,7 +46,9 @@ def render_preview_map(
     try:
         import mapnik
     except ImportError:
-        print("Error: python-mapnik not available. Install with: pip install mapnik")
+        logger.info(
+            "Error: python-mapnik not available. Install with: pip install mapnik"
+        )
         return None
 
     # Build the style with hillshading configuration
@@ -89,7 +94,7 @@ def create_style_grid(
     cols=2,
 ):
     """Create a grid of style previews"""
-    print(f"Creating style preview grid with {len(styles)} styles...")
+    logger.info(f"Creating style preview grid with {len(styles)} styles...")
 
     rows = math.ceil(len(styles) / cols)
 
@@ -135,7 +140,7 @@ def create_style_grid(
         row = i // cols
         col = i % cols
 
-        print(f"  Rendering {style_title} ({style_name})...")
+        logger.info(f"  Rendering {style_title} ({style_name})...")
 
         # Calculate position
         x = col * (preview_size[0] + padding)
@@ -179,8 +184,8 @@ def create_style_grid(
 
 
 def main():
-    print("Style Preview Generator for Lumsden Tourist Map")
-    print("=" * 55)
+    logger.info("Style Preview Generator for Lumsden Tourist Map")
+    logger.info("=" * 55)
 
     # Ensure we're working from the project root directory
     # Use the PROJECT_ROOT constant defined at the module level
@@ -191,9 +196,11 @@ def main():
     preview_format = load_output_format("preview")
     preview_width, preview_height = calculate_pixel_dimensions(preview_format)
 
-    print(f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}")
-    print(f"Preview size: {preview_width}×{preview_height} pixels")
-    print()
+    logger.info(
+        f"Center: {area_config['center']['lat']}, {area_config['center']['lon']}"
+    )
+    logger.info(f"Preview size: {preview_width}×{preview_height} pixels")
+    logger.info("")
 
     # Calculate area
     bbox = calculate_bbox(
@@ -207,42 +214,44 @@ def main():
     osm_file = Path(area_config.get("osm_file", "data/lumsden_area.osm"))
 
     if not osm_file.exists():
-        print("OSM data file not found. Run map_generator.py first to download data.")
+        logger.info(
+            "OSM data file not found. Run map_generator.py first to download data."
+        )
         return 1
 
     # Convert to shapefiles if needed
     data_dir = Path("data")
     osm_data_dir = data_dir / "osm_data"
     if not osm_data_dir.exists():
-        print("Converting OSM data to shapefiles...")
+        logger.info("Converting OSM data to shapefiles...")
         osm_data_dir = convert_osm_to_shapefiles(str(osm_file))
     else:
-        print(f"Using existing shapefile data: {osm_data_dir}")
+        logger.info(f"Using existing shapefile data: {osm_data_dir}")
         osm_data_dir = str(osm_data_dir)
 
     # Ensure contour data is available for preview generation
-    print("Checking contour data availability...")
+    logger.info("Checking contour data availability...")
     contour_file = Path(osm_data_dir) / "contours.shp"
     if not contour_file.exists():
-        print("Generating contour data for previews...")
+        logger.info("Generating contour data for previews...")
         contour_data = process_elevation_and_contours(
             bbox, osm_data_dir, contour_interval=10, enable_contours=True
         )
         if contour_data:
-            print("Contour data ready for preview generation")
+            logger.info("Contour data ready for preview generation")
         else:
-            print(
+            logger.info(
                 "Could not generate contour data, previews will show without contours"
             )
     else:
-        print("Contour data already available")
+        logger.info("Contour data already available")
 
     # Process elevation data for hillshading if enabled
     hillshade_available = False
     hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
     if hillshade_file:
         hillshade_available = True
-        print(f"Hillshading data available: {hillshade_file}")
+        logger.info(f"Hillshading data available: {hillshade_file}")
 
     # Create area configs for hillshading variants
     area_config_no_hillshade = area_config.copy()
@@ -277,11 +286,11 @@ def main():
             hillshade_title = f"{style_title} + Hillshade"
             styles.append((style_name, hillshade_title, area_config, True))
 
-    print(f"Available styles: {len(styles)}")
+    logger.info(f"Available styles: {len(styles)}")
     for style_name, style_title, _, hillshade_enabled in styles:
         hillshade_status = "with hillshading" if hillshade_enabled else "standard"
-        print(f"  - {style_title} ({hillshade_status})")
-    print()
+        logger.info(f"  - {style_title} ({hillshade_status})")
+    logger.info("")
 
     # Create the style grid
     grid_img = create_style_grid(
@@ -297,7 +306,7 @@ def main():
     preview_dir = data_dir / "style_previews"
     preview_dir.mkdir(exist_ok=True)
 
-    print("\nSaving individual previews...")
+    logger.info("\nSaving individual previews...")
     for style_name, style_title, style_area_config, style_hillshade_available in styles:
         preview_img = render_preview_map(
             style_name,
@@ -318,23 +327,27 @@ def main():
             )
             preview_file = preview_dir / f"{safe_title}_preview.png"
             preview_img.save(str(preview_file), "PNG")
-            print(f"  Saved {preview_file}")
+            logger.info(f"  Saved {preview_file}")
 
     file_size_kb = os.path.getsize(output_file) / 1024
-    print(f"\nSUCCESS!")
-    print(f"Style grid: {output_file} ({file_size_kb:.1f} KB)")
-    print(f"Individual previews: {preview_dir}")
+    logger.info(f"\nSUCCESS!")
+    logger.info(f"Style grid: {output_file} ({file_size_kb:.1f} KB)")
+    logger.info(f"Individual previews: {preview_dir}")
 
     if hillshade_available:
         standard_count = len(base_styles)
         hillshade_count = len(base_styles)
-        print(
+        logger.info(
             f"Grid shows {standard_count} standard styles + {hillshade_count} hillshading variants"
         )
-        print(f"Hillshading enhances topographical visualization with terrain relief")
+        logger.info(
+            f"Hillshading enhances topographical visualization with terrain relief"
+        )
     else:
-        print(f"Grid shows {len(styles)} different style options at lower resolution")
-        print(f"Enable hillshading in config/areas.json to see terrain variants")
+        logger.info(
+            f"Grid shows {len(styles)} different style options at lower resolution"
+        )
+        logger.info(f"Enable hillshading in config/areas.json to see terrain variants")
 
     return 0
 

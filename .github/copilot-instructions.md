@@ -55,9 +55,59 @@ python3 -c "import pytest; print('pytest available')"
 - **Build process**: No build step required - this is a Python application with modules
 - **Run for specific area**: `python3 map_generator.py lumsden`
 - **Run with default area**: `python3 map_generator.py` (uses Lumsden)
+- **Run with verbose logging**: `python3 map_generator.py lumsden -v` or `python3 map_generator.py lumsden --verbose`
 - **Available areas**: lumsden, balmoral_castle, crathes_castle, dunnottar_castle, cairngorms_national_park, fraserburgh, peterhead, huntly, stonehaven, lochnagar, ythan_estuary
 - **Execution time**: Takes approximately 1-2 seconds per area. NEVER CANCEL builds under 60 seconds.
 - **Timeout recommendation**: Set 120+ seconds timeout for any test runs to account for variations
+
+### Logging Framework
+**IMPORTANT**: This project uses Python's standard logging framework, not print() statements.
+
+#### Using Logging in Code
+```python
+import logging
+
+# Get logger for your module
+logger = logging.getLogger(__name__)
+
+# Log at different levels
+logger.debug("Detailed information for debugging")
+logger.info("General informational messages")
+logger.warning("Warning messages for potential issues")
+logger.error("Error messages for failures")
+
+# The logging system automatically handles emoji formatting
+logger.info("🗺️ Map generation started")  # Emoji preserved
+logger.error("Failed to process data")  # Automatically gets ❌ emoji
+logger.warning("Data quality is low")  # Automatically gets ⚠️ emoji
+```
+
+#### Logging Best Practices
+- **NEVER use print()** - Always use logging instead
+- **Use appropriate log levels**: DEBUG for detailed info, INFO for normal messages, WARNING for potential issues, ERROR for failures
+- **Get module logger**: Always use `logger = logging.getLogger(__name__)` at module level
+- **Preserve emoji style**: Continue using emoji in messages for better readability (e.g., "🗺️", "✓", "📍")
+- **Verbose mode**: Use the `-v` flag for debug-level logging during development
+- **Structured messages**: Keep messages clear and actionable
+
+#### Logging Configuration
+The logging framework is configured in `utils/logging_config.py` and provides:
+- Colored console output with emoji support
+- Configurable log levels (INFO, DEBUG, WARNING, ERROR)
+- Custom formatter that preserves existing emoji style
+- Verbose mode via command-line flag (`-v` or `--verbose`)
+
+#### Examples
+```bash
+# Normal output (INFO level)
+python3 map_generator.py lumsden
+
+# Verbose output (DEBUG level)
+python3 map_generator.py lumsden -v
+
+# Run utility scripts with proper logging
+python3 utils/system_validation.py
+```
 
 ### Testing and Quality Assurance
 **CRITICAL**: This project has comprehensive testing infrastructure. ALWAYS run tests after changes:

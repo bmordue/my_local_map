@@ -5,11 +5,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
-from utils.data_processing import (
-    calculate_bbox,
-    convert_osm_to_shapefiles,
-    download_osm_data,
-)
+
+from utils.data_processing import (calculate_bbox, convert_osm_to_shapefiles,
+                                   download_osm_data)
 
 
 class TestDataProcessing:

@@ -4,12 +4,10 @@ import tempfile
 import unittest
 from unittest.mock import mock_open, patch
 
-from utils.elevation_processing import (
-    calculate_elevation_bbox,
-    download_elevation_data,
-    generate_hillshade,
-    process_elevation_for_hillshading,
-)
+from utils.elevation_processing import (calculate_elevation_bbox,
+                                        download_elevation_data,
+                                        generate_hillshade,
+                                        process_elevation_for_hillshading)
 
 
 class TestElevationProcessing(unittest.TestCase):
@@ -75,20 +73,29 @@ class TestElevationProcessing(unittest.TestCase):
         with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
             # Test SRTM source
             result = download_elevation_data(
-                self.test_bbox, temp_file.name, dem_source="srtm", allow_synthetic_fallback=False
+                self.test_bbox,
+                temp_file.name,
+                dem_source="srtm",
+                allow_synthetic_fallback=False,
             )
             self.assertFalse(result)
-            
+
             # Test other DEM sources
             for source in ["aster", "os_terrain", "eu_dem"]:
                 result = download_elevation_data(
-                    self.test_bbox, temp_file.name, dem_source=source, allow_synthetic_fallback=False
+                    self.test_bbox,
+                    temp_file.name,
+                    dem_source=source,
+                    allow_synthetic_fallback=False,
                 )
                 self.assertFalse(result)
-            
+
             # Test unknown source
             result = download_elevation_data(
-                self.test_bbox, temp_file.name, dem_source="unknown", allow_synthetic_fallback=False
+                self.test_bbox,
+                temp_file.name,
+                dem_source="unknown",
+                allow_synthetic_fallback=False,
             )
             self.assertFalse(result)
 
@@ -96,7 +103,10 @@ class TestElevationProcessing(unittest.TestCase):
         """Test elevation data download failure when real DEM unavailable"""
         with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
             result = download_elevation_data(
-                self.test_bbox, temp_file.name, dem_source="srtm", allow_synthetic_fallback=False
+                self.test_bbox,
+                temp_file.name,
+                dem_source="srtm",
+                allow_synthetic_fallback=False,
             )
             # Should fail because real SRTM implementation not available
             self.assertFalse(result)
