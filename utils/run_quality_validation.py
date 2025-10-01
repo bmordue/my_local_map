@@ -6,6 +6,7 @@ This script loads enhanced data and runs comprehensive quality validation checks
 as specified in Phase 2 roadmap requirements.
 """
 
+import logging
 import sys
 import os
 import json
@@ -17,6 +18,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from utils.quality_validation import validate_data_quality
 from utils.config import load_area_config
 from utils.data_processing import calculate_bbox
+
+
+
+logger = logging.getLogger(__name__)
 
 
 def load_enhanced_data(data_dir: str = "enhanced_data") -> dict:
@@ -33,8 +38,8 @@ def load_enhanced_data(data_dir: str = "enhanced_data") -> dict:
     data_path = Path(data_dir)
     
     if not data_path.exists():
-        print(f"⚠️  Enhanced data directory not found: {data_dir}")
-        print("   Generating sample data for validation testing...")
+        logger.warning(f" Enhanced data directory not found: {data_dir}")
+        logger.info("   Generating sample data for validation testing...")
         return generate_sample_data()
     
     # Load GeoJSON files
@@ -71,15 +76,15 @@ def load_enhanced_data(data_dir: str = "enhanced_data") -> dict:
                     data_list.append(item)
                 
                 data_sources[source_name] = data_list
-                print(f"✓ Loaded {len(data_list)} items from {filename}")
+                logger.info(f"✓ Loaded {len(data_list)} items from {filename}")
                 
             except Exception as e:
-                print(f"⚠️  Error loading {filename}: {e}")
+                logger.warning(f" Error loading {filename}: {e}")
         else:
-            print(f"⚠️  File not found: {filename}")
+            logger.warning(f" File not found: {filename}")
     
     if not data_sources:
-        print("⚠️  No enhanced data found, using sample data for validation")
+        logger.warning(" No enhanced data found, using sample data for validation")
         return generate_sample_data()
     
     return data_sources
@@ -169,13 +174,13 @@ def generate_sample_data() -> dict:
 
 def main():
     """Main function to run quality validation"""
-    print("🔍 Data Quality Validation for Lumsden Tourist Map")
-    print("=" * 60)
+    logger.info("🔍 Data Quality Validation for Lumsden Tourist Map")
+    logger.info("=" * 60)
     
     try:
         # Load area configuration
         area_config = load_area_config("lumsden")
-        print(f"📍 Validation area: {area_config['name']}")
+        logger.info(f"📍 Validation area: {area_config['name']}")
         
         # Calculate bounding box for coordinate validation
         bbox = calculate_bbox(
@@ -185,17 +190,17 @@ def main():
             area_config['coverage']['height_km']
         )
         
-        print(f"🗺️  Map bounds: {bbox['south']:.4f}°S to {bbox['north']:.4f}°N, "
+        logger.info(f"🗺️  Map bounds: {bbox['south']:.4f}°S to {bbox['north']:.4f}°N, "
               f"{bbox['west']:.4f}°W to {bbox['east']:.4f}°E")
-        print()
+        logger.info()
         
         # Load data sources
-        print("📂 Loading data sources...")
+        logger.info("📂 Loading data sources...")
         data_sources = load_enhanced_data()
         
         total_items = sum(len(data) for data in data_sources.values())
-        print(f"📊 Total items to validate: {total_items}")
-        print()
+        logger.info(f"📊 Total items to validate: {total_items}")
+        logger.info()
         
         # Run quality validation
         validation_report = validate_data_quality(
@@ -205,43 +210,43 @@ def main():
         )
         
         # Generate summary
-        print("\n" + "=" * 60)
-        print("📋 VALIDATION SUMMARY")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("📋 VALIDATION SUMMARY")
+        logger.info("=" * 60)
         
         total_checks = len(validation_report.results)
         passed_checks = sum(1 for r in validation_report.results if r.passed)
         failed_checks = total_checks - passed_checks
         
-        print(f"Total validation checks: {total_checks}")
-        print(f"Passed checks: {passed_checks}")
-        print(f"Failed checks: {failed_checks}")
+        logger.info(f"Total validation checks: {total_checks}")
+        logger.info(f"Passed checks: {passed_checks}")
+        logger.info(f"Failed checks: {failed_checks}")
         
         total_errors = sum(len(r.errors) for r in validation_report.results)
         total_warnings = sum(len(r.warnings) for r in validation_report.results)
         
-        print(f"Total errors: {total_errors}")
-        print(f"Total warnings: {total_warnings}")
+        logger.info(f"Total errors: {total_errors}")
+        logger.info(f"Total warnings: {total_warnings}")
         
         # Overall status
         overall_status = "✅ PASSED" if failed_checks == 0 else "❌ FAILED"
-        print(f"\nOverall Quality Status: {overall_status}")
+        logger.info(f"\nOverall Quality Status: {overall_status}")
         
         # Show recommendations
         report_dict = validation_report.generate_report()
         if report_dict['recommendations']:
-            print("\n🔧 RECOMMENDATIONS:")
+            logger.info("\n🔧 RECOMMENDATIONS:")
             for i, rec in enumerate(report_dict['recommendations'], 1):
-                print(f"{i}. {rec}")
+                logger.info(f"{i}. {rec}")
         
-        print("\n" + "=" * 60)
-        print("📄 Detailed report saved to: validation_reports/quality_validation_report.json")
+        logger.info("\n" + "=" * 60)
+        logger.info("📄 Detailed report saved to: validation_reports/quality_validation_report.json")
         
         # Return appropriate exit code
         return 0 if failed_checks == 0 else 1
         
     except Exception as e:
-        print(f"❌ Validation failed with error: {e}")
+        logger.error(f"Validation failed with error: {e}")
         import traceback
         traceback.print_exc()
         return 1

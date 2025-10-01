@@ -3,10 +3,15 @@
 Enhanced Map Data Integration - Demonstrating Additional Data Sources
 """
 
+import logging
 import csv
 import json
 import sqlite3
 from pathlib import Path
+
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_enhanced_tourist_database():
@@ -568,12 +573,12 @@ def create_enhanced_tourist_database():
     conn.commit()
     conn.close()
 
-    print(f"✓ Created comprehensive tourist database: {db_path}")
-    print(f"  - {len(attractions)} tourist attractions")
-    print(f"  - {len(accommodation)} accommodation options")
-    print(f"  - {len(dining)} dining venues")
-    print(f"  - {len(activities)} activities")
-    print(f"  - {len(trails)} walking trails")
+    logger.info(f"✓ Created comprehensive tourist database: {db_path}")
+    logger.info(f"  - {len(attractions)} tourist attractions")
+    logger.info(f"  - {len(accommodation)} accommodation options")
+    logger.info(f"  - {len(dining)} dining venues")
+    logger.info(f"  - {len(activities)} activities")
+    logger.info(f"  - {len(trails)} walking trails")
 
     return db_path
 
@@ -615,7 +620,7 @@ def export_database_to_geojson(db_path):
         with open(output_file, "w") as f:
             json.dump(geojson, f, indent=2)
 
-        print(f"✓ Exported {table}: {len(features)} features")
+        logger.info(f"✓ Exported {table}: {len(features)} features")
 
     # Export trails separately (they have start/end points)
     cursor.execute("SELECT * FROM walking_trails")
@@ -648,19 +653,19 @@ def export_database_to_geojson(db_path):
     with open("data/enhanced_data/walking_trails.geojson", "w") as f:
         json.dump(trails_geojson, f, indent=2)
 
-    print(f"✓ Exported walking_trails: {len(trail_features)} features")
+    logger.info(f"✓ Exported walking_trails: {len(trail_features)} features")
 
     conn.close()
 
 
 if __name__ == "__main__":
-    print("Creating Enhanced Tourist Data Integration")
-    print("=" * 50)
+    logger.info("Creating Enhanced Tourist Data Integration")
+    logger.info("=" * 50)
 
     db_path = create_enhanced_tourist_database()
     export_database_to_geojson(db_path)
 
-    print("\n🎉 Enhanced tourist data created!")
-    print("📊 Database: data/enhanced_data/lumsden_tourist.db")
-    print("🗺️  GeoJSON files: data/enhanced_data/*.geojson")
-    print("📋 Ready for integration with mapping systems")
+    logger.info("\n🎉 Enhanced tourist data created!")
+    logger.info("📊 Database: data/enhanced_data/lumsden_tourist.db")
+    logger.info("🗺️  GeoJSON files: data/enhanced_data/*.geojson")
+    logger.info("📋 Ready for integration with mapping systems")

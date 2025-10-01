@@ -1,5 +1,8 @@
-"""Elevation data processing and hillshading utilities"""
+"""
+Elevation data processing and hillshading utilities
+"""
 
+import logging
 import math
 import os
 import struct
@@ -10,6 +13,9 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import requests
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_dem_cache_dir():
@@ -33,7 +39,7 @@ def _format_srtm_tile_name(lat, lon):
 def _download_file_with_progress(url, output_path, timeout=30):
     """Download a file with basic progress indication"""
     try:
-        print(f"  📥 Downloading from {url}")
+        logger.info(f"  📥 Downloading from {url}")
         response = requests.get(url, timeout=timeout, stream=True)
         response.raise_for_status()
         
@@ -51,12 +57,12 @@ def _download_file_with_progress(url, output_path, timeout=30):
                     downloaded += len(chunk)
                     if total_size > 0:
                         percent = (downloaded / total_size) * 100
-                        print(f"  📊 Progress: {percent:.1f}%", end='\r')
+                        logger.info(f"  📊 Progress: {percent:.1f}%", end='\r')
         
-        print()  # New line after progress
+        logger.info()  # New line after progress
         return True
     except Exception as e:
-        print(f"  ❌ Download failed: {e}")
+        logger.info(f"  ❌ Download failed: {e}")
         return False
 
 
@@ -92,17 +98,17 @@ def generate_contours(elevation_file, contours_file, interval=10):
 
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
-            print(f"✓ Generated contours: {contours_file}")
+            logger.info(f"✓ Generated contours: {contours_file}")
             return True
         else:
-            print(f"⚠ Warning: Failed to generate contours: {result.stderr}")
+            logger.warning(f"Warning: Failed to generate contours: {result.stderr}")
             return False
 
     except subprocess.CalledProcessError as e:
-        print(f"⚠ Warning: gdal_contour command failed: {e}")
+        logger.warning(f"Warning: gdal_contour command failed: {e}")
         return False
     except FileNotFoundError:
-        print("⚠ Warning: gdal_contour not available")
+        logger.warning("Warning: gdal_contour not available")
         return False
 
 
@@ -117,7 +123,7 @@ def _create_synthetic_dem_fallback(bbox, output_file, resolution=30):
         import numpy as np
         from osgeo import gdal, osr
         
-        print("  📊 Creating synthetic DEM as fallback...")
+        logger.info("  📊 Creating synthetic DEM as fallback...")
         
         # Calculate grid dimensions based on bbox and resolution
         width_degrees = bbox["east"] - bbox["west"]
@@ -133,7 +139,7 @@ def _create_synthetic_dem_fallback(bbox, output_file, resolution=30):
         cols = int(width_meters / resolution)
         rows = int(height_meters / resolution)
         
-        print(f"    📐 Creating {cols}x{rows} grid at {resolution}m resolution")
+        logger.info(f"    📐 Creating {cols}x{rows} grid at {resolution}m resolution")
         
         # Create synthetic elevation data with gentle terrain
         x = np.linspace(0, width_degrees, cols)
@@ -183,14 +189,14 @@ def _create_synthetic_dem_fallback(bbox, output_file, resolution=30):
         band = None
         dataset = None
         
-        print(f"    ✓ Synthetic DEM created: {output_file}")
+        logger.info(f"    ✓ Synthetic DEM created: {output_file}")
         return True
         
     except ImportError as e:
-        print(f"    ❌ Cannot create synthetic DEM: missing dependencies ({e})")
+        logger.info(f"    ❌ Cannot create synthetic DEM: missing dependencies ({e})")
         return False
     except Exception as e:
-        print(f"    ❌ Error creating synthetic DEM: {e}")
+        logger.info(f"    ❌ Error creating synthetic DEM: {e}")
         return False
 
 
@@ -213,7 +219,7 @@ def download_elevation_data(
     Returns:
         bool: True if successful, False otherwise
     """
-    print(f"📊 Attempting to download real elevation data from {dem_source}...")
+    logger.info(f"📊 Attempting to download real elevation data from {dem_source}...")
 
     # Handle different DEM sources
     success = False
@@ -226,13 +232,13 @@ def download_elevation_data(
     elif dem_source == "eu_dem":
         success = _download_eu_dem_data(bbox, output_file, resolution)
     else:
-        print(f"❌ Unknown DEM source '{dem_source}'")
-        print("❌ Supported sources: srtm, aster, os_terrain, eu_dem")
+        logger.error(f"Unknown DEM source '{dem_source}'")
+        logger.error("Supported sources: srtm, aster, os_terrain, eu_dem")
         return False
     
     # If real DEM download failed and synthetic fallback is allowed
     if not success and allow_synthetic_fallback:
-        print("💡 Real DEM download failed, attempting synthetic fallback...")
+        logger.info("💡 Real DEM download failed, attempting synthetic fallback...")
         return _create_synthetic_dem_fallback(bbox, output_file, resolution)
     
     return success
@@ -244,7 +250,7 @@ def _download_aster_elevation_data(bbox, output_file, resolution=30):
     
     ASTER GDEM provides 30m resolution global elevation data.
     """
-    print("📊 Downloading ASTER GDEM elevation data...")
+    logger.info("📊 Downloading ASTER GDEM elevation data...")
     
     try:
         # ASTER tiles are 1x1 degree tiles
@@ -253,7 +259,7 @@ def _download_aster_elevation_data(bbox, output_file, resolution=30):
         west_tile = int(math.floor(bbox["west"]))
         east_tile = int(math.floor(bbox["east"]))
         
-        print(f"  📍 Required ASTER tiles: lat {south_tile} to {north_tile}, lon {west_tile} to {east_tile}")
+        logger.info(f"  📍 Required ASTER tiles: lat {south_tile} to {north_tile}, lon {west_tile} to {east_tile}")
         
         cache_dir = get_dem_cache_dir() / "aster"
         cache_dir.mkdir(exist_ok=True)
@@ -265,23 +271,23 @@ def _download_aster_elevation_data(bbox, output_file, resolution=30):
                 cached_file = cache_dir / tile_name
                 
                 if cached_file.exists():
-                    print(f"  ✓ Using cached ASTER tile: {tile_name}")
+                    logger.info(f"  ✓ Using cached ASTER tile: {tile_name}")
                     temp_files.append(str(cached_file))
                 else:
-                    print(f"  📥 Downloading ASTER tile: {tile_name}")
+                    logger.info(f"  📥 Downloading ASTER tile: {tile_name}")
                     if _download_aster_tile(lat, lon, cached_file):
                         temp_files.append(str(cached_file))
         
         if not temp_files:
-            print("  ❌ No ASTER tiles downloaded successfully")
+            logger.info("  ❌ No ASTER tiles downloaded successfully")
             return False
         
         # Process and crop tiles
-        print("  🔄 Processing ASTER tiles...")
+        logger.info("  🔄 Processing ASTER tiles...")
         return _process_srtm_tiles(temp_files, bbox, output_file)
         
     except Exception as e:
-        print(f"❌ Error downloading ASTER data: {e}")
+        logger.error(f"Error downloading ASTER data: {e}")
         return False
 
 
@@ -310,22 +316,22 @@ def _download_aster_tile(lat, lon, output_file):
     
     for source_url in aster_sources:
         try:
-            print(f"    🌐 Trying ASTER source: {source_url.split('/')[2]}")
+            logger.info(f"    🌐 Trying ASTER source: {source_url.split('/')[2]}")
             
             if _download_file_with_progress(source_url, output_file):
                 if output_file.stat().st_size > 1000:
-                    print(f"    ✓ Successfully downloaded ASTER {tile_name}")
+                    logger.info(f"    ✓ Successfully downloaded ASTER {tile_name}")
                     return True
                 else:
                     output_file.unlink(missing_ok=True)
             
         except Exception as e:
-            print(f"    ❌ ASTER source failed: {e}")
+            logger.info(f"    ❌ ASTER source failed: {e}")
             output_file.unlink(missing_ok=True)
             continue
     
-    print("  ❌ All ASTER sources failed - this may require authentication")
-    print("  💡 Consider using SRTM as alternative for this region")
+    logger.info("  ❌ All ASTER sources failed - this may require authentication")
+    logger.info("  💡 Consider using SRTM as alternative for this region")
     return False
 
 
@@ -335,28 +341,28 @@ def _download_os_terrain_data(bbox, output_file, resolution=50):
     
     OS Terrain provides high-resolution elevation data for the UK.
     """
-    print("📊 Downloading OS Terrain elevation data...")
+    logger.info("📊 Downloading OS Terrain elevation data...")
     
     # Check if bbox is within UK bounds
     if not _is_bbox_in_uk(bbox):
-        print("  ❌ OS Terrain data is only available for the UK")
-        print("  💡 Consider using SRTM or ASTER for areas outside the UK")
+        logger.info("  ❌ OS Terrain data is only available for the UK")
+        logger.info("  💡 Consider using SRTM or ASTER for areas outside the UK")
         return False
     
     try:
-        print("  📍 Area is within UK bounds")
+        logger.info("  📍 Area is within UK bounds")
         
         # OS Terrain 50 data access
         # Note: OS OpenData is freely available but requires proper API access
-        print("  ❌ OS Terrain download not yet implemented")
-        print("  💡 This requires OS Data Hub API access")
-        print("  💡 For now, falling back to SRTM data...")
+        logger.info("  ❌ OS Terrain download not yet implemented")
+        logger.info("  💡 This requires OS Data Hub API access")
+        logger.info("  💡 For now, falling back to SRTM data...")
         
         # Fallback to SRTM for UK
         return _download_srtm_elevation_data(bbox, output_file, resolution)
         
     except Exception as e:
-        print(f"❌ Error downloading OS Terrain data: {e}")
+        logger.error(f"Error downloading OS Terrain data: {e}")
         return False
 
 
@@ -382,27 +388,27 @@ def _download_eu_dem_data(bbox, output_file, resolution=25):
     
     EU-DEM provides 25m resolution elevation data for Europe.
     """
-    print("📊 Downloading EU-DEM elevation data...")
+    logger.info("📊 Downloading EU-DEM elevation data...")
     
     # Check if bbox is within Europe bounds  
     if not _is_bbox_in_europe(bbox):
-        print("  ❌ EU-DEM data is only available for Europe")
-        print("  💡 Consider using SRTM or ASTER for areas outside Europe")
+        logger.info("  ❌ EU-DEM data is only available for Europe")
+        logger.info("  💡 Consider using SRTM or ASTER for areas outside Europe")
         return False
     
     try:
-        print("  📍 Area is within European bounds")
+        logger.info("  📍 Area is within European bounds")
         
         # EU-DEM data access via Copernicus
-        print("  ❌ EU-DEM download not yet implemented")
-        print("  💡 This requires Copernicus Data Space API access")
-        print("  💡 For now, falling back to SRTM data...")
+        logger.info("  ❌ EU-DEM download not yet implemented")
+        logger.info("  💡 This requires Copernicus Data Space API access")
+        logger.info("  💡 For now, falling back to SRTM data...")
         
         # Fallback to SRTM for Europe
         return _download_srtm_elevation_data(bbox, output_file, resolution)
         
     except Exception as e:
-        print(f"❌ Error downloading EU-DEM data: {e}")
+        logger.error(f"Error downloading EU-DEM data: {e}")
         return False
 
 
@@ -437,7 +443,7 @@ def _download_srtm_elevation_data(bbox, output_file, resolution=30):
         bool: True if successful, False otherwise
     """
     try:
-        print("📊 Downloading SRTM elevation data...")
+        logger.info("📊 Downloading SRTM elevation data...")
         
         # Calculate SRTM tile numbers (1 degree tiles)
         south_tile = int(math.floor(bbox["south"]))
@@ -445,7 +451,7 @@ def _download_srtm_elevation_data(bbox, output_file, resolution=30):
         west_tile = int(math.floor(bbox["west"]))
         east_tile = int(math.floor(bbox["east"]))
 
-        print(f"  📍 Required SRTM tiles: lat {south_tile} to {north_tile}, lon {west_tile} to {east_tile}")
+        logger.info(f"  📍 Required SRTM tiles: lat {south_tile} to {north_tile}, lon {west_tile} to {east_tile}")
         
         # Setup cache directory
         cache_dir = get_dem_cache_dir()
@@ -458,30 +464,30 @@ def _download_srtm_elevation_data(bbox, output_file, resolution=30):
                 cached_file = cache_dir / tile_name
                 
                 if cached_file.exists():
-                    print(f"  ✓ Using cached tile: {tile_name}")
+                    logger.info(f"  ✓ Using cached tile: {tile_name}")
                     temp_files.append(str(cached_file))
                 else:
-                    print(f"  📥 Downloading tile: {tile_name}")
+                    logger.info(f"  📥 Downloading tile: {tile_name}")
                     if _download_srtm_tile(lat, lon, cached_file):
                         temp_files.append(str(cached_file))
                     else:
-                        print(f"  ⚠️  Failed to download {tile_name}, continuing with available tiles")
+                        logger.info(f"  ⚠️  Failed to download {tile_name}, continuing with available tiles")
         
         if not temp_files:
-            print("  ❌ No SRTM tiles downloaded successfully")
+            logger.info("  ❌ No SRTM tiles downloaded successfully")
             return False
         
         # Merge and crop tiles to bounding box
-        print("  🔄 Processing SRTM tiles...")
+        logger.info("  🔄 Processing SRTM tiles...")
         if _process_srtm_tiles(temp_files, bbox, output_file):
-            print(f"  ✓ SRTM elevation data saved: {output_file}")
+            logger.info(f"  ✓ SRTM elevation data saved: {output_file}")
             return True
         else:
-            print("  ❌ Failed to process SRTM tiles")
+            logger.info("  ❌ Failed to process SRTM tiles")
             return False
 
     except Exception as e:
-        print(f"❌ Error downloading SRTM data: {e}")
+        logger.error(f"Error downloading SRTM data: {e}")
         return False
 
 
@@ -501,19 +507,19 @@ def _download_srtm_tile(lat, lon, output_file):
     
     for source_url in srtm_sources:
         try:
-            print(f"    🌐 Trying source: {source_url.split('/')[2]}")
+            logger.info(f"    🌐 Trying source: {source_url.split('/')[2]}")
             
             if _download_file_with_progress(source_url, output_file):
                 # Verify file is valid
                 if output_file.stat().st_size > 1000:  # Basic size check
-                    print(f"    ✓ Successfully downloaded {tile_name}")
+                    logger.info(f"    ✓ Successfully downloaded {tile_name}")
                     return True
                 else:
-                    print(f"    ❌ Downloaded file too small, trying next source")
+                    logger.info(f"    ❌ Downloaded file too small, trying next source")
                     output_file.unlink(missing_ok=True)
             
         except Exception as e:
-            print(f"    ❌ Source failed: {e}")
+            logger.info(f"    ❌ Source failed: {e}")
             output_file.unlink(missing_ok=True)
             continue
     
@@ -543,12 +549,12 @@ def _process_srtm_tiles(tile_files, bbox, output_file):
                     os.unlink(temp_merged.name)
                     return success
                 else:
-                    print(f"    ❌ Failed to merge tiles: {result.stderr}")
+                    logger.info(f"    ❌ Failed to merge tiles: {result.stderr}")
                     os.unlink(temp_merged.name)
                     return False
     
     except Exception as e:
-        print(f"    ❌ Error processing SRTM tiles: {e}")
+        logger.info(f"    ❌ Error processing SRTM tiles: {e}")
         return False
 
 
@@ -568,11 +574,11 @@ def _crop_dem_to_bbox(input_file, bbox, output_file):
         if result.returncode == 0:
             return True
         else:
-            print(f"    ❌ Failed to crop DEM: {result.stderr}")
+            logger.info(f"    ❌ Failed to crop DEM: {result.stderr}")
             return False
             
     except Exception as e:
-        print(f"    ❌ Error cropping DEM: {e}")
+        logger.info(f"    ❌ Error cropping DEM: {e}")
         return False
 
 
@@ -604,14 +610,14 @@ def generate_hillshade(dem_file, output_file, config):
 
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
-            print(f"Error generating hillshade: {result.stderr}")
+            logger.info(f"Error generating hillshade: {result.stderr}")
             return False
 
-        print(f"✓ Generated hillshade: {output_file}")
+        logger.info(f"✓ Generated hillshade: {output_file}")
         return True
 
     except Exception as e:
-        print(f"Error generating hillshade: {e}")
+        logger.info(f"Error generating hillshade: {e}")
         return False
 
 
@@ -626,10 +632,10 @@ def process_elevation_for_hillshading(bbox, area_config, data_dir):
     contours_enabled = contours_config.get("enabled", False)
 
     if not (hillshading_enabled or contours_enabled):
-        print("📊 Hillshading and contours disabled in configuration")
+        logger.info("📊 Hillshading and contours disabled in configuration")
         return None
 
-    print("📊 Processing elevation data for hillshading...")
+    logger.info("📊 Processing elevation data for hillshading...")
 
     # Create data directory if needed
     data_path = Path(data_dir)
@@ -650,7 +656,7 @@ def process_elevation_for_hillshading(bbox, area_config, data_dir):
     # Download/generate elevation data
     if not download_elevation_data(elev_bbox, dem_file, dem_source=dem_source, 
                                    allow_synthetic_fallback=allow_fallback):
-        print("❌ Failed to obtain elevation data from any source")
+        logger.error("Failed to obtain elevation data from any source")
         return None
 
     # Generate hillshade if enabled

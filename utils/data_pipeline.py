@@ -8,6 +8,7 @@ Handles the sequential data processing steps needed for map generation:
 - Hillshading processing
 """
 
+import logging
 import os
 from pathlib import Path
 
@@ -18,6 +19,8 @@ from .data_processing import (
     validate_osm_data_quality,
 )
 from .elevation_processing import process_elevation_for_hillshading
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_osm_data(area_name, area_config, bbox, data_dir):
@@ -38,17 +41,17 @@ def prepare_osm_data(area_name, area_config, bbox, data_dir):
     osm_file = Path(osm_file_path)
     
     if not osm_file.exists():
-        print(f"OSM file not found at {osm_file}. Downloading...")
+        logger.info(f"OSM file not found at {osm_file}. Downloading...")
         if not download_osm_data(bbox, str(osm_file)):
-            print("❌ Failed to download OSM data")
+            logger.error("Failed to download OSM data")
             return None, False
 
         # Validate the downloaded data quality
         if not validate_osm_data_quality(str(osm_file)):
-            print("⚠ Warning: Downloaded OSM data has low quality")
-            print("   Map may have limited features, but continuing...")
+            logger.warning("Downloaded OSM data has low quality")
+            logger.warning("Map may have limited features, but continuing...")
     else:
-        print(f"📁 Using existing OSM data: {osm_file}")
+        logger.info(f"📁 Using existing OSM data: {osm_file}")
         # Also validate existing data
         validate_osm_data_quality(str(osm_file))
     
@@ -74,11 +77,11 @@ def process_data_pipeline(area_name, area_config, bbox, data_dir):
         return None, False, False
     
     # Convert to shapefiles (no database!)
-    print("\n🔄 Converting OSM data to shapefiles...")
+    logger.info("\n🔄 Converting OSM data to shapefiles...")
     osm_data_dir = convert_osm_to_shapefiles(osm_file)
     
     # Process elevation data and generate contours if enabled
-    print("\n⛰️  Processing elevation data and contours...")
+    logger.info("\n⛰️  Processing elevation data and contours...")
     contour_config = area_config.get("contours", {})
     contour_data = process_elevation_and_contours(
         bbox,
@@ -88,19 +91,19 @@ def process_data_pipeline(area_name, area_config, bbox, data_dir):
     )
 
     if contour_data:
-        print(f"✓ Contour lines generated with {contour_data['interval']}m intervals")
+        logger.info(f"✓ Contour lines generated with {contour_data['interval']}m intervals")
     else:
-        print("ℹ️  Contour generation skipped or failed")
+        logger.info("Contour generation skipped or failed")
 
     # Process elevation data for hillshading if enabled
     # Only process if we have a valid data directory
     if osm_data_dir:
-        print("\n🏔️  Processing hillshading...")
+        logger.info("\n🏔️  Processing hillshading...")
         hillshade_file = process_elevation_for_hillshading(
             bbox, area_config, osm_data_dir
         )
     else:
-        print("⚠ Skipping hillshading due to missing OSM data directory")
+        logger.warning("Skipping hillshading due to missing OSM data directory")
         hillshade_file = None
     hillshade_available = hillshade_file is not None
     

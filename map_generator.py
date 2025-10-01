@@ -5,6 +5,7 @@ Uses configuration-driven approach for maximum flexibility
 """
 
 import argparse
+import logging
 import os
 from pathlib import Path
 
@@ -14,36 +15,43 @@ from utils.config import (
     load_output_format,
 )
 from utils.data_processing import calculate_bbox
+from utils.logging_config import setup_logging, get_logger
 
 # from utils.download_icons import download_icons # not needed - icons are already present
 
 # Configuration will be loaded dynamically
 
+logger = get_logger(__name__)
 
-def main(area_name="lumsden"):
+
+def main(area_name="lumsden", verbose=False):
     """
     Main map generation function - orchestrates the complete workflow.
     
     Args:
         area_name: Name of the geographic area to generate map for
+        verbose: Enable verbose/debug logging output
         
     Returns:
         int: Exit code (0 for success, 1 for failure)
     """
-    print(f"🗺️  My Local Map Generator - Multi-Area Support")
-    print("=" * 50)
-    print(f"📍 Area: {area_name.title()}")
+    # Set up logging based on verbose flag
+    setup_logging(verbose=verbose)
+    
+    logger.info("🗺️  My Local Map Generator - Multi-Area Support")
+    logger.info("=" * 50)
+    logger.info(f"📍 Area: {area_name.title()}")
 
     # Load and validate configuration
     try:
         area_config = load_area_config(area_name)
     except KeyError:
-        print(f"❌ Error: Area '{area_name}' not found in configuration.")
-        print("Available areas:")
+        logger.error(f"Area '{area_name}' not found in configuration.")
+        logger.info("Available areas:")
         from utils.config import list_areas
 
         for area in list_areas():
-            print(f"  - {area}")
+            logger.info(f"  - {area}")
         return 1
 
     output_format = load_output_format("A3")
@@ -56,10 +64,10 @@ def main(area_name="lumsden"):
         area_config["coverage"]["width_km"],
         area_config["coverage"]["height_km"],
     )
-    print(f"📍 Area: {area_config['name']} ({area_config['center']['lat']}, {area_config['center']['lon']})")
-    print(f"📏 Coverage: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
-    print(f"🎯 Scale: 1:{area_config['scale']:,}")
-    print()
+    logger.info(f"📍 Area: {area_config['name']} ({area_config['center']['lat']}, {area_config['center']['lon']})")
+    logger.info(f"📏 Coverage: {area_config['coverage']['width_km']}×{area_config['coverage']['height_km']}km")
+    logger.info(f"🎯 Scale: 1:{area_config['scale']:,}")
+    logger.info("")
 
     # Ensure data directory exists
     data_dir = Path("data")
@@ -99,11 +107,16 @@ if __name__ == "__main__":
         default="lumsden",
         help="The area to generate a map for (default: lumsden)",
     )
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Enable verbose/debug logging output"
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
-    # Run main with the specified area
+    # Run main with the specified area and verbose flag
     import sys
 
-    sys.exit(main(args.area))
+    sys.exit(main(args.area, verbose=args.verbose))
