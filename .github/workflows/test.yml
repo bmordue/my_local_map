@@ -25,17 +25,6 @@ jobs:
         name: devenv
         skipPush: true
     
-    - name: Verify Nix environment
-      run: |
-        nix develop --command bash -c "
-          ogr2ogr --version
-          python -c 'import requests; print(\"✓ requests available\")'
-          python -c 'from PIL import Image; print(\"✓ Pillow available\")'
-          python -c 'import pytest; print(\"✓ pytest available\")'
-          # Note: mapnik might not be available in CI, but tests work with mocks
-          python -c 'try: import mapnik; print(\"✓ mapnik available\"); except ImportError: print(\"✓ mapnik not available but tests can still run with mocks\")'
-        "
-    
     - name: Run tests
       run: |
         nix develop --command python -m pytest tests/ -v
