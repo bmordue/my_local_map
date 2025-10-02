@@ -37,7 +37,7 @@ nix-shell
 
 ### Manual installation
 ```bash
-# Install system dependencies (Ubuntu/Debian)
+# Install system dependencies
 sudo apt-get update
 sudo apt-get install gdal-bin python3-mapnik
 
@@ -47,6 +47,34 @@ pip3 install -r requirements.txt
 # Run enhanced map generator
 python3 map_generator.py
 ```
+
+#### Option 2: Nix Development Environment (Recommended)
+If you have Nix installed, you can use the provided development environment:
+
+```bash
+# Clone repository
+git clone https://github.com/bmordue/my_local_map.git
+cd my_local_map
+
+# Enter Nix development shell (using flake)
+nix develop
+
+# Or use traditional shell.nix
+nix-shell
+
+# Run enhanced map generator
+python map_generator.py
+
+# Run tests
+pytest tests/
+```
+
+**Benefits of Nix approach:**
+- 🚀 Reproducible development environment
+- 📦 All dependencies managed declaratively
+- ⚡ Fast setup on any system with Nix
+- 🧪 Integrated testing and linting tools
+- 🔧 Same environment used in CI/CD
 
 ### Output
 - Enhanced Map: `lumsden_enhanced_tourist_map_A3.png` (3507×4960 pixels, A3 300DPI)

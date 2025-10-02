@@ -10,48 +10,28 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        python-version: ['3.12']
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
       with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gdal-bin python3-dev
-        # Install mapnik development libraries
-        sudo apt-get install -y libmapnik-dev mapnik-utils python3-mapnik
-    
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-test.txt
-        # Install core dependencies for the main application
-        pip install requests Pillow
-    
-    # - name: Verify installations
-    #   run: |
-    #     # Check GDAL/OGR
-    #     ogr2ogr --version
-    #     # Check Python imports (mapnik might not be available in all Python versions)
-    #     python -c "import requests; print('requests OK')"
-    #     python -c "try: import mapnik; print('mapnik available'); except ImportError: print('mapnik not available but tests can still run with mocks')"
+        nix_path: nixpkgs=channel:nixos-unstable
+        
+    - name: Setup Nix cache
+      uses: cachix/cachix-action@v12
+      with:
+        name: devenv
+        skipPush: true
     
     - name: Run tests
       run: |
-        python -m pytest tests/
+        nix develop --command python -m pytest tests/ -v
     
-    - name: Run all tests with coverage
+    - name: Run tests with coverage
       run: |
-        python -m pytest tests/ --cov=. --cov-report=xml --cov-report=term-missing -v
+        nix develop --command python -m pytest tests/ --cov=. --cov-report=xml --cov-report=term-missing -v
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -66,28 +46,39 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
       with:
-        python-version: '3.12'
+        nix_path: nixpkgs=channel:nixos-unstable
+        
+    - name: Setup Nix cache
+      uses: cachix/cachix-action@v12
+      with:
+        name: devenv
+        skipPush: true
     
-    - name: Install linting dependencies
+    - name: Install linting dependencies in Nix shell
       run: |
-        python -m pip install --upgrade pip
-        pip install flake8 black isort
+        # Verify that linting tools are available in the development shell
+        nix develop --command bash -c "
+          echo '✓ Linting tools available in Nix environment'
+          black --version
+          isort --version
+          flake8 --version
+        "
     
     - name: Run black formatter check
       run: |
-        black --check --diff .
+        nix develop --command black --check --diff .
       continue-on-error: true
     
     - name: Run isort import checker
       run: |
-        isort --check-only --diff .
+        nix develop --command isort --check-only --diff .
       continue-on-error: true
     
     - name: Run flake8 linter (PEP8 check)
       run: |
-        chmod +x check_flake8.sh
-        ./check_flake8.sh
+        chmod +x utils/check_flake8.sh
+        ./utils/check_flake8.sh
       continue-on-error: true

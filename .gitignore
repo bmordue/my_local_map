@@ -27,6 +27,12 @@ styles/*_map_style.xml
 
 .gemini/
 gha-creds-*.json
+
+# Nix
+.direnv/
+result
+result-*
+flake.lock
 build/
 
 #BMAD
@@ -49,4 +55,3 @@ tourist_map_style.xml
 osm_data/
 data/osm_data/
 enhanced_data/
-
