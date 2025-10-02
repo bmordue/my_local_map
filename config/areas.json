@@ -81,7 +81,8 @@
     },
     "elevation": {
       "source": "srtm",
-      "resolution": 30
+      "resolution": 30,
+      "allow_synthetic_fallback": false
     }
   },
   "crathes_castle": {

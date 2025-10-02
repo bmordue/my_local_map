@@ -226,6 +226,9 @@ def download_elevation_data(
 
     Returns:
         bool: True if successful, False otherwise
+    
+    Raises:
+        RuntimeError: If real DEM download fails and synthetic fallback is disabled
     """
     logger.info(f"📊 Attempting to download real elevation data from {dem_source}...")
 
@@ -244,10 +247,19 @@ def download_elevation_data(
         logger.error("Supported sources: srtm, aster, os_terrain, eu_dem")
         return False
 
-    # If real DEM download failed and synthetic fallback is allowed
-    if not success and allow_synthetic_fallback:
-        logger.info("💡 Real DEM download failed, attempting synthetic fallback...")
-        return _create_synthetic_dem_fallback(bbox, output_file, resolution)
+    # If real DEM download failed
+    if not success:
+        if allow_synthetic_fallback:
+            logger.info("💡 Real DEM download failed, attempting synthetic fallback...")
+            return _create_synthetic_dem_fallback(bbox, output_file, resolution)
+        else:
+            logger.error(f"❌ Failed to download real DEM data from '{dem_source}' source")
+            logger.error("❌ Synthetic fallback is disabled in configuration")
+            logger.error("❌ Cannot proceed without elevation data")
+            raise RuntimeError(
+                f"DEM data download failed from '{dem_source}' source and synthetic fallback is disabled. "
+                f"Either enable synthetic fallback or ensure network connectivity to DEM data sources."
+            )
 
     return success
 
@@ -670,14 +682,19 @@ def process_elevation_for_hillshading(bbox, area_config, data_dir):
     allow_fallback = elevation_config.get("allow_synthetic_fallback", True)
 
     # Download/generate elevation data
-    if not download_elevation_data(
-        elev_bbox,
-        dem_file,
-        dem_source=dem_source,
-        allow_synthetic_fallback=allow_fallback,
-    ):
-        logger.error("Failed to obtain elevation data from any source")
-        return None
+    try:
+        if not download_elevation_data(
+            elev_bbox,
+            dem_file,
+            dem_source=dem_source,
+            allow_synthetic_fallback=allow_fallback,
+        ):
+            logger.error("Failed to obtain elevation data from any source")
+            return None
+    except RuntimeError as e:
+        # Re-raise the exception to propagate the failure
+        logger.error(f"Critical DEM data failure: {e}")
+        raise e
 
     # Generate hillshade if enabled
     hillshade_result = None
