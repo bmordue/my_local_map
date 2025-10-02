@@ -2,6 +2,10 @@ data/
 __pycache__/
 *.pyc
 
+# Generated reports and validation outputs 
+validation_reports/
+quality_reports/
+
 # Testing artifacts
 .pytest_cache/
 .coverage
@@ -19,7 +23,7 @@ htmlcov/
 # OS files
 .DS_Store
 Thumbs.db
-styles/tourist_map_style.xml
+styles/*_map_style.xml
 
 .gemini/
 gha-creds-*.json
@@ -29,3 +33,25 @@ gha-creds-*.json
 result
 result-*
 flake.lock
+build/
+
+#BMAD
+.bmad-core/
+.claude/
+.github/chatmodes/
+.qwen/
+
+test_output/
+
+# DEM cache directory (elevation data should not be committed)
+**/.my_local_map/
+**/dem_cache/
+
+# Generated map outputs
+*.png
+tourist_map_style.xml
+
+# Data files (OSM shapefiles, elevation data)
+osm_data/
+data/osm_data/
+enhanced_data/

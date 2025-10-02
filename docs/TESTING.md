@@ -143,7 +143,7 @@ Key mocked components:
 
 Run the validation script to check basic functionality:
 ```bash
-python validate_setup.py
+python utils/system_validation.py
 ```
 
 This tests:
@@ -156,7 +156,7 @@ This tests:
 The CI pipeline also includes:
 - **Black** formatting checks
 - **isort** import sorting
-- **flake8** linting
+- **flake8** linting (PEP8 compliance)
 
 Run locally:
 ```bash
@@ -168,7 +168,9 @@ isort .
 black --check .
 isort --check-only .
 
-# Lint code
+# Lint code (PEP8 compliance)
+./check_flake8.sh
+# Or run flake8 directly
 flake8 .
 ```
 

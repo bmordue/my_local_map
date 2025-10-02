@@ -1,8 +1,10 @@
 """Integration tests for the main map generator application"""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from PIL import Image
+
 
 class TestMapGeneratorIntegration:
     """Integration tests for the complete map generation process"""
@@ -11,49 +13,60 @@ class TestMapGeneratorIntegration:
     def mock_dependencies(self):
         """Mock all external dependencies for integration testing"""
         return {
-            'area_config': {
+            "area_config": {
                 "center": {"lat": 57.3167, "lon": -2.8833},
                 "coverage": {"width_km": 8, "height_km": 12},
                 "scale": 25000,
-                "name": "Lumsden, Aberdeenshire"
+                "name": "Lumsden, Aberdeenshire",
             },
-            'output_format': {
+            "output_format": {
                 "width_mm": 297,
                 "height_mm": 420,
                 "dpi": 300,
-                "description": "Standard A3 format"
-            }
+                "description": "Standard A3 format",
+            },
         }
 
     @pytest.mark.integration
     def test_main_with_mocked_dependencies(self, mock_dependencies):
         """Test main function with all dependencies mocked"""
-        
+
         # Import here to avoid import-time side effects
         import map_generator
-        
-        with patch('map_generator.load_area_config') as mock_load_area, \
-             patch('map_generator.load_output_format') as mock_load_output, \
-             patch('map_generator.calculate_pixel_dimensions') as mock_calc_pixels, \
-             patch('pathlib.Path.exists') as mock_exists, \
-             patch('pathlib.Path.mkdir') as mock_mkdir, \
-             patch('map_generator.download_osm_data') as mock_download, \
-             patch('map_generator.convert_osm_to_shapefiles') as mock_convert, \
-             patch('map_generator.create_mapnik_style') as mock_create_style, \
-             patch('map_generator.render_map') as mock_render:
-            
+
+        with patch("map_generator.load_area_config") as mock_load_area, patch(
+            "map_generator.load_output_format"
+        ) as mock_load_output, patch(
+            "map_generator.calculate_pixel_dimensions"
+        ) as mock_calc_pixels, patch(
+            "map_generator.calculate_bbox"
+        ) as mock_calc_bbox, patch(
+            "pathlib.Path.mkdir"
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline"
+        ) as mock_pipeline, patch(
+            "utils.quality_validation.run_enhanced_data_validation"
+        ) as mock_validation, patch(
+            "utils.map_renderer.execute_map_rendering"
+        ) as mock_rendering:
+
             # Setup mocks
-            mock_load_area.return_value = mock_dependencies['area_config']
-            mock_load_output.return_value = mock_dependencies['output_format']
+            mock_load_area.return_value = mock_dependencies["area_config"]
+            mock_load_output.return_value = mock_dependencies["output_format"]
             mock_calc_pixels.return_value = (3507, 4960)
-            mock_exists.return_value = True  # OSM file exists
-            mock_convert.return_value = "/mock/osm_data"
-            mock_create_style.return_value = "mock_style.xml"
-            mock_render.return_value = True
-            
+            mock_calc_bbox.return_value = {
+                "south": 57.0,
+                "north": 57.5,
+                "west": -3.0,
+                "east": -2.5,
+            }
+            mock_pipeline.return_value = ("/mock/osm_data", True, True)
+            mock_validation.return_value = True
+            mock_rendering.return_value = True
+
             # Run main function
             result = map_generator.main()
-            
+
             # Verify success
             assert result == 0
 
@@ -64,21 +77,26 @@ class TestRenderMapUnit:
     @pytest.mark.unit
     def test_render_map_import_error_handling(self):
         """Test render_map when mapnik import fails"""
-        import map_generator
-        
+        from utils.map_renderer import render_map
+
         # Mock the mapnik import to fail
-        with patch.dict('sys.modules', {'mapnik': None}):
-            with patch('builtins.__import__', side_effect=ImportError("No module named 'mapnik'")):
-                result = map_generator.render_map("test.xml", {}, "test.png", 100, 100)
-        with patch('builtins.__import__', side_effect=ImportError("No module named 'mapnik'")):
-            result = map_generator.render_map("test.xml", {}, "test.png", 100, 100)
+        with patch.dict("sys.modules", {"mapnik": None}):
+            with patch(
+                "builtins.__import__",
+                side_effect=ImportError("No module named 'mapnik'"),
+            ):
+                result = render_map("test.xml", {}, "test.png", 100, 100)
+        with patch(
+            "builtins.__import__", side_effect=ImportError("No module named 'mapnik'")
+        ):
+            result = render_map("test.xml", {}, "test.png", 100, 100)
             assert result is False
 
-    @pytest.mark.unit 
+    @pytest.mark.unit
     def test_render_map_with_mock_mapnik(self):
         """Test successful rendering with mocked mapnik"""
-        import map_generator
-        
+        from utils.map_renderer import render_map
+
         # Create a mock mapnik module
         mock_mapnik = MagicMock()
         mock_map_instance = MagicMock()
@@ -86,21 +104,22 @@ class TestRenderMapUnit:
         mock_mapnik.Box2d.return_value = MagicMock()
         mock_mapnik.Projection.return_value = MagicMock()
         mock_mapnik.ProjTransform.return_value = MagicMock()
-        
-        with patch.dict('sys.modules', {'mapnik': mock_mapnik}):
-            with patch('os.path.getsize', return_value=1024*1024):
+
+        with patch.dict("sys.modules", {"mapnik": mock_mapnik}):
+            with patch("os.path.getsize", return_value=1024 * 1024):
                 style_file = "test.xml"
-                bbox = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
+                bbox = {"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5}
                 output_file = "test.png"
                 # Create a dummy PNG file so PIL.Image.open does not fail
-                img = Image.new('RGB', (10, 10), color='white')
+                img = Image.new("RGB", (10, 10), color="white")
                 img.save(output_file)
                 try:
-                    result = map_generator.render_map(style_file, bbox, output_file, 1000, 1000)
+                    result = render_map(style_file, bbox, output_file, 1000, 1000)
                     assert result is True
                     mock_mapnik.Map.assert_called_once_with(1000, 1000)
                 finally:
                     import os
+
                     if os.path.exists(output_file):
                         os.remove(output_file)
 
@@ -111,17 +130,19 @@ class TestCreateMapnikStyleUnit:
     @pytest.mark.unit
     def test_create_mapnik_style_calls_build_function(self):
         """Test that create_mapnik_style calls the build function correctly"""
-        import map_generator
-        
+        from utils.map_renderer import create_mapnik_style
+
         area_config = {"hillshading": {"enabled": True}}
-        
-        with patch('map_generator.build_mapnik_style') as mock_build:
+
+        with patch("utils.map_renderer.build_mapnik_style") as mock_build:
             mock_build.return_value = "tourist_map_style.xml"
-            
-            result = map_generator.create_mapnik_style("/test/data", area_config, True)
-            
+
+            result = create_mapnik_style("/test/data", area_config, True)
+
             assert result == "tourist_map_style.xml"
-            mock_build.assert_called_once_with("tourist", "/test/data", area_config, True)
+            mock_build.assert_called_once_with(
+                "tourist", "/test/data", area_config, True
+            )
 
 
 class TestConfigurationHandling:
@@ -131,24 +152,40 @@ class TestConfigurationHandling:
     def test_configuration_loading_sequence(self):
         """Test that configuration is loaded in the correct sequence"""
         import map_generator
-        
-        with patch('map_generator.load_area_config') as mock_load_area, \
-             patch('map_generator.load_output_format') as mock_load_output, \
-             patch('map_generator.calculate_pixel_dimensions') as mock_calc_pixels, \
-             patch('map_generator.calculate_bbox') as mock_calc_bbox, \
-             patch('pathlib.Path.exists', return_value=True), \
-             patch('map_generator.convert_osm_to_shapefiles', return_value="data"), \
-             patch('map_generator.create_mapnik_style', return_value="style.xml"), \
-             patch('map_generator.render_map', return_value=True):
+
+        with patch("map_generator.load_area_config") as mock_load_area, patch(
+            "map_generator.load_output_format"
+        ) as mock_load_output, patch(
+            "map_generator.calculate_pixel_dimensions"
+        ) as mock_calc_pixels, patch(
+            "map_generator.calculate_bbox"
+        ) as mock_calc_bbox, patch(
+            "pathlib.Path.mkdir"
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("osm_data", True, True),
+        ), patch(
+            "utils.quality_validation.run_enhanced_data_validation", return_value=True
+        ), patch(
+            "utils.map_renderer.execute_map_rendering", return_value=True
+        ):
             # Setup return values
-            area_config = {"center": {"lat": 57.3167, "lon": -2.8833}, 
-                          "coverage": {"width_km": 8, "height_km": 12},
-                          "scale": 25000}
+            area_config = {
+                "center": {"lat": 57.3167, "lon": -2.8833},
+                "coverage": {"width_km": 8, "height_km": 12},
+                "scale": 25000,
+                "name": "Lumsden, Aberdeenshire",
+            }
             output_format = {"width_mm": 297, "height_mm": 420, "dpi": 300}
             mock_load_area.return_value = area_config
             mock_load_output.return_value = output_format
             mock_calc_pixels.return_value = (3507, 4960)
-            mock_calc_bbox.return_value = {'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}
+            mock_calc_bbox.return_value = {
+                "south": 57.0,
+                "north": 57.5,
+                "west": -3.0,
+                "east": -2.5,
+            }
             # Run main
             result = map_generator.main()
             # Verify function calls
@@ -166,51 +203,82 @@ class TestFileHandling:
     def test_osm_file_exists_path(self):
         """Test behavior when OSM file exists"""
         import map_generator
-        
-        with patch('pathlib.Path.exists') as mock_exists, \
-             patch('pathlib.Path.mkdir') as mock_mkdir, \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
-             patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
-             patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
-             patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
-             patch('map_generator.download_osm_data') as mock_download, \
-             patch('map_generator.convert_osm_to_shapefiles', return_value="/data"), \
-             patch('map_generator.create_mapnik_style', return_value="style.xml"), \
-             patch('map_generator.render_map', return_value=True):
-            
+
+        with patch("pathlib.Path.exists") as mock_exists, patch(
+            "pathlib.Path.mkdir"
+        ) as mock_mkdir, patch(
+            "map_generator.load_area_config",
+            return_value={
+                "center": {"lat": 57.3167, "lon": -2.8833},
+                "coverage": {"width_km": 8, "height_km": 12},
+                "scale": 25000,
+                "name": "Lumsden, Aberdeenshire",
+            },
+        ), patch(
+            "map_generator.load_output_format",
+            return_value={"width_mm": 297, "height_mm": 420, "dpi": 300},
+        ), patch(
+            "map_generator.calculate_pixel_dimensions", return_value=(3507, 4960)
+        ), patch(
+            "map_generator.calculate_bbox",
+            return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("/data", True, True),
+        ) as mock_pipeline, patch(
+            "utils.quality_validation.run_enhanced_data_validation"
+        ), patch(
+            "utils.map_renderer.execute_map_rendering", return_value=True
+        ):
+
             # Set file to exist
             mock_exists.return_value = True
-            
+
             result = map_generator.main()
-            
-            # Download should not be called when file exists
-            mock_download.assert_not_called()
+
+            # Should call the data pipeline which handles OSM file processing
+            mock_pipeline.assert_called_once()
             assert result == 0
 
-    @pytest.mark.unit 
+    @pytest.mark.unit
     def test_osm_file_download_needed(self):
         """Test behavior when OSM file needs to be downloaded"""
         import map_generator
-        
-        with patch('pathlib.Path.exists') as mock_exists, \
-             patch('pathlib.Path.mkdir') as mock_mkdir, \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
-             patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
-             patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
-             patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
-             patch('map_generator.download_osm_data') as mock_download, \
-             patch('map_generator.convert_osm_to_shapefiles', return_value="/data"), \
-             patch('map_generator.create_mapnik_style', return_value="style.xml"), \
-             patch('map_generator.render_map', return_value=True):
-            
+
+        with patch("pathlib.Path.exists") as mock_exists, patch(
+            "pathlib.Path.mkdir"
+        ) as mock_mkdir, patch(
+            "map_generator.load_area_config",
+            return_value={
+                "center": {"lat": 57.3167, "lon": -2.8833},
+                "coverage": {"width_km": 8, "height_km": 12},
+                "scale": 25000,
+                "name": "Lumsden, Aberdeenshire",
+            },
+        ), patch(
+            "map_generator.load_output_format",
+            return_value={"width_mm": 297, "height_mm": 420, "dpi": 300},
+        ), patch(
+            "map_generator.calculate_pixel_dimensions", return_value=(3507, 4960)
+        ), patch(
+            "map_generator.calculate_bbox",
+            return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("/data", True, True),
+        ) as mock_pipeline, patch(
+            "utils.quality_validation.run_enhanced_data_validation"
+        ), patch(
+            "utils.map_renderer.execute_map_rendering", return_value=True
+        ):
+
             # Set file to not exist
             mock_exists.return_value = False
-            mock_download.return_value = True  # Successful download
-            
+
             result = map_generator.main()
-            
-            # Download should be called when file doesn't exist
-            mock_download.assert_called_once()
+
+            # Should call the data pipeline which handles download if needed
+            mock_pipeline.assert_called_once()
             assert result == 0
 
 
@@ -221,42 +289,77 @@ class TestErrorHandling:
     def test_download_failure_handling(self):
         """Test handling when OSM download fails"""
         import map_generator
-        
-        with patch('pathlib.Path.exists', return_value=False), \
-             patch('pathlib.Path.mkdir'), \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
-             patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
-             patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
-             patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
-             patch('map_generator.download_osm_data', return_value=False) as mock_download, \
-             patch('map_generator.convert_osm_to_shapefiles') as mock_convert:
-            
+
+        with patch("pathlib.Path.exists", return_value=False), patch(
+            "pathlib.Path.mkdir"
+        ), patch(
+            "map_generator.load_area_config",
+            return_value={
+                "center": {"lat": 57.3167, "lon": -2.8833},
+                "coverage": {"width_km": 8, "height_km": 12},
+                "scale": 25000,
+                "name": "Lumsden, Aberdeenshire",
+            },
+        ), patch(
+            "map_generator.load_output_format",
+            return_value={"width_mm": 297, "height_mm": 420, "dpi": 300},
+        ), patch(
+            "map_generator.calculate_pixel_dimensions", return_value=(3507, 4960)
+        ), patch(
+            "map_generator.calculate_bbox",
+            return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=(None, False, False),
+        ) as mock_pipeline, patch(
+            "utils.quality_validation.run_enhanced_data_validation"
+        ), patch(
+            "utils.map_renderer.execute_map_rendering"
+        ) as mock_render:
+
             result = map_generator.main()
-            
+
             # Should return failure code
             assert result == 1
-            # Download should be attempted
-            mock_download.assert_called_once()
-            # Conversion should not be called after download failure
-            mock_convert.assert_not_called()
+            # Pipeline should be attempted
+            mock_pipeline.assert_called_once()
+            # Rendering should not be called after pipeline failure
+            mock_render.assert_not_called()
 
     @pytest.mark.unit
     def test_render_failure_handling(self):
         """Test handling when map rendering fails"""
         import map_generator
-        
-        with patch('pathlib.Path.exists', return_value=True), \
-             patch('pathlib.Path.mkdir'), \
-             patch('map_generator.load_area_config', return_value={"center": {"lat": 57.3167, "lon": -2.8833}, "coverage": {"width_km": 8, "height_km": 12}, "scale": 25000}), \
-             patch('map_generator.load_output_format', return_value={"width_mm": 297, "height_mm": 420, "dpi": 300}), \
-             patch('map_generator.calculate_pixel_dimensions', return_value=(3507, 4960)), \
-             patch('map_generator.calculate_bbox', return_value={'south': 57.0, 'north': 57.5, 'west': -3.0, 'east': -2.5}), \
-             patch('map_generator.convert_osm_to_shapefiles', return_value="/data"), \
-             patch('map_generator.create_mapnik_style', return_value="style.xml"), \
-             patch('map_generator.render_map', return_value=False) as mock_render:
-            
+
+        with patch("pathlib.Path.exists", return_value=True), patch(
+            "pathlib.Path.mkdir"
+        ), patch(
+            "map_generator.load_area_config",
+            return_value={
+                "center": {"lat": 57.3167, "lon": -2.8833},
+                "coverage": {"width_km": 8, "height_km": 12},
+                "scale": 25000,
+                "name": "Lumsden, Aberdeenshire",
+            },
+        ), patch(
+            "map_generator.load_output_format",
+            return_value={"width_mm": 297, "height_mm": 420, "dpi": 300},
+        ), patch(
+            "map_generator.calculate_pixel_dimensions", return_value=(3507, 4960)
+        ), patch(
+            "map_generator.calculate_bbox",
+            return_value={"south": 57.0, "north": 57.5, "west": -3.0, "east": -2.5},
+        ), patch(
+            "utils.data_pipeline.process_data_pipeline",
+            return_value=("/data", True, True),
+        ), patch(
+            "utils.quality_validation.run_enhanced_data_validation"
+        ), patch(
+            "utils.map_renderer.execute_map_rendering", return_value=False
+        ) as mock_render:
+
             result = map_generator.main()
-            
+
             # Should return failure code
             assert result == 1
             # Render should be attempted

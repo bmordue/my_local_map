@@ -59,6 +59,12 @@
       <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
       <PolygonSymbolizer fill="#c8facc" fill-opacity="0.8"/>
     </Rule>
+    <!-- Nature reserves -->
+    <Rule>
+      <Filter>[leisure] = 'nature_reserve'</Filter>
+      <PolygonSymbolizer fill="#27ae60" fill-opacity="0.3"/>
+      <LineSymbolizer stroke="#27ae60" stroke-width="1" stroke-opacity="0.8" stroke-dasharray="4,2"/>
+    </Rule>
   </Style>
 
   <!-- WATER -->
@@ -137,12 +143,37 @@
       <Filter>[highway] = 'cycleway'</Filter>
       <LineSymbolizer stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2" stroke-opacity="0.9"/>
     </Rule>
-    <!-- Commented out route filter as it's not available in OSM shapefiles
+    <!-- Hiking trails -->
     <Rule>
-      <Filter>[route] = 'hiking'</Filter>
+      <Filter>[other_tags].match('.*route.*hiking.*')</Filter>
       <LineSymbolizer stroke="#d35400" stroke-width="2.5" stroke-dasharray="5,3" stroke-opacity="0.9"/>
     </Rule>
-    -->
+    <!-- Horse riding trails -->
+    <Rule>
+      <Filter>[other_tags].match('.*horse.*yes.*')</Filter>
+      <LineSymbolizer stroke="#8e44ad" stroke-width="2" stroke-dasharray="6,4" stroke-opacity="0.8"/>
+    </Rule>
+  </Style>
+  
+  <!-- OUTDOOR RECREATION - Parks, trails, and activity areas -->
+  <Style name="recreation">
+    <Rule>
+      <Filter>[leisure] = 'park' or [leisure] = 'garden'</Filter>
+      <PolygonSymbolizer fill="#c8facc" fill-opacity="0.6"/>
+      <LineSymbolizer stroke="#27ae60" stroke-width="1" stroke-opacity="0.8"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'playground'</Filter>
+      <PolygonSymbolizer fill="#f9e79f" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'pitch'</Filter>
+      <PolygonSymbolizer fill="#f8c471" fill-opacity="0.6"/>
+    </Rule>
+    <Rule>
+      <Filter>[leisure] = 'track'</Filter>
+      <LineSymbolizer stroke="#e67e22" stroke-width="2" stroke-opacity="0.8"/>
+    </Rule>
   </Style>
   
   <!-- BUILDINGS -->
@@ -157,12 +188,12 @@
   <Style name="poi">
     <!-- Food & Drink -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*restaurant.*') or [other_tags].match('.*amenity.*cafe.*') or [other_tags].match('.*amenity.*pub.*')</Filter>
+      <Filter>[other_tags].match('.*amenity.*(restaurant|cafe|pub).*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/restaurant-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Accommodation -->
     <Rule>
-      <Filter>[other_tags].match('.*tourism.*hotel.*') or [other_tags].match('.*tourism.*guest_house.*') or [other_tags].match('.*tourism.*hostel.*') or [other_tags].match('.*tourism.*chalet.*') or [other_tags].match('.*tourism.*camp_site.*')</Filter>
+      <Filter>[other_tags].match('.*tourism.*(hotel|guest_house|hostel|chalet|camp_site).*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/lodging-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Attractions -->
@@ -188,7 +219,7 @@
     </Rule>
     <!-- Services -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*bank.*') or [other_tags].match('.*amenity.*post_office.*')</Filter>
+      <Filter>[other_tags].match('.*amenity.*(bank|post_office).*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/bank-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Shopping -->
@@ -216,7 +247,7 @@
     </Rule>
     <!-- Healthcare -->
     <Rule>
-      <Filter>[other_tags].match('.*amenity.*hospital.*') or [other_tags].match('.*amenity.*pharmacy.*') or [other_tags].match('.*amenity.*clinic.*')</Filter>
+      <Filter>[other_tags].match('.*amenity.*(hospital|pharmacy|clinic).*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/hospital-15.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Religious Sites -->
@@ -241,7 +272,7 @@
     </Rule>
     <!-- Generators -->
     <Rule>
-      <Filter>[other_tags].match('.*generator.*') or [other_tags].match('.*power.*generator.*')</Filter>
+      <Filter>[other_tags].match('.*generator.*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/power-wind-14.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
     <!-- Man Made -->
@@ -279,6 +310,11 @@
       <Filter>[other_tags].match('.*heritage.*')</Filter>
       <PointSymbolizer file="$ICONS_DIR/monument-14.svg" allow-overlap="true" ignore-placement="true"/>
     </Rule>
+    <!-- Castle -->
+    <Rule>
+      <Filter>[other_tags].match('.*castle.*')</Filter>
+      <PointSymbolizer file="$ICONS_DIR/castle-14.svg" allow-overlap="true" ignore-placement="true"/>
+    </Rule>
   </Style>
   
   <!-- PLACE NAMES - Hierarchical text labels -->
@@ -310,28 +346,28 @@
   <Style name="poi_labels">
     <!-- Schools and hospitals -->
     <Rule>
-      <Filter>[other_tags].match('.*school.*') or [other_tags].match('.*hospital.*')</Filter>
+      <Filter>[other_tags].match('.*(school|hospital).*')</Filter>
       <TextSymbolizer size="10" fill="#e74c3c" fontset-name="bold" 
                       dx="8" dy="0" halo-fill="#ffffff" halo-radius="1.5" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Pubs and restaurants -->
     <Rule>
-      <Filter>[other_tags].match('.*pub.*') or [other_tags].match('.*restaurant.*')</Filter>
+      <Filter>[other_tags].match('.*(pub|restaurant).*')</Filter>
       <TextSymbolizer size="9" fill="#8e44ad" fontset-name="regular" 
                       dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Religious buildings -->
     <Rule>
-      <Filter>[other_tags].match('.*place_of_worship.*') or [other_tags].match('.*church.*')</Filter>
+      <Filter>[other_tags].match('.*(place_of_worship|church).*')</Filter>
       <TextSymbolizer size="9" fill="#7f8c8d" fontset-name="italic" 
                       dx="8" dy="0" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
     </Rule>
     <!-- Natural features -->
     <Rule>
-      <Filter>[other_tags].match('.*peak.*') or [other_tags].match('.*hill.*')</Filter>
+      <Filter>[other_tags].match('.*(peak|hill).*')</Filter>
       <TextSymbolizer size="9" fill="#27ae60" fontset-name="italic" 
                       dx="0" dy="-8" halo-fill="#ffffff" halo-radius="1" 
                       allow-overlap="false" placement="point">[name]</TextSymbolizer>
@@ -465,6 +501,15 @@
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$DATA_DIR/points.shp</Parameter>
+    </Datasource>
+  </Layer>
+  
+  <!-- Recreation layer -->
+  <Layer name="recreation" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>recreation</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$DATA_DIR/multipolygons.shp</Parameter>
     </Datasource>
   </Layer>
   
