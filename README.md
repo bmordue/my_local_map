@@ -27,11 +27,6 @@ Render a local map suitable for printing.
 - GDAL/OGR tools
 - Mapnik rendering library
 
-<<<<<<< HEAD
-### Installation
-
-#### Option 1: Traditional Installation (Ubuntu/Debian)
-=======
 ### Nix shell
 
 This project provides a shell.nix to install dependencies and set up a development environment.
@@ -41,7 +36,6 @@ nix-shell
 ```
 
 ### Manual installation
->>>>>>> origin/main
 ```bash
 # Install system dependencies
 sudo apt-get update
