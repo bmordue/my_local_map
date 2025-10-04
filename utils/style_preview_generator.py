@@ -22,12 +22,7 @@ from utils.config import (
     load_area_config,
     load_output_format,
 )
-from utils.data_processing import (
-    calculate_bbox,
-    convert_osm_to_shapefiles,
-    process_elevation_and_contours,
-)
-from utils.elevation_processing import process_elevation_for_hillshading
+from utils.data_processing import calculate_bbox, convert_osm_to_shapefiles
 from utils.style_builder import build_mapnik_style
 
 logger = logging.getLogger(__name__)
@@ -229,29 +224,23 @@ def main():
         logger.info(f"Using existing shapefile data: {osm_data_dir}")
         osm_data_dir = str(osm_data_dir)
 
-    # Ensure contour data is available for preview generation
+    # Check if contour data already exists (do not download/generate)
     logger.info("Checking contour data availability...")
     contour_file = Path(osm_data_dir) / "contours.shp"
-    if not contour_file.exists():
-        logger.info("Generating contour data for previews...")
-        contour_data = process_elevation_and_contours(
-            bbox, osm_data_dir, contour_interval=10, enable_contours=True
-        )
-        if contour_data:
-            logger.info("Contour data ready for preview generation")
-        else:
-            logger.info(
-                "Could not generate contour data, previews will show without contours"
-            )
-    else:
+    if contour_file.exists():
         logger.info("Contour data already available")
+    else:
+        logger.info("No contour data available - run map_generator.py first to generate contours")
+        logger.info("Previews will show without contours")
 
-    # Process elevation data for hillshading if enabled
+    # Check if hillshade data already exists (do not download/generate)
     hillshade_available = False
-    hillshade_file = process_elevation_for_hillshading(bbox, area_config, osm_data_dir)
-    if hillshade_file:
+    hillshade_file = Path(osm_data_dir) / "hillshade.tif"
+    if hillshade_file.exists():
         hillshade_available = True
-        logger.info(f"Hillshading data available: {hillshade_file}")
+        logger.info(f"Using existing hillshading data: {hillshade_file}")
+    else:
+        logger.info("No hillshade data available - run map_generator.py first to generate hillshading")
 
     # Create area configs for hillshading variants
     area_config_no_hillshade = area_config.copy()
