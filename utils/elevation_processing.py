@@ -577,7 +577,6 @@ def _download_srtm_tile(lat, lon, output_file):
                     temp_file.unlink(missing_ok=True)
                     
             elif source_type == "gz":
-                import gzip
                 temp_file = output_file.with_suffix('.hgt.gz')
                 if _download_file_with_progress(source_url, temp_file):
                     if temp_file.stat().st_size > 1000:
@@ -603,7 +602,7 @@ def _download_srtm_tile(lat, lon, output_file):
                                 if tif_files:
                                     z.extract(tif_files[0], output_file.parent)
                                     extracted = output_file.parent / tif_files[0]
-                                    extracted.rename(output_file.with_suffix('.tif'))
+                                    extracted.rename(output_file)
                                     temp_file.unlink(missing_ok=True)
                                     logger.info(f"    Successfully downloaded from {source_name}")
                                     # Return the .tif file path
