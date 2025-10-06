@@ -225,13 +225,15 @@ def main():
         osm_data_dir = str(osm_data_dir)
 
     # Check if contour data already exists (do not download/generate)
+    contours_available = False
     logger.info("Checking contour data availability...")
     contour_file = Path(osm_data_dir) / "contours.shp"
     if contour_file.exists():
+        contours_available = True
         logger.info("Contour data already available")
     else:
         logger.info("No contour data available - run map_generator.py first to generate contours")
-        logger.info("Previews will show without contours")
+        logger.info("Contour-dependent styles will be skipped")
 
     # Check if hillshade data already exists (do not download/generate)
     hillshade_available = False
@@ -252,26 +254,33 @@ def main():
 
     # Define available styles including hillshading and contour line variants
     base_styles = [
-        ("tourist", "Tourist (Default)"),
-        ("tourist_no_contours", "Tourist - No Contours"),
-        ("tourist_contours_prominent", "Tourist - Prominent Contours"),
-        ("blue_theme", "Blue Theme"),
-        ("warm_theme", "Warm Theme"),
-        ("monochrome_theme", "Monochrome"),
-        ("delicate_theme", "Delicate Purple"),
-        ("high_contrast", "High Contrast"),
-        ("minimalist", "Minimalist"),
+        ("tourist", "Tourist (Default)", False),  # Third value: requires_contours
+        ("tourist_no_contours", "Tourist - No Contours", False),
+        ("tourist_contours_prominent", "Tourist - Prominent Contours", True),
+        ("blue_theme", "Blue Theme", False),
+        ("warm_theme", "Warm Theme", False),
+        ("monochrome_theme", "Monochrome", False),
+        ("delicate_theme", "Delicate Purple", False),
+        ("high_contrast", "High Contrast", False),
+        ("minimalist", "Minimalist", False),
     ]
 
     styles = []
 
     # Add standard versions (no hillshading)
-    for style_name, style_title in base_styles:
+    for style_name, style_title, requires_contours in base_styles:
+        # Skip styles that require contours if contours aren't available
+        if requires_contours and not contours_available:
+            logger.info(f"  Skipping {style_title} (requires contour data)")
+            continue
         styles.append((style_name, style_title, area_config_no_hillshade, False))
 
     # Add hillshading versions if available
     if hillshade_available:
-        for style_name, style_title in base_styles:
+        for style_name, style_title, requires_contours in base_styles:
+            # Skip styles that require contours if contours aren't available
+            if requires_contours and not contours_available:
+                continue
             hillshade_title = f"{style_title} + Hillshade"
             styles.append((style_name, hillshade_title, area_config, True))
 
