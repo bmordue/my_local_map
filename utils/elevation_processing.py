@@ -248,21 +248,21 @@ def download_elevation_data(
         logger.error("Supported sources: srtm, aster, os_terrain, eu_dem")
         return False
 
-    # If real DEM download failed
+    # If download failed, handle fallback
     if not success:
         if allow_synthetic_fallback:
-            logger.info("💡 Real DEM download failed, attempting synthetic fallback...")
-            return _create_synthetic_dem_fallback(bbox, output_file, resolution)
+            logger.info("  ⚠️ Real DEM download failed. Using synthetic fallback.")
+            if _create_synthetic_dem_fallback(bbox, output_file, resolution):
+                return True
+            else:
+                logger.error("  ❌ Synthetic DEM fallback creation failed.")
+                return False
         else:
-            logger.error(f"❌ Failed to download real DEM data from '{dem_source}' source")
-            logger.error("❌ Synthetic fallback is disabled in configuration")
-            logger.error("❌ Cannot proceed without elevation data")
-            raise RuntimeError(
-                f"DEM data download failed from '{dem_source}' source and synthetic fallback is disabled. "
-                f"Either enable synthetic fallback or ensure network connectivity to DEM data sources."
-            )
+            logger.warning("  ❌ Real DEM download failed. Synthetic fallback disabled.")
+            return False
 
-    return success
+    logger.info(f"✓ Elevation data saved to: {output_file}")
+    return True
 
 
 def _download_aster_elevation_data(bbox, output_file, resolution=30):
@@ -696,14 +696,14 @@ def _crop_dem_to_bbox(input_file, bbox, output_file):
 # Real DEM data sources should be used instead
 
 
-def generate_hillshade(dem_file, output_file, config):
+def generate_hillshade(dem_file, hillshade_file, config):
     """Generate hillshade from DEM using GDAL"""
     try:
         cmd = [
             "gdaldem",
             "hillshade",
             str(dem_file),
-            str(output_file),
+            str(hillshade_file),
             "-z",
             str(config.get("z_factor", 1.0)),
             "-s",
@@ -723,7 +723,7 @@ def generate_hillshade(dem_file, output_file, config):
             logger.info(f"Error generating hillshade: {result.stderr}")
             return False
 
-        logger.info(f"✓ Generated hillshade: {output_file}")
+        logger.info(f"✓ Generated hillshade: {hillshade_file}")
         return True
 
     except Exception as e:
