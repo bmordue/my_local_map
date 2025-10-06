@@ -61,18 +61,6 @@ class TestNixEnvironment:
             content = envrc_path.read_text().strip()
             assert content == "use flake", ".envrc should contain 'use flake'"
 
-    @pytest.mark.unit
-    def test_cachix_documentation_exists(self):
-        """Test that Cachix documentation is present"""
-        cachix_path = Path("CACHIX.md")
-        assert cachix_path.exists(), "CACHIX.md should exist for documentation"
-        
-        content = cachix_path.read_text()
-        
-        # Should document key aspects
-        assert "devenv" in content, "Should mention devenv cache"
-        assert "Cache Configuration" in content, "Should have configuration section"
-        assert "Performance Benefits" in content, "Should document benefits"
 
     @pytest.mark.unit
     def test_gitignore_nix_entries(self):

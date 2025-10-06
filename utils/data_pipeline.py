@@ -98,9 +98,14 @@ def process_data_pipeline(area_name, area_config, bbox, data_dir):
     # Only process if we have a valid data directory
     if osm_data_dir:
         logger.info("\n🏔️  Processing hillshading...")
-        hillshade_file = process_elevation_for_hillshading(
-            bbox, area_config, osm_data_dir
-        )
+        try:
+            hillshade_file = process_elevation_for_hillshading(
+                bbox, area_config, osm_data_dir
+            )
+        except RuntimeError as e:
+            logger.error(f"❌ Critical elevation data failure: {e}")
+            logger.error("❌ Cannot proceed without required DEM data")
+            return None, False, False
     else:
         logger.warning("Skipping hillshading due to missing OSM data directory")
         hillshade_file = None
