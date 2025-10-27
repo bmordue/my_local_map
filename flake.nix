@@ -15,19 +15,19 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # Minimal mapping dependencies (no PostgreSQL!)
-            python312
-            python312Packages.requests
-            python312Packages.python-mapnik
-            python312Packages.pytest
-            python312Packages.pytest-mock
-            python312Packages.pytest-cov
-            python312Packages.cairosvg
-            python312Packages.pillow
+            python311
+            python311Packages.requests
+            python311Packages.python-mapnik
+            python311Packages.pytest
+            python311Packages.pytest-mock
+            python311Packages.pytest-cov
+            python311Packages.cairosvg
+            python311Packages.pillow
             
             # Code formatting and linting
-            python312Packages.black
-            python312Packages.isort
-            python312Packages.flake8
+            python311Packages.black
+            python311Packages.isort
+            python311Packages.flake8
 
             # GDAL for OSM conversion
             gdal
@@ -41,7 +41,7 @@
             echo "🗺️  Lumsden Tourist Map Generator - Nix Development Environment"
             echo "=============================================================="
             echo "Made available:"
-            echo "  🐍 Python 3.12 + core packages (requests, Pillow)"
+            echo "  🐍 Python 3.11 + core packages (requests, Pillow)"
             echo "  🗺️  GDAL/OGR (for data conversion)"
             echo "  🎨 Mapnik (for map rendering)"
             echo "  🧪 pytest + pytest-mock + pytest-cov (for testing)"
