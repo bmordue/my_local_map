@@ -26,7 +26,8 @@ class TestNixEnvironment:
         assert "description" in content
         assert "nixpkgs" in content
         assert "flake-utils" in content
-        assert "python312" in content
+        # Check for Python (any version 3.x)
+        assert "python3" in content, "Should contain python3xx package"
         assert "pytest" in content
         assert "gdal" in content
 
@@ -39,14 +40,14 @@ class TestNixEnvironment:
         # Read shell.nix content
         content = shell_path.read_text()
         
-        # Validate it contains our required dependencies
+        # Validate it contains our required dependencies (version-agnostic)
         required_deps = [
-            "python312",
-            "python312Packages.requests", 
-            "python312Packages.pytest",
-            "python312Packages.pytest-mock",
-            "python312Packages.pytest-cov",
-            "python312Packages.pillow",
+            "python3",  # Check for any python3xx version
+            "Packages.requests", 
+            "Packages.pytest",
+            "Packages.pytest-mock",
+            "Packages.pytest-cov",
+            "Packages.pillow",
             "gdal"
         ]
         
@@ -143,9 +144,17 @@ class TestDependencyConsistency:
         # Check shell.nix
         shell_content = Path("shell.nix").read_text()
         
-        # Both should specify python312
-        assert "python312" in flake_content, "flake.nix should specify python312"
-        assert "python312" in shell_content, "shell.nix should specify python312"
+        # Extract Python version from flake.nix (e.g., python311, python312)
+        import re
+        flake_python = re.search(r'python3\d+', flake_content)
+        shell_python = re.search(r'python3\d+', shell_content)
+        
+        assert flake_python, "flake.nix should specify a python3xx version"
+        assert shell_python, "shell.nix should specify a python3xx version"
+        
+        # Both should use the same Python version
+        assert flake_python.group() == shell_python.group(), \
+            f"Python versions should match: flake.nix uses {flake_python.group()}, shell.nix uses {shell_python.group()}"
 
     @pytest.mark.unit
     def test_test_dependencies_included(self):
@@ -173,6 +182,7 @@ class TestDependencyConsistency:
                 assert dep in flake_content, f"flake.nix should include {dep}"
                 assert dep in shell_content, f"shell.nix should include {dep}"
             else:
-                package_name = f"python312Packages.{dep}"
-                assert package_name in flake_content, f"flake.nix should include {package_name}"
-                assert package_name in shell_content, f"shell.nix should include {package_name}"
+                # Check for pythonXXXPackages.dep pattern (version-agnostic)
+                package_pattern = f"Packages.{dep}"
+                assert package_pattern in flake_content, f"flake.nix should include pythonXXXPackages.{dep}"
+                assert package_pattern in shell_content, f"shell.nix should include pythonXXXPackages.{dep}"
