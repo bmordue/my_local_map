@@ -306,7 +306,7 @@ class OSDataProcessor:
                 "-nln",
                 product_key,
                 str(shapefile),
-                "/dev/null",
+                os.devnull,
                 "-dialect",
                 "sqlite",
                 "-sql",

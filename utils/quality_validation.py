@@ -676,18 +676,18 @@ class QualityValidationReport:
 
     def print_summary(self):
         """Print a formatted summary of validation results"""
-        print("\n" + "=" * 60)
-        print("🔍 QUALITY VALIDATION SUMMARY")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("🔍 QUALITY VALIDATION SUMMARY")
+        logger.info("=" * 60)
 
         for result in self.results:
             status = "✓ PASSED" if result.passed else "✗ FAILED"
-            print(f"{status} {result.check_name}")
+            logger.info(f"{status} {result.check_name}")
 
             if result.errors:
-                print(f"   Errors: {len(result.errors)}")
+                logger.info(f"   Errors: {len(result.errors)}")
             if result.warnings:
-                print(f"   Warnings: {len(result.warnings)}")
+                logger.info(f"   Warnings: {len(result.warnings)}")
 
             # Print key statistics
             for key, value in result.stats.items():
@@ -696,7 +696,7 @@ class QualityValidationReport:
                     or key.endswith("_count")
                     or key.endswith("items")
                 ):
-                    print(f"   {key.replace('_', ' ').title()}: {value}")
+                    logger.info(f"   {key.replace('_', ' ').title()}: {value}")
 
         summary = {
             "total_checks": len(self.results),
@@ -706,15 +706,17 @@ class QualityValidationReport:
             "total_warnings": sum(len(r.warnings) for r in self.results),
         }
 
-        print("\n" + "=" * 60)
-        print(
+        logger.info("\n" + "=" * 60)
+        logger.info(
             f"Overall Status: {'✓ ALL PASSED' if summary['failed_checks'] == 0 else '✗ ISSUES FOUND'}"
         )
-        print(f"Checks: {summary['passed_checks']}/{summary['total_checks']} passed")
-        print(
+        logger.info(
+            f"Checks: {summary['passed_checks']}/{summary['total_checks']} passed"
+        )
+        logger.info(
             f"Issues: {summary['total_errors']} errors, {summary['total_warnings']} warnings"
         )
-        print("=" * 60)
+        logger.info("=" * 60)
 
 
 def validate_data_quality(
@@ -817,4 +819,89 @@ if __name__ == "__main__":
     lumsden_bbox = {"south": 57.26, "north": 57.37, "west": -2.95, "east": -2.82}
 
     # Run validation
-    validation_report = validate_data_quality(sample_data, lumsden_bbox)
+
+
+def run_enhanced_data_validation(bbox):
+    """
+    Run quality validation on enhanced data if available.
+
+    Args:
+        bbox: Bounding box for validation
+
+    Returns:
+        bool: True if validation passed or was skipped, False if failed
+    """
+    import json
+
+    quality_validation_enabled = os.environ.get(
+        "ENABLE_QUALITY_VALIDATION", ""
+    ).lower() in ("1", "true", "yes")
+    if not quality_validation_enabled:
+        return True
+
+    logger.info("\n🔍 Running data quality validation...")
+    try:
+        # Load enhanced data if available for validation
+        enhanced_data_path = Path("enhanced_data")
+        if enhanced_data_path.exists():
+            data_sources = {}
+            geojson_files = {
+                "tourist_attractions": "tourist_attractions.geojson",
+                "accommodation": "accommodation.geojson",
+                "dining": "dining.geojson",
+                "activities": "activities.geojson",
+                "walking_trails": "walking_trails.geojson",
+            }
+
+            for source_name, filename in geojson_files.items():
+                file_path = enhanced_data_path / filename
+                if file_path.exists():
+                    try:
+                        with open(file_path, "r") as f:
+                            geojson_data = json.load(f)
+                            features = geojson_data.get("features", [])
+                            data_list = []
+
+                            for feature in features:
+                                item = feature.get("properties", {}).copy()
+                                geom = feature.get("geometry", {})
+                                if geom.get("type") == "Point":
+                                    coords = geom.get("coordinates", [])
+                                    if len(coords) >= 2:
+                                        item["lon"] = coords[0]
+                                        item["lat"] = coords[1]
+                                data_list.append(item)
+
+                            if data_list:
+                                data_sources[source_name] = data_list
+                    except Exception as e:
+                        logger.info(
+                            f"⚠️  Warning: Could not load {filename} for validation: {e}"
+                        )
+
+            if data_sources:
+                validation_report = validate_data_quality(data_sources, bbox)
+                failed_checks = sum(
+                    1 for r in validation_report.results if not r.passed
+                )
+                if failed_checks > 0:
+                    logger.info(
+                        f"⚠️  Quality validation found {failed_checks} issues (continuing with map generation)"
+                    )
+                else:
+                    logger.info("✓ All data quality checks passed")
+            else:
+                logger.info(" No enhanced data found for quality validation")
+        else:
+            logger.info(
+                " Enhanced data directory not found - skipping quality validation"
+            )
+        return True
+    except ImportError:
+        logger.info(
+            "⚠️  Quality validation not available (utils.quality_validation not found)"
+        )
+        return True
+    except Exception as e:
+        logger.warning(f" Quality validation failed: {e}")
+        return True

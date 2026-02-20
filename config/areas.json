@@ -10,7 +10,7 @@
     },
     "scale": 25000,
     "name": "Lumsden, Aberdeenshire",
-    "osm_file": "data/lumsden_area.osm",
+    "osm_file": "lumsden_area.osm",
     "contours": {
       "enabled": false,
       "interval": 10,
@@ -36,14 +36,23 @@
       "z_factor": 1.0,
       "scale": 111120
     },
+    "elevation": {
+      "source": "srtm",
+      "resolution": 30,
+      "allow_synthetic_fallback": false
+    },
     "ordnance_survey": {
       "enabled": true,
-      "layers": ["roads", "boundaries", "rights_of_way"],
+      "layers": [
+        "roads",
+        "boundaries",
+        "rights_of_way"
+      ],
       "style": {
         "roads": {
           "primary_color": "#CC6600",
           "primary_width": 2.0,
-          "secondary_color": "#FF9933", 
+          "secondary_color": "#FF9933",
           "secondary_width": 1.5,
           "tertiary_color": "#FFCC99",
           "tertiary_width": 1.0
@@ -65,10 +74,7 @@
           "byway_width": 1.5
         }
       },
-      "priority": "overlay",
-      "elevation": {
-        "source": "srtm",
-        "resolution": 30
+      "priority": "overlay"
     }
   },
   "balmoral_castle": {
@@ -110,13 +116,14 @@
     },
     "elevation": {
       "source": "srtm",
-      "resolution": 30
+      "resolution": 30,
+      "allow_synthetic_fallback": false
     }
   },
   "crathes_castle": {
     "center": {
-      "lat": 57.2910,
-      "lon": -2.5290
+      "lat": 57.291,
+      "lon": -2.529
     },
     "coverage": {
       "width_km": 8,

@@ -9,15 +9,12 @@ import tempfile
 from unittest.mock import MagicMock, patch
 
 import pytest
-from utils.quality_validation import (
-    AttributeValidator,
-    CoordinateValidator,
-    CrossReferenceValidator,
-    QualityValidationReport,
-    TemporalValidator,
-    ValidationResult,
-    validate_data_quality,
-)
+
+from utils.quality_validation import (AttributeValidator, CoordinateValidator,
+                                      CrossReferenceValidator,
+                                      QualityValidationReport,
+                                      TemporalValidator, ValidationResult,
+                                      validate_data_quality)
 
 
 class TestValidationResult:

@@ -9,12 +9,10 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
-from utils.data_processing import (
-    calculate_bbox,
-    convert_osm_to_shapefiles,
-    download_osm_data,
-    validate_osm_data_quality,
-)
+
+from utils.data_processing import (calculate_bbox, convert_osm_to_shapefiles,
+                                   download_osm_data,
+                                   validate_osm_data_quality)
 
 
 class TestOSMIntegration:

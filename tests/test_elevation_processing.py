@@ -4,12 +4,10 @@ import tempfile
 import unittest
 from unittest.mock import mock_open, patch
 
-from utils.elevation_processing import (
-    calculate_elevation_bbox,
-    download_elevation_data,
-    generate_hillshade,
-    process_elevation_for_hillshading,
-)
+from utils.elevation_processing import (calculate_elevation_bbox,
+                                        download_elevation_data,
+                                        generate_hillshade,
+                                        process_elevation_for_hillshading)
 
 
 class TestElevationProcessing(unittest.TestCase):
@@ -70,37 +68,49 @@ class TestElevationProcessing(unittest.TestCase):
         self.assertGreater(width, original_width)
         self.assertGreater(height, original_height)
 
-    @patch("subprocess.run")
-    @patch("builtins.open", new_callable=mock_open)
-    def test_download_elevation_data_success(self, mock_file, mock_subprocess):
-        """Test successful elevation data generation"""
-        # Mock successful subprocess call
-        mock_subprocess.return_value.returncode = 0
-        mock_subprocess.return_value.stderr = ""
-
+    @patch("utils.elevation_processing._download_srtm_elevation_data", return_value=False)
+    def test_download_elevation_data_no_real_dem(self, mock_download):
+        """Test that elevation data download returns False when real DEM sources unavailable and fallback disabled"""
         with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
+            # Test SRTM source - should return False with fallback disabled
             result = download_elevation_data(
-                self.test_bbox, temp_file.name, force_subprocess=True
+                self.test_bbox,
+                temp_file.name,
+                dem_source="srtm",
+                allow_synthetic_fallback=False,
             )
+            self.assertFalse(result)
 
-            self.assertTrue(result)
-            # Should call gdal_translate
-            mock_subprocess.assert_called()
-            call_args = mock_subprocess.call_args[0][0]
-            self.assertIn("gdal_translate", call_args)
+            # Test other DEM sources - should also return False
+            for source in ["aster", "os_terrain", "eu_dem"]:
+                result = download_elevation_data(
+                    self.test_bbox,
+                    temp_file.name,
+                    dem_source=source,
+                    allow_synthetic_fallback=False,
+                )
+                self.assertFalse(result)
 
-    @patch("subprocess.run")
-    def test_download_elevation_data_failure(self, mock_subprocess):
-        """Test elevation data generation failure"""
-        # Mock failed subprocess call
-        mock_subprocess.return_value.returncode = 1
-        mock_subprocess.return_value.stderr = "Error message"
+            # Test unknown source - should return False
+            result = download_elevation_data(
+                self.test_bbox,
+                temp_file.name,
+                dem_source="unknown",
+                allow_synthetic_fallback=False,
+            )
+            self.assertFalse(result)
 
+    @patch("utils.elevation_processing._download_srtm_elevation_data", return_value=False)
+    def test_download_elevation_data_failure(self, mock_download):
+        """Test elevation data download failure when real DEM unavailable and fallback disabled"""
         with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
+            # Should return False with fallback disabled
             result = download_elevation_data(
-                self.test_bbox, temp_file.name, force_subprocess=True
+                self.test_bbox,
+                temp_file.name,
+                dem_source="srtm",
+                allow_synthetic_fallback=False,
             )
-
             self.assertFalse(result)
 
     @patch("subprocess.run")
@@ -220,6 +230,70 @@ class TestElevationProcessing(unittest.TestCase):
         self.assertEqual(config["altitude"], 45)
         self.assertEqual(config["z_factor"], 1.0)
         self.assertEqual(config["scale"], 111120)
+
+    @patch("utils.elevation_processing._download_srtm_elevation_data")
+    @patch("utils.elevation_processing._create_synthetic_dem_fallback")
+    def test_download_elevation_data_with_fallback_disabled(
+        self, mock_synthetic, mock_srtm
+    ):
+        """Test download with synthetic fallback disabled"""
+        mock_srtm.return_value = False
+
+        with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
+            result = download_elevation_data(
+                self.test_bbox,
+                temp_file.name,
+                dem_source="srtm",
+                allow_synthetic_fallback=False,
+            )
+            self.assertFalse(result)
+            # Synthetic fallback should not be called
+            mock_synthetic.assert_not_called()
+
+    @patch("utils.elevation_processing._download_srtm_elevation_data")
+    @patch("utils.elevation_processing._create_synthetic_dem_fallback")
+    def test_download_elevation_data_with_fallback_enabled(
+        self, mock_synthetic, mock_srtm
+    ):
+        """Test that download_elevation_data uses synthetic fallback when real download fails and fallback is enabled"""
+        # Mock failed real download, successful synthetic fallback
+        mock_srtm.return_value = False
+        mock_synthetic.return_value = True
+
+        with tempfile.NamedTemporaryFile(suffix=".tif") as temp_file:
+            # Test with fallback enabled - should succeed
+            result = download_elevation_data(
+                self.test_bbox,
+                temp_file.name,
+                dem_source="srtm",
+                allow_synthetic_fallback=True,
+            )
+
+            self.assertTrue(result)
+            # Verify synthetic fallback was called
+            mock_synthetic.assert_called_once()
+
+    @patch("utils.elevation_processing.download_elevation_data")
+    def test_process_elevation_for_hillshading_dem_failure(self, mock_download):
+        """Test that process_elevation_for_hillshading propagates RuntimeError from DEM download failure"""
+        # Mock download raising RuntimeError
+        mock_download.side_effect = RuntimeError(
+            "DEM data download failed from 'srtm' source and synthetic fallback is disabled"
+        )
+
+        area_config_no_fallback = {
+            "hillshading": {"enabled": True},
+            "elevation": {"source": "srtm", "allow_synthetic_fallback": False},
+        }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Should propagate the RuntimeError
+            with self.assertRaises(RuntimeError) as context:
+                process_elevation_for_hillshading(
+                    self.test_bbox, area_config_no_fallback, temp_dir
+                )
+
+            self.assertIn("DEM data download failed", str(context.exception))
 
 
 if __name__ == "__main__":

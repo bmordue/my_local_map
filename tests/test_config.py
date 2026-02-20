@@ -5,11 +5,9 @@ from pathlib import Path
 from unittest.mock import mock_open, patch
 
 import pytest
-from utils.config import (
-    calculate_pixel_dimensions,
-    load_area_config,
-    load_output_format,
-)
+
+from utils.config import (calculate_pixel_dimensions, load_area_config,
+                          load_output_format)
 
 
 class TestConfigUtilities:
