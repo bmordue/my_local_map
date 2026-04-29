@@ -123,7 +123,7 @@ enhanced_data/
 
 ### Phase 2: Content Expansion 
 - [ ] Integrate live OSM data with proper coordinates
-- [ ] Add elevation data and contour lines
+- [x] Add elevation data and contour lines
 - [ ] Include Ordnance Survey data layers
 - [ ] Add real-time information (weather, events)
 - [x] Implement quality validation systems

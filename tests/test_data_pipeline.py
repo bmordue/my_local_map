@@ -85,9 +85,6 @@ class TestDataPipeline:
         ), patch(
             "utils.data_pipeline.convert_osm_to_shapefiles", return_value="osm_data"
         ), patch(
-            "utils.data_pipeline.process_elevation_and_contours",
-            return_value={"interval": 10},
-        ), patch(
             "utils.data_pipeline.process_elevation_for_hillshading",
             return_value="hillshade.tif",
         ):
@@ -124,9 +121,6 @@ class TestDataPipeline:
         ), patch(
             "utils.data_pipeline.convert_osm_to_shapefiles", return_value="osm_data"
         ), patch(
-            "utils.data_pipeline.process_elevation_and_contours",
-            return_value={"interval": 10},
-        ), patch(
             "utils.data_pipeline.process_elevation_for_hillshading", return_value=None
         ):
 
@@ -137,3 +131,33 @@ class TestDataPipeline:
             assert success is True
             assert osm_data_dir == "osm_data"
             assert hillshade_available is False
+
+    @pytest.mark.unit
+    def test_process_data_pipeline_passes_contour_config(
+        self, sample_area_config, sample_bbox
+    ):
+        """Pipeline forwards the area_config (with contours) to elevation processing.
+
+        Contour generation is performed inside process_elevation_for_hillshading,
+        which inspects area_config["contours"]. Verify the config is passed through.
+        """
+        with patch(
+            "utils.data_pipeline.prepare_osm_data",
+            return_value=("data/lumsden_area.osm", True),
+        ), patch(
+            "utils.data_pipeline.convert_osm_to_shapefiles", return_value="osm_data"
+        ), patch(
+            "utils.data_pipeline.process_elevation_for_hillshading",
+            return_value="hillshade.tif",
+        ) as mock_elev:
+
+            process_data_pipeline(
+                "lumsden", sample_area_config, sample_bbox, Path("data")
+            )
+
+            mock_elev.assert_called_once_with(
+                sample_bbox, sample_area_config, "osm_data"
+            )
+            # The forwarded config must enable contours so they get generated.
+            forwarded_config = mock_elev.call_args[0][1]
+            assert forwarded_config["contours"]["enabled"] is True
