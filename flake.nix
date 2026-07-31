@@ -2,7 +2,7 @@
   description = "Lumsden Tourist Map Generator - A Python-based map generator using OpenStreetMap data";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/2dad7af78a183b6c486702c18af8a9544f298377";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
