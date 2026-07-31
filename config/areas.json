@@ -12,7 +12,7 @@
     "name": "Lumsden, Aberdeenshire",
     "osm_file": "lumsden_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -39,7 +39,7 @@
     "elevation": {
       "source": "srtm",
       "resolution": 30,
-      "allow_synthetic_fallback": true
+      "allow_synthetic_fallback": false
     }
   },
   "balmoral_castle": {
@@ -55,7 +55,7 @@
     "name": "Balmoral Castle, Aberdeenshire",
     "osm_file": "data/balmoral_castle_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -81,7 +81,8 @@
     },
     "elevation": {
       "source": "srtm",
-      "resolution": 30
+      "resolution": 30,
+      "allow_synthetic_fallback": false
     }
   },
   "crathes_castle": {
@@ -97,7 +98,7 @@
     "name": "Crathes Castle, Aberdeenshire",
     "osm_file": "data/crathes_castle_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -139,7 +140,7 @@
     "name": "Dunnottar Castle, Aberdeenshire",
     "osm_file": "data/dunnottar_castle_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -223,7 +224,7 @@
     "name": "Fraserburgh, Aberdeenshire",
     "osm_file": "data/fraserburgh_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -265,7 +266,7 @@
     "name": "Peterhead, Aberdeenshire",
     "osm_file": "data/peterhead_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -307,7 +308,7 @@
     "name": "Huntly, Aberdeenshire",
     "osm_file": "data/huntly_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -349,7 +350,7 @@
     "name": "Stonehaven, Aberdeenshire",
     "osm_file": "data/stonehaven_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {
@@ -433,7 +434,7 @@
     "name": "Ythan Estuary, Aberdeenshire",
     "osm_file": "data/ythan_estuary_area.osm",
     "contours": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10,
       "major_interval": 50,
       "style": {

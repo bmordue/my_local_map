@@ -74,7 +74,13 @@ class TestDEMSources(unittest.TestCase):
         self.assertTrue(_is_bbox_in_europe(self.test_bbox_uk))  # UK is in Europe
         self.assertFalse(_is_bbox_in_europe(self.test_bbox_global))
 
-    def test_download_elevation_data_all_sources(self):
+    @patch("utils.elevation_processing._download_srtm_elevation_data", return_value=False)
+    @patch("utils.elevation_processing._download_aster_elevation_data", return_value=False)
+    @patch("utils.elevation_processing._download_os_terrain_data", return_value=False)
+    @patch("utils.elevation_processing._download_eu_dem_data", return_value=False)
+    def test_download_elevation_data_all_sources(
+        self, mock_eu, mock_os, mock_aster, mock_srtm
+    ):
         """Test all DEM source options"""
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "test_elevation.tif"
@@ -133,7 +139,8 @@ class TestDEMSources(unittest.TestCase):
             )
             self.assertFalse(result)
 
-    def test_os_terrain_uk_only(self):
+    @patch("utils.elevation_processing._download_os_terrain_data", return_value=False)
+    def test_os_terrain_uk_only(self, mock_download):
         """Test OS Terrain is only used for UK areas"""
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "test_elevation.tif"
@@ -156,7 +163,8 @@ class TestDEMSources(unittest.TestCase):
             )
             self.assertFalse(result)
 
-    def test_eu_dem_europe_only(self):
+    @patch("utils.elevation_processing._download_eu_dem_data", return_value=False)
+    def test_eu_dem_europe_only(self, mock_download):
         """Test EU-DEM is only used for European areas"""
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "test_elevation.tif"

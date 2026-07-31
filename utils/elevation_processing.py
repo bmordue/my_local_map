@@ -2,6 +2,7 @@
 Elevation data processing and hillshading utilities
 """
 
+import gzip
 import logging
 import math
 import os
@@ -226,6 +227,9 @@ def download_elevation_data(
 
     Returns:
         bool: True if successful, False otherwise
+    
+    Raises:
+        RuntimeError: If real DEM download fails and synthetic fallback is disabled
     """
     logger.info(f"📊 Attempting to download real elevation data from {dem_source}...")
 
@@ -244,12 +248,21 @@ def download_elevation_data(
         logger.error("Supported sources: srtm, aster, os_terrain, eu_dem")
         return False
 
-    # If real DEM download failed and synthetic fallback is allowed
-    if not success and allow_synthetic_fallback:
-        logger.info("💡 Real DEM download failed, attempting synthetic fallback...")
-        return _create_synthetic_dem_fallback(bbox, output_file, resolution)
+    # If download failed, handle fallback
+    if not success:
+        if allow_synthetic_fallback:
+            logger.info("  ⚠️ Real DEM download failed. Using synthetic fallback.")
+            if _create_synthetic_dem_fallback(bbox, output_file, resolution):
+                return True
+            else:
+                logger.error("  ❌ Synthetic DEM fallback creation failed.")
+                return False
+        else:
+            logger.warning("  ❌ Real DEM download failed. Synthetic fallback disabled.")
+            return False
 
-    return success
+    logger.info(f"✓ Elevation data saved to: {output_file}")
+    return True
 
 
 def _download_aster_elevation_data(bbox, output_file, resolution=30):
@@ -500,37 +513,117 @@ def _download_srtm_elevation_data(bbox, output_file, resolution=30):
 
 
 def _download_srtm_tile(lat, lon, output_file):
-    """Download a single SRTM tile"""
+    """Download a single SRTM tile from public sources"""
     tile_name = _format_srtm_tile_name(lat, lon)
-
-    # Try multiple SRTM data sources
+    
+    # Format tile name components for different sources
+    lat_prefix = "N" if lat >= 0 else "S"
+    lon_prefix = "E" if lon >= 0 else "W"
+    lat_str = f"{abs(int(lat)):02d}"
+    lon_str = f"{abs(int(lon)):03d}"
+    
+    # Calculate SRTM tile grid (CGIAR uses 5x5 degree blocks)
+    tile_lat = (lat // 5) * 5 + 1
+    tile_lon = (lon // 5) * 5 + 1
+    
+    # SRTM data sources (as of 2025)
+    # Note: Many SRTM sources now require authentication or have moved
     srtm_sources = [
-        # USGS SRTM 1-arc second data via public mirror
-        f"https://cloud.sdsc.edu/v1/datasetsearch/download/SRTM_GL1/{tile_name}",
-        # Alternative: NASA's SRTM data via OpenTopography
-        f"https://opentopography.org/API/globaldem?demtype=SRTM_GL1&south={lat}&north={lat+1}&west={lon}&east={lon+1}&outputFormat=GTiff",
-        # CGIAR SRTM data (backup)
-        f"https://srtm.csi.cgiar.org/wp-content/uploads/files/srtm_5x5/TIFF/{tile_name.replace('.hgt', '.tif')}",
+        # 1. ViewfinderPanoramas - Reliable, free SRTM3 (90m) data
+        {
+            "url": f"http://viewfinderpanoramas.org/dem3/{lat_prefix}{lat_str}{lon_prefix}{lon_str}.hgt.zip",
+            "type": "zip",
+            "name": "ViewfinderPanoramas"
+        },
+        # 2. DWTKNS (Derek Watkins) - SRTM mirror, very reliable
+        {
+            "url": f"https://elevation-tiles-prod.s3.amazonaws.com/skadi/{lat_prefix}{lat_str}/{lat_prefix}{lat_str}{lon_prefix}{lon_str}.hgt.gz",
+            "type": "gz",
+            "name": "AWS Terrain Tiles"
+        },
+        # 3. CGIAR-CSI - 5x5 degree tiles (fallback)
+        {
+            "url": f"http://srtm.csi.cgiar.org/wp-content/uploads/files/srtm_5x5/TIFF/srtm_{abs(tile_lon):02d}_{abs(tile_lat):02d}.zip",
+            "type": "zip_tif",
+            "name": "CGIAR-CSI"
+        },
     ]
 
-    for source_url in srtm_sources:
+    for source in srtm_sources:
         try:
-            logger.info(f"    🌐 Trying source: {source_url.split('/')[2]}")
-
-            if _download_file_with_progress(source_url, output_file):
-                # Verify file is valid
-                if output_file.stat().st_size > 1000:  # Basic size check
-                    logger.info(f"    ✓ Successfully downloaded {tile_name}")
-                    return True
-                else:
-                    logger.info(f"    ❌ Downloaded file too small, trying next source")
-                    output_file.unlink(missing_ok=True)
+            source_url = source["url"]
+            source_type = source["type"]
+            source_name = source["name"]
+            
+            logger.info(f"    Trying source: {source_name}")
+            
+            # Handle different compression formats
+            if source_type == "zip":
+                temp_file = output_file.with_suffix('.zip')
+                if _download_file_with_progress(source_url, temp_file):
+                    if temp_file.stat().st_size > 1000:
+                        try:
+                            with zipfile.ZipFile(temp_file, 'r') as z:
+                                hgt_files = [f for f in z.namelist() if f.endswith('.hgt')]
+                                if hgt_files:
+                                    z.extract(hgt_files[0], output_file.parent)
+                                    extracted = output_file.parent / hgt_files[0]
+                                    extracted.rename(output_file)
+                                    temp_file.unlink(missing_ok=True)
+                                    logger.info(f"    Successfully downloaded {tile_name} from {source_name}")
+                                    return True
+                        except zipfile.BadZipFile:
+                            logger.info(f"    Invalid zip file from {source_name}")
+                    temp_file.unlink(missing_ok=True)
+                    
+            elif source_type == "gz":
+                temp_file = output_file.with_suffix('.hgt.gz')
+                if _download_file_with_progress(source_url, temp_file):
+                    if temp_file.stat().st_size > 1000:
+                        try:
+                            with gzip.open(temp_file, 'rb') as f_in:
+                                with open(output_file, 'wb') as f_out:
+                                    f_out.write(f_in.read())
+                            temp_file.unlink(missing_ok=True)
+                            logger.info(f"    Successfully downloaded {tile_name} from {source_name}")
+                            return True
+                        except Exception as e:
+                            logger.info(f"    Failed to decompress: {e}")
+                    temp_file.unlink(missing_ok=True)
+                    
+            elif source_type == "zip_tif":
+                # CGIAR tiles are 5x5 degree GeoTIFF files in zip
+                temp_file = output_file.with_suffix('.zip')
+                if _download_file_with_progress(source_url, temp_file):
+                    if temp_file.stat().st_size > 1000:
+                        try:
+                            with zipfile.ZipFile(temp_file, 'r') as z:
+                                tif_files = [f for f in z.namelist() if f.endswith('.tif')]
+                                if tif_files:
+                                    z.extract(tif_files[0], output_file.parent)
+                                    extracted = output_file.parent / tif_files[0]
+                                    extracted.rename(output_file)
+                                    temp_file.unlink(missing_ok=True)
+                                    logger.info(f"    Successfully downloaded from {source_name}")
+                                    # Return the .tif file path
+                                    return True
+                        except Exception as e:
+                            logger.info(f"    Failed to extract: {e}")
+                    temp_file.unlink(missing_ok=True)
+            else:
+                # Direct download
+                if _download_file_with_progress(source_url, output_file):
+                    if output_file.stat().st_size > 1000:
+                        logger.info(f"    Successfully downloaded {tile_name} from {source_name}")
+                        return True
+                    else:
+                        output_file.unlink(missing_ok=True)
 
         except Exception as e:
-            logger.info(f"    ❌ Source failed: {e}")
-            output_file.unlink(missing_ok=True)
+            logger.info(f"    Source {source['name']} failed: {e}")
             continue
 
+    logger.info(f"  All sources failed for tile {tile_name}")
     return False
 
 
@@ -602,14 +695,14 @@ def _crop_dem_to_bbox(input_file, bbox, output_file):
 # Real DEM data sources should be used instead
 
 
-def generate_hillshade(dem_file, output_file, config):
+def generate_hillshade(dem_file, hillshade_file, config):
     """Generate hillshade from DEM using GDAL"""
     try:
         cmd = [
             "gdaldem",
             "hillshade",
             str(dem_file),
-            str(output_file),
+            str(hillshade_file),
             "-z",
             str(config.get("z_factor", 1.0)),
             "-s",
@@ -629,7 +722,7 @@ def generate_hillshade(dem_file, output_file, config):
             logger.info(f"Error generating hillshade: {result.stderr}")
             return False
 
-        logger.info(f"✓ Generated hillshade: {output_file}")
+        logger.info(f"✓ Generated hillshade: {hillshade_file}")
         return True
 
     except Exception as e:
@@ -670,14 +763,19 @@ def process_elevation_for_hillshading(bbox, area_config, data_dir):
     allow_fallback = elevation_config.get("allow_synthetic_fallback", True)
 
     # Download/generate elevation data
-    if not download_elevation_data(
-        elev_bbox,
-        dem_file,
-        dem_source=dem_source,
-        allow_synthetic_fallback=allow_fallback,
-    ):
-        logger.error("Failed to obtain elevation data from any source")
-        return None
+    try:
+        if not download_elevation_data(
+            elev_bbox,
+            dem_file,
+            dem_source=dem_source,
+            allow_synthetic_fallback=allow_fallback,
+        ):
+            logger.error("Failed to obtain elevation data from any source")
+            return None
+    except RuntimeError as e:
+        # Re-raise the exception to propagate the failure
+        logger.error(f"Critical DEM data failure: {e}")
+        raise e
 
     # Generate hillshade if enabled
     hillshade_result = None

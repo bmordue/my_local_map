@@ -3,21 +3,21 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     # Minimal mapping dependencies (no PostgreSQL!)
-    python312
-    python312Packages.requests
-    python312Packages.python-mapnik
-    python312Packages.pytest
-    python312Packages.pytest-mock
-    python312Packages.pytest-cov
-    python312Packages.cairosvg
-    python312Packages.pillow
-    python312Packages.gdal  # GDAL Python bindings (osgeo module)
-    python312Packages.numpy # For elevation processing
+    python311
+    python311Packages.requests
+    python311Packages.python-mapnik
+    python311Packages.pytest
+    python311Packages.pytest-mock
+    python311Packages.pytest-cov
+    python311Packages.cairosvg
+    python311Packages.pillow
+    python311Packages.gdal  # GDAL Python bindings (osgeo module)
+    python311Packages.numpy # For elevation processing
 
     # dev dependencies, linting etc
-    python312Packages.flake8
-    python312Packages.black
-    python312Packages.isort
+    python311Packages.flake8
+    python311Packages.black
+    python311Packages.isort
 
     # GDAL for OSM conversion
     gdal
@@ -33,7 +33,7 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "Made available:"
-    echo "  Python 3.12 + requests + Pillow"
+    echo "  Python 3.11 + requests + Pillow"
     echo "  GDAL/OGR (for data conversion)"
     echo "  GDAL Python bindings (osgeo module)"
     echo "  Mapnik (for rendering)"
